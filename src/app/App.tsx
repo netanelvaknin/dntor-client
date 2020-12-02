@@ -5,7 +5,7 @@ import rootContext from "../context/root/rootContext";
 import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
 
-import { Button } from "../ui";
+import { Button, Card } from "../ui";
 // const Home = lazy(() => import("./pages/home/Home"));
 
 const App = () => {
@@ -15,15 +15,28 @@ const App = () => {
 
   return (
     <BlockUi blocking={rootState && rootState.loading} keepInView>
-      <Button variant="text" onClick={() => console.log("lol")}>
-        נסיון
-      </Button>
       <br />
       <br />
-      <Button variant="outlined">נסיון</Button>
       <br />
       <br />
-      <Button variant="contained">נסיון</Button>
+      <Card expandable cardTitle="כותרת לכרטיסיה">
+        <Button variant="text" onClick={() => console.log("lol")}>
+          נסיון
+        </Button>
+        <br />
+        <br />
+        <Button variant="outlined">נסיון</Button>
+        <br />
+        <br />
+        <br />
+        <br />
+      </Card>
+      <br />
+      <br />
+      <br />
+      <Card>
+        <Button variant="contained">נסיון</Button>
+      </Card>
 
       <Switch>
         {appRoutes.map((route) => (

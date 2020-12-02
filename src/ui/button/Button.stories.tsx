@@ -1,8 +1,7 @@
-import { Button } from "../ui/button/Button";
+import { Button } from "./Button";
 
 export default {
   title: "UI/Button",
-  component: Button,
 };
 
 export const TextButton = () => <Button variant="text">טקסט</Button>;
