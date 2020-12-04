@@ -26,16 +26,16 @@ const AppContainer = (props: any) => {
   return (
     <Suspense fallback={<div>Loading</div>}>
       <Router>
-        <RTL>
-          <StylesProvider injectFirst>
-            <MuiThemeProvider theme={theme}>
-              <ThemeProvider theme={theme}>
-                <GlobalStyles />
+        <StylesProvider injectFirst>
+          <MuiThemeProvider theme={theme}>
+            <ThemeProvider theme={theme}>
+              <GlobalStyles />
+              <RTL>
                 <ContextContainer>{props.children}</ContextContainer>
-              </ThemeProvider>
-            </MuiThemeProvider>
-          </StylesProvider>
-        </RTL>
+              </RTL>
+            </ThemeProvider>
+          </MuiThemeProvider>
+        </StylesProvider>
       </Router>
     </Suspense>
   );
