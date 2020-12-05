@@ -3,10 +3,11 @@ import { DaysPickerContainer, DayButtonWrapper } from "./DaysPickerStyle";
 import { Button } from "@material-ui/core";
 
 interface DaysPickerProps {
+  className?: string;
   onChange: (days: { active: boolean; day: string }[]) => void;
 }
 
-export const DaysPicker = ({ onChange }: DaysPickerProps) => {
+export const DaysPicker = ({ className, onChange }: DaysPickerProps) => {
   const [days, setDays] = useState([
     { active: true, day: "א" },
     { active: true, day: "ב" },
@@ -31,7 +32,7 @@ export const DaysPicker = ({ onChange }: DaysPickerProps) => {
   };
 
   return (
-    <DaysPickerContainer>
+    <DaysPickerContainer className={className}>
       {days.map(({ day, active }) => {
         return (
           <DayButtonWrapper active={active} key={day}>

@@ -29,6 +29,11 @@ export default createMuiTheme({
         margin: '.5rem 0'
       }
     },
+    MuiTypography: {
+      body1: {
+        fontSize: '1.8rem'
+      }
+    },
     MuiButton: {
       label: {
         fontSize: '1.8rem',

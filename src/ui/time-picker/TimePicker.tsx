@@ -5,10 +5,11 @@ import { useTimePickerStyles } from "./TimePickerStyle";
 
 interface TimePickerProps {
   value: Moment | (() => MaterialUiPickersDate) | null;
+  className?: string;
   onChange: any;
 }
 
-export const TimePicker = ({ value, onChange }: TimePickerProps) => {
+export const TimePicker = ({ value, className, onChange }: TimePickerProps) => {
   const classes = useTimePickerStyles();
 
   return (
@@ -19,6 +20,7 @@ export const TimePicker = ({ value, onChange }: TimePickerProps) => {
       cancelLabel="ביטול"
       ampm={false}
       InputProps={{ className: classes.input }}
+      className={className}
       onChange={onChange}
     />
   );
