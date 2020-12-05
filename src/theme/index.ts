@@ -32,6 +32,9 @@ export default createMuiTheme({
     MuiTypography: {
       body1: {
         fontSize: '1.8rem'
+      },
+      h2: {
+        fontSize: '1.8rem'
       }
     },
     MuiButton: {
@@ -50,6 +53,6 @@ export default createMuiTheme({
       root: {
         fontSize: '1.8rem'
       }
-    }
+    },
   }
 });

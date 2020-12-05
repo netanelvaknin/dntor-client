@@ -5,26 +5,16 @@ import rootContext from "../context/root/rootContext";
 import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
 
-// const Home = lazy(() => import("./pages/home/Home"));
-
-import { DaysPicker, Checkbox } from "../ui";
+const Login = lazy(() => import("../pages/login/Login"));
 
 const App = () => {
-  const [checked, setChecked] = useState(false);
   const rootState = useContext(rootContext);
-  const appRoutes = [{ path: "/", component: <div></div>, label: "דף הבית" }];
+  const appRoutes = [
+    { path: "/login", component: <Login />, label: "login page" },
+  ];
 
   return (
     <BlockUi blocking={rootState && rootState.loading} keepInView>
-      <Checkbox
-        name="Netanel"
-        checked={checked}
-        label="זכור אותי"
-        onChange={(e) => {
-          setChecked(e.target.checked);
-          console.log(checked);
-        }}
-      />
       <Switch>
         {appRoutes.map((route) => (
           <Route key={route.path} exact path={route.path}>

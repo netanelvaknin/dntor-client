@@ -24,13 +24,13 @@ export const Button = ({
       variant={variant}
       disabled={disabled}
       startIcon={startIcon}
+      className={className}
       classes={{
         root: classes.root,
         outlined: classes.outlined,
         text: classes.text,
         contained: classes.contained,
       }}
-      className={className}
       onClick={onClick}
     >
       {children}

@@ -6,7 +6,7 @@ export default {
   title: "UI/DayPicker",
 };
 
-export const Buttons = () => {
+export const DayPicker = () => {
   const [days, setDays] = useState<{ active: boolean; day: string }[]>([]);
 
   return (

@@ -6,6 +6,7 @@ interface TextFieldProps {
   type?: "text" | "email" | "password";
   label?: string;
   startAdornment?: React.ReactNode;
+  placeholder?: string;
   className?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -15,6 +16,7 @@ export const TextField = ({
   type = "text",
   label,
   startAdornment,
+  placeholder,
   className,
   onChange,
 }: TextFieldProps) => {
@@ -25,12 +27,13 @@ export const TextField = ({
       value={value}
       type={type}
       label={label}
+      placeholder={placeholder}
       onChange={onChange}
+      className={className}
       classes={{ root: classes.root }}
       InputProps={{
         startAdornment: startAdornment,
       }}
-      className={className}
     />
   );
 };
