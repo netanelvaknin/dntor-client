@@ -5,7 +5,6 @@ import rootContext from "../context/root/rootContext";
 import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
 
-import { Button, Card, TextField, TimePicker, DaysPicker } from "../ui";
 // const Home = lazy(() => import("./pages/home/Home"));
 
 const App = () => {

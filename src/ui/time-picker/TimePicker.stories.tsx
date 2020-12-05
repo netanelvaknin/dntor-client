@@ -5,7 +5,7 @@ import moment from "moment";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 export default {
-  title: "UI/Time",
+  title: "UI/TimePicker",
 };
 
 export const Time = () => {
