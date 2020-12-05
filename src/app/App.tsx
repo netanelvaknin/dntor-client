@@ -5,13 +5,11 @@ import rootContext from "../context/root/rootContext";
 import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
 
-import styled from "styled-components/macro";
-import { Button, Card, TextField } from "../ui";
+import { Button, Card, TextField, TimePicker, DaysPicker } from "../ui";
 // const Home = lazy(() => import("./pages/home/Home"));
 
 const App = () => {
   const rootState = useContext(rootContext);
-
   const appRoutes = [{ path: "/", component: <div></div>, label: "דף הבית" }];
 
   return (

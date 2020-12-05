@@ -1,7 +1,3 @@
 import {makeStyles} from '@material-ui/core/styles';
 
-export const useTextFieldStyles = makeStyles((theme) => ({
-    root: {
-
-    }
-}));
+export const useTextFieldStyles = makeStyles((theme) => ({root: {}}));

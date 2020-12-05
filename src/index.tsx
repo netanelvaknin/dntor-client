@@ -9,11 +9,16 @@ import {
   StylesProvider,
   jssPreset,
 } from "@material-ui/core/styles";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
 import { ThemeProvider } from "styled-components";
 import GlobalStyles from "./styles";
 import theme from "./theme/index";
 import { create } from "jss";
 import rtl from "jss-rtl";
+import "moment/locale/he";
+moment.locale("he");
 
 const AppContainer = (props: any) => {
   // Configure JSS
@@ -26,16 +31,22 @@ const AppContainer = (props: any) => {
   return (
     <Suspense fallback={<div>Loading</div>}>
       <Router>
-        <StylesProvider injectFirst>
-          <MuiThemeProvider theme={theme}>
-            <ThemeProvider theme={theme}>
-              <GlobalStyles />
-              <RTL>
-                <ContextContainer>{props.children}</ContextContainer>
-              </RTL>
-            </ThemeProvider>
-          </MuiThemeProvider>
-        </StylesProvider>
+        <MuiPickersUtilsProvider
+          libInstance={moment}
+          utils={MomentUtils}
+          locale="he"
+        >
+          <StylesProvider injectFirst>
+            <MuiThemeProvider theme={theme}>
+              <ThemeProvider theme={theme}>
+                <GlobalStyles />
+                <RTL>
+                  <ContextContainer>{props.children}</ContextContainer>
+                </RTL>
+              </ThemeProvider>
+            </MuiThemeProvider>
+          </StylesProvider>
+        </MuiPickersUtilsProvider>
       </Router>
     </Suspense>
   );
