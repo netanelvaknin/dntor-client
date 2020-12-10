@@ -13,6 +13,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     font-size: 1.6rem;
+    padding-top: 8.6rem;
   }
 `
 
