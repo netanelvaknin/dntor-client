@@ -1,6 +1,6 @@
 import {
   LoginPageStyle,
-  LoginCard,
+  LoginCardStyle,
   RegisterForFreeButton,
   IAlreadyHaveAccountText,
   HorizontalLine,
@@ -16,7 +16,7 @@ import { ReactComponent as PasswordIcon } from "../../assets/icons/password_icon
 export const Login = () => {
   return (
     <LoginPageStyle>
-      <LoginCard>
+      <LoginCardStyle>
         <Grid container direction="column" alignItems="center">
           <Grid item md={12}>
             <RegisterForFreeButton>אני רוצה להירשם בחינם</RegisterForFreeButton>
@@ -56,9 +56,9 @@ export const Login = () => {
             container
             alignItems="center"
             justify="space-around"
-            style={{ margin: "3rem 0", padding: "0 2rem" }}
+            style={{ margin: "3rem 0" }}
           >
-            <Grid item>
+            <Grid item md={6}>
               <Checkbox
                 name="remember_me"
                 label="זכור אותי"
@@ -66,7 +66,7 @@ export const Login = () => {
                 onChange={() => null}
               />
             </Grid>
-            <Grid item>
+            <Grid item md={6}>
               <Button variant="text">שכחתי סיסמה</Button>
             </Grid>
           </Grid>
@@ -75,7 +75,7 @@ export const Login = () => {
             <ConnectButton>כניסה</ConnectButton>
           </Grid>
         </Grid>
-      </LoginCard>
+      </LoginCardStyle>
     </LoginPageStyle>
   );
 };

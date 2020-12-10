@@ -36,16 +36,16 @@ const AppContainer = (props: any) => {
           utils={MomentUtils}
           locale="he"
         >
-          <StylesProvider injectFirst>
-            <MuiThemeProvider theme={theme}>
-              <ThemeProvider theme={theme}>
-                <GlobalStyles />
-                <RTL>
-                  <ContextContainer>{props.children}</ContextContainer>
-                </RTL>
-              </ThemeProvider>
-            </MuiThemeProvider>
-          </StylesProvider>
+          <ContextContainer>
+            <StylesProvider injectFirst>
+              <MuiThemeProvider theme={theme}>
+                <ThemeProvider theme={theme}>
+                  <GlobalStyles />
+                  <RTL>{props.children}</RTL>
+                </ThemeProvider>
+              </MuiThemeProvider>
+            </StylesProvider>
+          </ContextContainer>
         </MuiPickersUtilsProvider>
       </Router>
     </Suspense>

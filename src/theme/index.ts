@@ -33,6 +33,9 @@ export default createMuiTheme({
       body1: {
         fontSize: '1.8rem'
       },
+      h1: {
+        fontSize: '4rem'
+      },
       h2: {
         fontSize: '1.8rem'
       }

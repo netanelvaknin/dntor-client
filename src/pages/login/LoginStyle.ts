@@ -1,26 +1,23 @@
 import styled from 'styled-components/macro';
-import { Card, TextField, Button } from "../../ui/index";
+import { TextField, Button } from "../../ui/index";
 import { GradientButton } from "../../components";
-import LoginBackground from './login_background.svg';
+import LoginBackground from '../../assets/backgrounds/login_background.svg';
 import ManStanding from './man_standing.svg';
-
+import {LoginCard} from '../../components/index';
+import {mobile} from '../../utils/screen-sizes';
 
 export const LoginPageStyle = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     background-image: url(${LoginBackground});
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    min-height: 100vh;
 `;
 
-export const LoginCard = styled(Card)`
-    max-width: 38.2rem;
-    padding: 3.8rem 5rem;
-    position: relative;
-
+export const LoginCardStyle = styled(LoginCard)`
     &::before {
         content: '';
         width: 15rem;
@@ -31,11 +28,18 @@ export const LoginCard = styled(Card)`
         position: absolute;
         top: 5rem;
         right: -10.8rem;
+
+        @media ${mobile} {
+            display: none;
+        }
     }
 `;
 
 export const RegisterForFreeButton = styled(GradientButton)`
     margin-bottom: 3.6rem!important;
+    @media ${mobile} {
+        margin-top: 15rem!important;
+    }
 `;
 
 export const IAlreadyHaveAccountText = styled.span`
