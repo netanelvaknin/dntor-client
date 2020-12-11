@@ -10,9 +10,10 @@ export const LoginCard = styled(Card)`
 
     @media ${mobile} {
         max-width: 100%;
-        width: 100vh;
-        height: 100vh;
-        padding: 0;
+        width: 100%;
+        height: 100%;
+        padding: 0 0 2rem;
         box-shadow: none;
+        position: absolute;
     }
 `;

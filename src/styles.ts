@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -13,7 +13,6 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     font-size: 1.6rem;
-    padding-top: 8.6rem;
   }
 `
 

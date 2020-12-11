@@ -15,8 +15,8 @@ const App = () => {
   const pathname = useLocation().pathname;
 
   const appRoutes = [
-    { path: "/login", component: <Login />, label: "test" },
-    { path: "/register", component: <Register />, label: "test 2" },
+    { path: "/login", component: <Login />, label: "" },
+    { path: "/register", component: <Register />, label: "" },
   ];
 
   return (

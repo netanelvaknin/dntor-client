@@ -5,6 +5,7 @@ import LoginBackground from '../../assets/backgrounds/login_background.svg';
 import ManStanding from './man_standing.svg';
 import {LoginCard} from '../../components/index';
 import {mobile} from '../../utils/screen-sizes';
+import {Grid} from '@material-ui/core';
 
 export const LoginPageStyle = styled.div`
     display: flex;
@@ -15,6 +16,11 @@ export const LoginPageStyle = styled.div`
     background-repeat: no-repeat;
     background-size: cover;
     min-height: 100vh;
+    padding-top: 9rem;
+
+    @media ${mobile} {
+        padding-top: 0;
+    }
 `;
 
 export const LoginCardStyle = styled(LoginCard)`
@@ -38,7 +44,7 @@ export const LoginCardStyle = styled(LoginCard)`
 export const RegisterForFreeButton = styled(GradientButton)`
     margin-bottom: 3.6rem!important;
     @media ${mobile} {
-        margin-top: 15rem!important;
+        margin-top: 13rem!important;
     }
 `;
 
@@ -62,4 +68,17 @@ export const TextFieldStyle = styled(TextField)`
 export const ConnectButton = styled(Button)`
     width: 28rem;
     height: 3rem;
+
+    &.MuiButtonBase-root {
+        @media ${mobile} {
+            margin-bottom: 2rem;
+        }
+    }
+    
+`;
+
+export const GridStyle = styled(Grid)`
+    @media ${mobile} {
+        max-width: 35rem;
+    }
 `;

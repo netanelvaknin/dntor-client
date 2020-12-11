@@ -6,6 +6,7 @@ import {
   HorizontalLine,
   TextFieldStyle,
   ConnectButton,
+  GridStyle,
 } from "./LoginStyle";
 import { Grid } from "@material-ui/core";
 import { Checkbox, Button } from "../../ui/index";
@@ -50,7 +51,7 @@ export const Login = () => {
             />
           </Grid>
 
-          <Grid
+          <GridStyle
             item
             md={12}
             container
@@ -58,7 +59,7 @@ export const Login = () => {
             justify="space-around"
             style={{ margin: "3rem 0" }}
           >
-            <Grid item md={6}>
+            <Grid item>
               <Checkbox
                 name="remember_me"
                 label="זכור אותי"
@@ -66,10 +67,10 @@ export const Login = () => {
                 onChange={() => null}
               />
             </Grid>
-            <Grid item md={6}>
+            <Grid item>
               <Button variant="text">שכחתי סיסמה</Button>
             </Grid>
-          </Grid>
+          </GridStyle>
 
           <Grid item>
             <ConnectButton>כניסה</ConnectButton>

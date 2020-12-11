@@ -13,12 +13,17 @@ export const RegisterPageStyle = styled.div`
     background-repeat: no-repeat;
     background-size: cover;
     min-height: 100vh;
+    padding-top: 9rem;
+
+    @media ${mobile} {
+        padding-top: 0;
+    }
 `;
 
 export const RegisterHeading = styled(Typography)`
     @media ${mobile} {
         &.MuiTypography-root {
-            margin-top: 15rem;
+            margin-top: 12rem;
         }
     }
 `;
@@ -28,8 +33,11 @@ export const RegisterButton = styled(Button)`
         margin-top: 5rem;
         width: 28rem;
         height: 3rem;
-        @media ${mobile} {
-        
+
+        &.MuiButtonBase-root {
+            @media ${mobile} {
+                margin-bottom: 2rem;
+            }
         }
     }
 `;
