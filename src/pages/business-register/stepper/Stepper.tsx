@@ -1,9 +1,11 @@
+import { Fragment } from "react";
 import {
   StepperContainerStyle,
   StepNumberButton,
   StepName,
 } from "./StepperStyle";
 import { Grid } from "@material-ui/core";
+import { useSmallScreen } from "../../../hooks/index";
 
 type Step = {
   number: number;
@@ -17,25 +19,32 @@ interface StepperProps {
 }
 
 export const Stepper = ({ steps, activeStep }: StepperProps) => {
+  const isSmallScreen = useSmallScreen();
+
   return (
     <StepperContainerStyle>
-      {steps.map(({ number, name, component }) => {
-        return (
-          <Grid container alignItems="center" key={number}>
-            <Grid item md={4}>
-              <StepNumberButton
-                active={activeStep === number}
-                disabled={activeStep !== number}
-              >
-                {number}
-              </StepNumberButton>
-            </Grid>
-            <Grid item md={8}>
-              <StepName>{name}</StepName>
-            </Grid>
-          </Grid>
-        );
-      })}
+      <Grid container alignItems="center" style={{ height: "100%" }}>
+        {steps.map(({ number, name, component }) => {
+          return (
+            <Fragment key={number}>
+              <Grid item md={4}>
+                <StepNumberButton
+                  $activeStep={activeStep === number}
+                  disabled={activeStep !== number}
+                >
+                  {!isSmallScreen && <span>{number}</span>}
+                </StepNumberButton>
+              </Grid>
+
+              {!isSmallScreen && (
+                <Grid item md={8}>
+                  <StepName>{name}</StepName>
+                </Grid>
+              )}
+            </Fragment>
+          );
+        })}
+      </Grid>
     </StepperContainerStyle>
   );
 };

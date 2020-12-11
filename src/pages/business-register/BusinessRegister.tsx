@@ -2,8 +2,12 @@ import { lazy, useState } from "react";
 import {
   BusinessRegisterPageStyle,
   BusinessRegisterCard,
+  CardLabel,
+  ArrowRightButton,
 } from "./BusinessRegisterStyle";
 import Stepper from "./stepper/Stepper";
+import { useSmallScreen } from "../../hooks/index";
+import arrowRight from "../../assets/icons/arrow-right.svg";
 
 // Steps components
 const BusinessProfile = lazy(() =>
@@ -21,6 +25,9 @@ const BusinessWorkers = lazy(() =>
 );
 
 export const BusinessRegister = () => {
+  const [currentStep] = useState(1);
+  const isSmallScreen = useSmallScreen();
+
   const steps = [
     { number: 1, name: "פרופיל העסק", component: <BusinessProfile /> },
     { number: 2, name: "שעות פעילות", component: <WorkingHours /> },
@@ -32,7 +39,11 @@ export const BusinessRegister = () => {
   return (
     <BusinessRegisterPageStyle>
       <BusinessRegisterCard>
-        <Stepper steps={steps} activeStep={1} />
+        <ArrowRightButton>
+          <img src={arrowRight} alt="כפתור חזור" />
+        </ArrowRightButton>
+        {isSmallScreen && <CardLabel>{steps[currentStep - 1].name}</CardLabel>}
+        <Stepper steps={steps} activeStep={currentStep} />
       </BusinessRegisterCard>
     </BusinessRegisterPageStyle>
   );

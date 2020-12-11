@@ -1,9 +1,6 @@
 import { NavbarStyle } from "./NavbarStyle";
 
-interface NavbarProps {
-  label?: string;
-}
-export const Navbar = ({ label }: NavbarProps) => {
+export const Navbar = () => {
   return <NavbarStyle></NavbarStyle>;
 };
 

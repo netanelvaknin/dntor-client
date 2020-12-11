@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default () => {
+export const useSmallScreen = () => {
   const mobileMinScreenSize = 0;
   const mobileMaximumScreenSize = 767;
 
@@ -25,3 +25,5 @@ export default () => {
 
   return isSmallScreen;
 };
+
+export default useSmallScreen;
