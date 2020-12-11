@@ -16,24 +16,45 @@ export const Register = () => {
         </Grid>
 
         <Grid container justify="center" alignItems="center">
-          <RegisterFieldStyle value="" label="שם מלא" onChange={() => {}} />
-        </Grid>
-
-        <Grid container justify="center" alignItems="center">
-          <RegisterFieldStyle value="" label="מייל" onChange={() => {}} />
-        </Grid>
-
-        <Grid container justify="center" alignItems="center">
-          <RegisterFieldStyle value="" label="נייד" onChange={() => {}} />
-        </Grid>
-
-        <Grid container justify="center" alignItems="center">
-          <RegisterFieldStyle value="" label="סיסמה" onChange={() => {}} />
+          <RegisterFieldStyle
+            value=""
+            type="text"
+            label="שם מלא"
+            onChange={() => {}}
+          />
         </Grid>
 
         <Grid container justify="center" alignItems="center">
           <RegisterFieldStyle
             value=""
+            type="email"
+            label="מייל"
+            onChange={() => {}}
+          />
+        </Grid>
+
+        <Grid container justify="center" alignItems="center">
+          <RegisterFieldStyle
+            value=""
+            type="text"
+            label="נייד"
+            onChange={() => {}}
+          />
+        </Grid>
+
+        <Grid container justify="center" alignItems="center">
+          <RegisterFieldStyle
+            value=""
+            type="password"
+            label="סיסמה"
+            onChange={() => {}}
+          />
+        </Grid>
+
+        <Grid container justify="center" alignItems="center">
+          <RegisterFieldStyle
+            value=""
+            type="password"
             label="אימות סיסמה"
             onChange={() => {}}
           />

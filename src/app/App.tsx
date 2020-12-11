@@ -9,6 +9,9 @@ import { useLocation } from "react-router-dom";
 
 const Login = lazy(() => import("../pages/login/Login"));
 const Register = lazy(() => import("../pages/register/Register"));
+const BusinessRegister = lazy(() =>
+  import("../pages/business-register/BusinessRegister")
+);
 
 const App = () => {
   const rootState = useContext(rootContext);
@@ -17,6 +20,7 @@ const App = () => {
   const appRoutes = [
     { path: "/login", component: <Login />, label: "" },
     { path: "/register", component: <Register />, label: "" },
+    { path: "/business-register", component: <BusinessRegister />, label: "" },
   ];
 
   return (

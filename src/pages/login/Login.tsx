@@ -13,14 +13,19 @@ import { Checkbox, Button } from "../../ui/index";
 import { Typography } from "@material-ui/core";
 import { ReactComponent as EmailIcon } from "../../assets/icons/mail_icon.svg";
 import { ReactComponent as PasswordIcon } from "../../assets/icons/password_icon.svg";
+import { useHistory } from "react-router-dom";
 
 export const Login = () => {
+  const history = useHistory();
+
   return (
     <LoginPageStyle>
       <LoginCardStyle>
         <Grid container direction="column" alignItems="center">
           <Grid item md={12}>
-            <RegisterForFreeButton>אני רוצה להירשם בחינם</RegisterForFreeButton>
+            <RegisterForFreeButton onClick={() => history.push("/register")}>
+              אני רוצה להירשם בחינם
+            </RegisterForFreeButton>
           </Grid>
 
           <Grid item md={12} container alignItems="center" justify="center">
