@@ -23,6 +23,7 @@ export const StepperContainerStyle = styled.div`
 
 interface StepNumberButtonProps {
     $activeStep: boolean;
+    $completed: boolean;
 }
 
 export const StepNumberButton = styled(IconButton)<StepNumberButtonProps>`
@@ -37,7 +38,7 @@ export const StepNumberButton = styled(IconButton)<StepNumberButtonProps>`
     }
 
     &.MuiIconButton-root.Mui-disabled {
-        background: #FFF;
+        background: ${props => props.$completed ? '#DBE8FC' : '#fff'};
     }
 `;
 

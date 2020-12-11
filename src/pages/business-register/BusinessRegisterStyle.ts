@@ -3,11 +3,16 @@ import {Card} from '../../ui/card/Card';
 import {mobile, tablet} from '../../utils/screen-sizes';
 import cardLabelBackground from '../../assets/backgrounds/card-label-background.svg';
 import {IconButton} from '@material-ui/core';
+import {Button} from '../../ui/index';
 
 export const BusinessRegisterPageStyle = styled.div`
     min-height: 100vh;
     padding: 8.6rem 0 5rem;
     background: #F5F9FF;
+
+    @media ${mobile} {
+        padding: 0;
+    }
 
     &:after {
         content: '';
@@ -38,12 +43,10 @@ export const BusinessRegisterCard = styled(Card)`
     }
 
     @media ${mobile} {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 100vw;
-        margin: 0;
+        width: 100%;
+        margin: 8.6rem 0 0;
+        min-height: 100vh;
+        padding-bottom: 1rem;
     }
 `;
 
@@ -67,7 +70,12 @@ export const ArrowRightButton = styled(IconButton)`
         right: 4rem;
 
         @media ${mobile} {
-            top: 9rem;
+            top: .5rem;
         }
     }
+`;
+
+export const ContinueButtonStyle = styled(Button)`
+    width: 28rem;
+    height: 3rem;
 `;

@@ -25,15 +25,19 @@ const BusinessWorkers = lazy(() =>
 );
 
 export const BusinessRegister = () => {
-  const [currentStep] = useState(1);
+  const [currentStep] = useState(2);
   const isSmallScreen = useSmallScreen();
 
   const steps = [
-    { number: 1, name: "פרופיל העסק", component: <BusinessProfile /> },
-    { number: 2, name: "שעות פעילות", component: <WorkingHours /> },
-    { number: 3, name: "הגדרת שירות", component: <BusinessServices /> },
-    { number: 4, name: "ניהול התראות", component: <NotificationsManagment /> },
-    { number: 5, name: "נותני שירות", component: <BusinessWorkers /> },
+    { stepNumber: 1, stepName: "פרופיל העסק", component: <BusinessProfile /> },
+    { stepNumber: 2, stepName: "שעות פעילות", component: <WorkingHours /> },
+    { stepNumber: 3, stepName: "הגדרת שירות", component: <BusinessServices /> },
+    {
+      stepNumber: 4,
+      stepName: "ניהול התראות",
+      component: <NotificationsManagment />,
+    },
+    { stepNumber: 5, stepName: "נותני שירות", component: <BusinessWorkers /> },
   ];
 
   return (
@@ -42,7 +46,13 @@ export const BusinessRegister = () => {
         <ArrowRightButton>
           <img src={arrowRight} alt="כפתור חזור" />
         </ArrowRightButton>
-        {isSmallScreen && <CardLabel>{steps[currentStep - 1].name}</CardLabel>}
+
+        {isSmallScreen && (
+          <CardLabel>{steps[currentStep - 1].stepName}</CardLabel>
+        )}
+
+        {steps[currentStep - 1].component}
+
         <Stepper steps={steps} activeStep={currentStep} />
       </BusinessRegisterCard>
     </BusinessRegisterPageStyle>
