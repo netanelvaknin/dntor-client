@@ -14,8 +14,8 @@ export const DaysPicker = ({ className, onChange }: DaysPickerProps) => {
     { active: true, day: "ג" },
     { active: true, day: "ד" },
     { active: true, day: "ה" },
-    { active: false, day: "ו" },
-    { active: false, day: "ש" },
+    { active: true, day: "ו" },
+    { active: true, day: "ש" },
   ]);
 
   const handleChange = (e: any) => {

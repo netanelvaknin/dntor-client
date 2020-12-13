@@ -54,7 +54,7 @@ export default createMuiTheme({
     },
     MuiInputBase: {
       root: {
-        fontSize: '1.8rem'
+        fontSize: '1.8rem',
       }
     },
   }

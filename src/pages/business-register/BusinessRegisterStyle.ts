@@ -35,7 +35,7 @@ export const BusinessRegisterCard = styled(Card)`
     margin: 10rem auto;
     position: relative;
     z-index: 1;
-    width: 75rem;
+    width: 72rem;
     min-height: 52rem;
 
     @media ${tablet} {
