@@ -15,7 +15,7 @@ export const LoginPageStyle = styled.div`
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    min-height: 100vh;
+    min-height: calc(100vh - 85px);
     padding-top: 9rem;
 
     @media ${mobile} {
@@ -44,7 +44,7 @@ export const LoginCardStyle = styled(LoginCard)`
 export const RegisterForFreeButton = styled(GradientButton)`
     margin-bottom: 3.6rem!important;
     @media ${mobile} {
-        margin-top: 13rem!important;
+        margin-top: 18rem!important;
     }
 `;
 

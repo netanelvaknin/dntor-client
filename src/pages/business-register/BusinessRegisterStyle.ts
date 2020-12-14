@@ -32,10 +32,10 @@ export const BusinessRegisterPageStyle = styled.div`
 
 
 export const BusinessRegisterCard = styled(Card)`
-    margin: 10rem auto;
+    margin: 7rem auto;
     position: relative;
     z-index: 1;
-    width: 72rem;
+    width: 80.4rem;
     min-height: 52rem;
 
     @media ${tablet} {
@@ -44,14 +44,13 @@ export const BusinessRegisterCard = styled(Card)`
 
     @media ${mobile} {
         width: 100%;
-        margin: 8.6rem 0 0;
+        margin: 0;
         min-height: 100vh;
-        padding-bottom: 1rem;
+        padding-bottom: 0;
     }
 `;
 
 export const CardLabel = styled.div`
-    margin-top: 8.5rem;
     height: 5rem;
     background: url(${cardLabelBackground});
     background-position: center;

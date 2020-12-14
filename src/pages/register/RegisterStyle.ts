@@ -12,7 +12,7 @@ export const RegisterPageStyle = styled.div`
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    min-height: 100vh;
+    min-height: calc(100vh - 85px);
     padding-top: 9rem;
 
     @media ${mobile} {
@@ -23,7 +23,7 @@ export const RegisterPageStyle = styled.div`
 export const RegisterHeading = styled(Typography)`
     @media ${mobile} {
         &.MuiTypography-root {
-            margin-top: 12rem;
+            margin-top: 18rem;
         }
     }
 `;
