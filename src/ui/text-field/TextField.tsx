@@ -3,7 +3,7 @@ import { useTextFieldStyles } from "./TextFieldStyle";
 
 interface TextFieldProps {
   value: string;
-  type?: "text" | "email" | "password" | "time";
+  type?: "text" | "email" | "password";
   label?: string;
   startAdornment?: React.ReactNode;
   placeholder?: string;

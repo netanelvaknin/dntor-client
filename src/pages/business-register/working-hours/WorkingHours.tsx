@@ -1,31 +1,47 @@
 import { useState } from "react";
-import { Grid, Typography } from "@material-ui/core";
-import { DaysPicker, Button, Card } from "../../../ui/index";
+import { Grid, Typography, IconButton } from "@material-ui/core";
+import { DaysPicker, TimePicker } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import {
-  TimePicker,
+  // TimePicker,
   RightGrid,
   LeftGrid,
   WorkingHourCard,
+  ToText,
+  AddButton,
+  HoursSetupHeading,
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
+import TrashIcon from "../../../assets/icons/trash_icon.svg";
+import PlusIcon from "../../../assets/icons/plus_icon.svg";
 
-type IWorkingHours = Array<{
-  days: string[];
-  workingHours: { from: string; to: string };
-  breakHours: { from: string; to: string };
-}>;
+// type IWorkingHours = Array<{
+//   days: string[];
+//   workingHours: { from: string; to: string };
+//   breakHours: { from: string; to: string };
+// }>;
 
 export const WorkingHours = () => {
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState<any>(new Date());
   const [showMobileView, setShowMobileView] = useState(false);
-  const [workingHours, setWorkingHours] = useState<any>([
+  const [workingHours] = useState<any>([
     {
-      days: ["א", "ה", "ו"],
+      days: ["א", "ב", "ג"],
+      workingHours: { from: "08:00", to: "18:00" },
+      breakHours: { from: "12:00", to: "13:00" },
+    },
+    {
+      days: ["א", "ב", "ג"],
+      workingHours: { from: "08:00", to: "18:00" },
+      breakHours: { from: "12:00", to: "13:00" },
+    },
+    {
+      days: ["א", "ב", "ג"],
       workingHours: { from: "08:00", to: "18:00" },
       breakHours: { from: "12:00", to: "13:00" },
     },
   ]);
+
   const isSmallScreen = useSmallScreen();
 
   const handleAddWorkingHours = () => {
@@ -38,22 +54,16 @@ export const WorkingHours = () => {
 
   return (
     <Grid container direction="row">
-      <Grid
-        md={12}
-        justify="center"
-        alignItems="center"
-        container
-        item
-        style={{ margin: "4rem 0" }}
-      >
-        <Typography variant="h1" style={{ textAlign: "center" }}>
-          שעות פעילות
-        </Typography>
+      <Grid md={12} justify="center" alignItems="center" container item>
+        <HoursSetupHeading variant="h1" style={{ textAlign: "center" }}>
+          הגדרת שעות
+        </HoursSetupHeading>
       </Grid>
 
       {!showMobileView && (
         <RightGrid
           md={6}
+          sm={6}
           container
           item
           direction="column"
@@ -66,7 +76,11 @@ export const WorkingHours = () => {
             <DaysPicker onChange={(days) => console.log(days)} />
           </Grid>
 
-          <Grid item container>
+          <Grid
+            item
+            container
+            justify={isSmallScreen ? "center" : "flex-start"}
+          >
             <Grid item>
               <Typography variant="h2" style={{ marginBottom: "2rem" }}>
                 שעות עבודה
@@ -78,28 +92,27 @@ export const WorkingHours = () => {
             item
             container
             alignItems="center"
-            justify="flex-start"
-            spacing={6}
+            justify={isSmallScreen ? "center" : "flex-start"}
             style={{ marginBottom: "2rem" }}
           >
             <Grid item md={5}>
-              <TimePicker
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-              />
+              <TimePicker value={time} onChange={setTime} />
             </Grid>
 
             <Grid item md={2}>
-              <span>עד</span>
+              <ToText>עד</ToText>
             </Grid>
 
             <Grid item md={5}>
-              <TimePicker type="time" value="" onChange={() => {}} />
+              <TimePicker value={time} onChange={setTime} />
             </Grid>
           </Grid>
 
-          <Grid item container>
+          <Grid
+            item
+            container
+            justify={isSmallScreen ? "center" : "flex-start"}
+          >
             <Grid item>
               <Typography variant="h2" style={{ marginBottom: "2rem" }}>
                 זמן הפסקה
@@ -111,25 +124,24 @@ export const WorkingHours = () => {
             item
             container
             alignItems="center"
-            justify="flex-start"
-            spacing={6}
+            justify={isSmallScreen ? "center" : "flex-start"}
           >
             <Grid item md={5}>
-              <TimePicker type="time" value="" onChange={() => {}} />
+              <TimePicker value={time} onChange={setTime} />
             </Grid>
 
             <Grid item md={2}>
-              <span>עד</span>
+              <ToText>עד</ToText>
             </Grid>
 
             <Grid item md={5}>
-              <TimePicker type="time" value="" onChange={() => {}} />
+              <TimePicker value={time} onChange={setTime} />
             </Grid>
           </Grid>
 
           {workingHours.length > 0 && !isSmallScreen && (
-            <Grid item style={{ marginTop: "5rem" }}>
-              <Button variant="text">הוספה</Button>
+            <Grid container item xs={12} md={12} style={{ marginTop: "3rem" }}>
+              <AddButton variant="text">הוספה</AddButton>
             </Grid>
           )}
         </RightGrid>
@@ -139,47 +151,96 @@ export const WorkingHours = () => {
       {!isSmallScreen && workingHours.length > 0 && (
         <LeftGrid
           md={6}
+          sm={6}
           container
           item
-          direction="column"
+          direction="row"
           justify="flex-start"
           alignItems="flex-start"
         >
-          {workingHours.map((workingHour: any, index: any) => {
-            return (
-              <WorkingHourCard key={index}>
-                {workingHour.workingHours.from}
-                {workingHour.workingHours.to}
-                {workingHour.breakHours.from}
-                {workingHour.breakHours.to}
-              </WorkingHourCard>
-            );
-          })}
+          <div
+            style={{
+              maxHeight: "30rem",
+              overflow: "auto",
+              padding: ".5rem .5rem .5rem 2rem",
+            }}
+          >
+            {workingHours.map((workingHour: any, index: any) => {
+              return (
+                <Grid container alignItems="center" key={index}>
+                  <WorkingHourCard>
+                    <div>
+                      {workingHour.days.map((day: string, i: number) =>
+                        workingHours.length !== i + 1 ? day + ", " : day
+                      )}
+                    </div>
+                    <div>
+                      {workingHour.workingHours.from}
+                      <strong style={{ margin: "0 1rem" }}>עד</strong>
+                      {workingHour.workingHours.to}
+                    </div>
+                    <div>
+                      {workingHour.breakHours.from}
+                      <strong style={{ margin: "0 1rem" }}>עד</strong>
+                      {workingHour.breakHours.to}
+                    </div>
+                  </WorkingHourCard>
+                  <IconButton>
+                    <img src={TrashIcon} alt="מחיקה" />
+                  </IconButton>
+                </Grid>
+              );
+            })}
+          </div>
         </LeftGrid>
       )}
 
       {/* MOBILE VIEW OF SELECTED HOURS */}
       {isSmallScreen && showMobileView && (
-        <>
-          <Grid item>
-            <div onClick={() => setShowMobileView(false)}>Plus</div>
+        <Grid container>
+          <Grid item container justify="flex-end" style={{ padding: "0 1rem" }}>
+            <IconButton onClick={() => setShowMobileView(false)}>
+              <img src={PlusIcon} alt="הוספה" />
+            </IconButton>
           </Grid>
+
           <LeftGrid
             md={6}
             container
             item
-            direction="column"
-            justify="flex-start"
-            alignItems="flex-start"
+            direction="row"
+            justify="center"
+            alignItems="center"
           >
             {workingHours.map((workingHour: any, index: any) => {
               return (
-                <WorkingHourCard key={index}>
-                  {workingHour.workingHours.from}
-                  {workingHour.workingHours.to}
-                  {workingHour.breakHours.from}
-                  {workingHour.breakHours.to}
-                </WorkingHourCard>
+                <Grid
+                  container
+                  alignItems="center"
+                  key={index}
+                  style={{ maxWidth: "32rem" }}
+                >
+                  <WorkingHourCard>
+                    <div>
+                      {workingHour.days.map((day: string, i: number) =>
+                        workingHours.length !== i + 1 ? day + ", " : day
+                      )}
+                    </div>
+                    <div>
+                      {workingHour.workingHours.from}
+                      <strong style={{ margin: "0 1rem" }}>עד</strong>
+                      {workingHour.workingHours.to}
+                    </div>
+                    <div>
+                      {workingHour.breakHours.from}
+                      <strong style={{ margin: "0 1rem" }}>עד</strong>
+                      {workingHour.breakHours.to}
+                    </div>
+                  </WorkingHourCard>
+                  <IconButton>
+                    <img src={TrashIcon} alt="מחיקה" />
+                  </IconButton>
+                </Grid>
               );
             })}
           </LeftGrid>
@@ -188,11 +249,11 @@ export const WorkingHours = () => {
             container
             justify="center"
             alignItems="center"
-            style={{ marginBottom: "3rem" }}
+            style={{ margin: "3rem 0" }}
           >
             <ContinueButtonStyle>המשך</ContinueButtonStyle>
           </Grid>
-        </>
+        </Grid>
       )}
 
       {!showMobileView && (

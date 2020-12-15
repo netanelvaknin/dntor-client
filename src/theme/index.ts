@@ -57,5 +57,10 @@ export default createMuiTheme({
         fontSize: '1.8rem',
       }
     },
+    MuiToolbar: {
+      root: {
+        display: 'none!important'
+      }
+    }
   }
 });

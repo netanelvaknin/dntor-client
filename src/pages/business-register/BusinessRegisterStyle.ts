@@ -6,12 +6,13 @@ import {IconButton} from '@material-ui/core';
 import {Button} from '../../ui/index';
 
 export const BusinessRegisterPageStyle = styled.div`
-    min-height: 100vh;
+    min-height: calc(100vh - 8.6rem);
     padding: 8.6rem 0 5rem;
     background: #F5F9FF;
 
     @media ${mobile} {
         padding: 0;
+        min-height: calc(100vh - 8.6rem);
     }
 
     &:after {
@@ -32,7 +33,7 @@ export const BusinessRegisterPageStyle = styled.div`
 
 
 export const BusinessRegisterCard = styled(Card)`
-    margin: 7rem auto;
+    margin: 7rem auto 0;
     position: relative;
     z-index: 1;
     width: 80.4rem;
@@ -45,8 +46,9 @@ export const BusinessRegisterCard = styled(Card)`
     @media ${mobile} {
         width: 100%;
         margin: 0;
-        min-height: 100vh;
+        min-height: calc(100vh - 8.6rem);
         padding-bottom: 0;
+        padding-top: 8.6rem;
     }
 `;
 

@@ -30,7 +30,11 @@ export const BusinessRegister = () => {
 
   const steps = [
     { stepNumber: 1, stepName: "פרופיל העסק", component: <BusinessProfile /> },
-    { stepNumber: 2, stepName: "שעות פעילות", component: <WorkingHours /> },
+    {
+      stepNumber: 2,
+      stepName: "שעות פעילות",
+      component: <WorkingHours />,
+    },
     { stepNumber: 3, stepName: "הגדרת שירות", component: <BusinessServices /> },
     {
       stepNumber: 4,

@@ -14,6 +14,20 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-size: 1.6rem;
   }
+
+  ::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f6f6f6;       
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #265fb1d4;  
+    border-radius: 20px;      
+    /* border: 3px solid orange;  */
+  }
 `
 
 export default GlobalStyle;
