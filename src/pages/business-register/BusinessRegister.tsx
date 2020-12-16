@@ -25,7 +25,7 @@ const BusinessWorkers = lazy(() =>
 );
 
 export const BusinessRegister = () => {
-  const [currentStep] = useState(3);
+  const [currentStep] = useState(4);
   const isSmallScreen = useSmallScreen();
 
   const steps = [
