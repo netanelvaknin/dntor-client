@@ -20,12 +20,9 @@ const BusinessServices = lazy(() =>
 const NotificationsManagment = lazy(() =>
   import("./notifications-managment/NotificationsManagment")
 );
-const BusinessWorkers = lazy(() =>
-  import("./business-workers/BusinessWorkers")
-);
 
 export const BusinessRegister = () => {
-  const [currentStep] = useState(4);
+  const [currentStep] = useState<1 | 2 | 3 | 4>(4);
   const isSmallScreen = useSmallScreen();
 
   const steps = [
@@ -41,7 +38,6 @@ export const BusinessRegister = () => {
       stepName: "ניהול התראות",
       component: <NotificationsManagment />,
     },
-    { stepNumber: 5, stepName: "נותני שירות", component: <BusinessWorkers /> },
   ];
 
   return (

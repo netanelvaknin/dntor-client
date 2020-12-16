@@ -8,15 +8,15 @@ const GlobalStyle = createGlobalStyle`
   }
 
   html {
-  font-size: 62.5%;
-}
+    font-size: 62.5%;
+  }
 
   body {
     font-size: 1.6rem;
   }
 
   ::-webkit-scrollbar {
-    width: 7px;
+    width: 10px;
   }
 
   ::-webkit-scrollbar-track {
@@ -26,7 +26,6 @@ const GlobalStyle = createGlobalStyle`
   ::-webkit-scrollbar-thumb {
     background-color: #265fb1d4;  
     border-radius: 20px;      
-    /* border: 3px solid orange;  */
   }
 `
 

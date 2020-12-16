@@ -5,6 +5,7 @@ interface ButtonProps {
   children?: React.ReactNode;
   variant?: "contained" | "outlined" | "text";
   disabled?: boolean;
+  type?: "submit" | "button" | "reset";
   startIcon?: React.ReactNode;
   className?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -14,6 +15,7 @@ export const Button = ({
   children,
   variant = "outlined",
   disabled,
+  type = "button",
   startIcon,
   className,
   onClick,
@@ -25,6 +27,7 @@ export const Button = ({
       variant={variant}
       disabled={disabled}
       startIcon={startIcon}
+      type={type}
       classes={{
         root: classes.root,
         outlined: classes.outlined,

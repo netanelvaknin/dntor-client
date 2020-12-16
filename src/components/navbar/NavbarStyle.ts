@@ -10,5 +10,5 @@ export const NavbarStyle = styled.nav`
     display: flex;
     align-items: center;
     width: 100%;
-    z-index: 11;
+    z-index: 12;
 `;

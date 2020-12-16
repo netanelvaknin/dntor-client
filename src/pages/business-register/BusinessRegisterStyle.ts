@@ -12,7 +12,7 @@ export const BusinessRegisterPageStyle = styled.div`
 
     @media ${mobile} {
         padding: 0;
-        min-height: calc(100vh - 8.6rem);
+        height: calc(100vh - 8.6rem);
     }
 
     &:after {
@@ -46,7 +46,7 @@ export const BusinessRegisterCard = styled(Card)`
     @media ${mobile} {
         width: 100%;
         margin: 0;
-        min-height: calc(100vh - 8.6rem);
+        height: calc(100vh - 8.6rem);
         padding-bottom: 0;
         padding-top: 8.6rem;
     }

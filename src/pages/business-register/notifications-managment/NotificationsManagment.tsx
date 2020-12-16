@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Switch, Checkbox } from "../../../ui/index";
-import { Grid } from "@material-ui/core";
+import { Grid, Box } from "@material-ui/core";
 import {
   NotificationsManagmentHeading,
   SwitchSpan,
@@ -10,13 +10,14 @@ import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 
 export const NotificationsManagment = () => {
   const [usersNotifications, setUsersNotifications] = useState(false);
+
   return (
     <>
       <Grid
         container
         justify="center"
         alignItems="center"
-        style={{ maxWidth: "28rem", margin: "0 auto" }}
+        style={{ maxWidth: "28rem", margin: "0 auto 4rem" }}
       >
         <Grid container justify="center" alignItems="center">
           <NotificationsManagmentHeading variant="h1">
@@ -46,35 +47,19 @@ export const NotificationsManagment = () => {
 
         {usersNotifications && (
           <Grid item container justify="flex-start">
-            <Checkbox
-              label="שעה לפני התור"
-              name=""
-              checked={true}
-              onChange={() => {}}
-            />
+            <Box mt="0.5rem" mb="0.5rem">
+              <Checkbox label="שעה לפני התור" name="" />
+            </Box>
 
-            <Checkbox
-              label="יום לפני התור"
-              name=""
-              checked={true}
-              onChange={() => {}}
-            />
-
-            <Checkbox
-              label="יומיים לפני התור"
-              name=""
-              checked={true}
-              onChange={() => {}}
-            />
+            <Box mb="0.5rem">
+              <Checkbox label="יום לפני התור" name="" />
+            </Box>
+            <Checkbox label="יומיים לפני התור" name="" />
           </Grid>
         )}
       </Grid>
 
-      <Grid
-        container
-        justify="center"
-        style={{ position: "absolute", bottom: "3rem" }}
-      >
+      <Grid container justify="center" style={{ marginBottom: "3rem" }}>
         <ContinueButtonStyle>המשך</ContinueButtonStyle>
       </Grid>
     </>
