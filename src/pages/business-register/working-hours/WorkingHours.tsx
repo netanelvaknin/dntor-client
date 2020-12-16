@@ -3,7 +3,6 @@ import { Grid, Typography, IconButton } from "@material-ui/core";
 import { DaysPicker, TimePicker } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import {
-  // TimePicker,
   RightGrid,
   LeftGrid,
   WorkingHourCard,
@@ -140,7 +139,14 @@ export const WorkingHours = () => {
           </Grid>
 
           {workingHours.length > 0 && !isSmallScreen && (
-            <Grid container item xs={12} md={12} style={{ marginTop: "3rem" }}>
+            <Grid
+              container
+              justify="center"
+              item
+              xs={12}
+              md={12}
+              style={{ marginTop: "3rem" }}
+            >
               <AddButton variant="text">הוספה</AddButton>
             </Grid>
           )}

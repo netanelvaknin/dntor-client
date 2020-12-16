@@ -4,7 +4,7 @@ import { Moment } from "moment";
 import { useTimePickerStyles } from "./TimePickerStyle";
 
 interface TimePickerProps {
-  value: Moment | (() => MaterialUiPickersDate) | null;
+  value: Moment | (() => MaterialUiPickersDate) | null | Date;
   className?: string;
   onChange: any;
 }
