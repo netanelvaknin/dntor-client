@@ -5,8 +5,14 @@ interface TextFieldProps {
   name?: string;
   type?: "text" | "email" | "password";
   label?: string;
+  error?: boolean;
+  helperText?: string;
   startAdornment?: React.ReactNode;
-  register?: any;
+  register?:
+    | ((instance: any) => void)
+    | React.RefObject<any>
+    | null
+    | undefined;
   placeholder?: string;
   className?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -17,6 +23,8 @@ export const TextField = ({
   name = "",
   type = "text",
   label,
+  error,
+  helperText,
   startAdornment,
   register,
   placeholder,
@@ -30,6 +38,8 @@ export const TextField = ({
       name={name}
       type={type}
       label={label}
+      error={error}
+      helperText={helperText}
       inputRef={register}
       placeholder={placeholder}
       className={className}

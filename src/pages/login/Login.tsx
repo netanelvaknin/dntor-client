@@ -15,16 +15,19 @@ import { ReactComponent as EmailIcon } from "../../assets/icons/mail_icon.svg";
 import { ReactComponent as PasswordIcon } from "../../assets/icons/password_icon.svg";
 import { useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { emailPattern } from "../../utils/patterns";
 
 export const Login = () => {
   const history = useHistory();
-  const { register, handleSubmit } = useForm();
-  const onSubmit = (data: any) => console.log(data);
+  const { register, errors, handleSubmit } = useForm();
+  const onSubmit = (data: any) => {
+    console.log(data);
+  };
 
   return (
     <LoginPageStyle>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <LoginCardStyle>
+      <LoginCardStyle>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <Grid container direction="column" alignItems="center">
             <Grid item md={12}>
               <RegisterForFreeButton onClick={() => history.push("/register")}>
@@ -44,19 +47,26 @@ export const Login = () => {
 
             <Grid item md={12}>
               <TextFieldStyle
-                register={register}
                 name="email"
                 placeholder="מייל"
+                register={register({
+                  pattern: emailPattern,
+                  required: true,
+                })}
+                error={!!errors.email}
+                helperText={errors.email && 'כתובת דוא"ל לא תקינה'}
                 startAdornment={<EmailIcon />}
               />
             </Grid>
 
             <Grid item md={12}>
               <TextFieldStyle
-                register={register}
                 name="password"
                 type="password"
                 placeholder="סיסמה"
+                register={register({ required: true, minLength: 6 })}
+                error={!!errors.password}
+                helperText={errors.password && "סיסמה לא תקינה"}
                 startAdornment={<PasswordIcon />}
               />
             </Grid>
@@ -85,8 +95,8 @@ export const Login = () => {
               <ConnectButton type="submit">כניסה</ConnectButton>
             </Grid>
           </Grid>
-        </LoginCardStyle>
-      </form>
+        </form>
+      </LoginCardStyle>
     </LoginPageStyle>
   );
 };
