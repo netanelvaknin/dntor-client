@@ -4,7 +4,11 @@ import { ReactComponent as CheckboxChecked } from "../../assets/icons/checkbox_c
 
 interface CheckboxProps {
   name: string;
-  register?: any;
+  register?:
+    | ((instance: any) => void)
+    | React.RefObject<any>
+    | null
+    | undefined;
   label?: string;
 }
 

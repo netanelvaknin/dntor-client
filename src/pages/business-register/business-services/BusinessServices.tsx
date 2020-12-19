@@ -19,22 +19,22 @@ export const BusinessServices = () => {
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
   const [services] = useState([
-    {
-      serviceName: "לק ג'ל",
-      serviceDuration: "1:00",
-    },
-    {
-      serviceName: "לק ג'ל",
-      serviceDuration: "1:00",
-    },
-    {
-      serviceName: "לק ג'ל",
-      serviceDuration: "1:00",
-    },
-    {
-      serviceName: "לק ג'ל",
-      serviceDuration: "1:00",
-    },
+    // {
+    //   serviceName: "לק ג'ל",
+    //   serviceDuration: "1:00",
+    // },
+    // {
+    //   serviceName: "לק ג'ל",
+    //   serviceDuration: "1:00",
+    // },
+    // {
+    //   serviceName: "לק ג'ל",
+    //   serviceDuration: "1:00",
+    // },
+    // {
+    //   serviceName: "לק ג'ל",
+    //   serviceDuration: "1:00",
+    // },
   ]);
 
   const handleAddWorkingHours = () => {
@@ -66,14 +66,20 @@ export const BusinessServices = () => {
           style={{ margin: "0 auto" }}
         >
           <TextField
-            startAdornment={<span style={{ minWidth: "6.5rem" }}>סוג תור</span>}
-            placeholder="תספורת, בניית ציפורנים ועוד"
+            label="שם השירות"
+            helperText="לדוגמא: תספורת, בניית ציפורניים ועוד"
             value=""
             onChange={() => {}}
           />
 
-          <Grid item container justify="center" style={{ marginTop: "3rem" }}>
-            <DurationText>קביעת זמן התור</DurationText>
+          <Grid
+            item
+            container
+            justify="center"
+            alignItems="center"
+            style={{ marginTop: "3rem" }}
+          >
+            <DurationText>קביעת משך התור</DurationText>
             <TimePicker value={new Date()} onChange={() => {}} />
           </Grid>
 

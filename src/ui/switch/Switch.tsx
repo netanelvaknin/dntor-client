@@ -1,28 +1,21 @@
-import { useState } from "react";
 import { Switch as MuiSwitch } from "@material-ui/core";
 import { useSwitchStyles } from "./SwitchStyle";
 
 interface SwitchProps {
   name: string;
-  checked: boolean;
-  onChange: (value: React.ChangeEvent<HTMLInputElement>) => void;
+  register?:
+    | ((instance: any) => void)
+    | React.RefObject<any>
+    | null
+    | undefined;
 }
-export const Switch = ({ name, checked, onChange }: SwitchProps) => {
+export const Switch = ({ name, register }: SwitchProps) => {
   const classes = useSwitchStyles();
-  const [value, setValue] = useState(checked);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.checked);
-
-    if (onChange) {
-      onChange(event);
-    }
-  };
 
   return (
     <MuiSwitch
-      checked={value}
-      onChange={handleChange}
+      inputRef={register}
+      name={name}
       classes={{
         root: classes.root,
         switchBase: classes.switchBase,

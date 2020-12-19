@@ -59,7 +59,9 @@ export default createMuiTheme({
     },
     MuiToolbar: {
       root: {
-        display: 'none!important'
+        '& .MuiTypography-root': {
+          fontSize: '3rem'
+        }
       }
     }
   }

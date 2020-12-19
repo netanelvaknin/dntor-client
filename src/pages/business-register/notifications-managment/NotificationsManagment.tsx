@@ -27,22 +27,18 @@ export const NotificationsManagment = () => {
 
         <Grid item container justify="space-between" alignItems="center">
           <SwitchSpan>קבלת התראות ב-SMS</SwitchSpan>
-          <Switch name="" checked={true} onChange={() => {}} />
+          <Switch name="" />
         </Grid>
         <HorizontalSeprator />
         <Grid item container justify="space-between" alignItems="center">
           <SwitchSpan>קבלת התראות במייל</SwitchSpan>
-          <Switch name="" checked={true} onChange={() => {}} />
+          <Switch name="" />
         </Grid>
         <HorizontalSeprator />
 
         <Grid item container justify="space-between" alignItems="center">
           <SwitchSpan>תזכורת ללקוחות</SwitchSpan>
-          <Switch
-            name=""
-            checked={usersNotifications}
-            onChange={() => setUsersNotifications(!usersNotifications)}
-          />
+          <Switch name="" />
         </Grid>
 
         {usersNotifications && (
