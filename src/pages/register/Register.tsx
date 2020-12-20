@@ -78,7 +78,6 @@ export const Register = () => {
               label="אימות סיסמה"
             />
           </Grid>
-
           <Grid container justify="center" alignItems="center">
             <RegisterButton type="submit">הרשמה</RegisterButton>
           </Grid>
