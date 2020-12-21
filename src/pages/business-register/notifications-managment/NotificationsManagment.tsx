@@ -9,7 +9,7 @@ import {
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 
 export const NotificationsManagment = () => {
-  const [usersNotifications, setUsersNotifications] = useState(false);
+  const [usersNotifications] = useState(false);
 
   return (
     <>

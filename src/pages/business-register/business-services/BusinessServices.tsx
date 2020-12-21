@@ -80,7 +80,7 @@ export const BusinessServices = () => {
             style={{ marginTop: "3rem" }}
           >
             <DurationText>קביעת משך התור</DurationText>
-            <TimePicker value={new Date()} onChange={() => {}} />
+            <TimePicker />
           </Grid>
 
           {services.length > 0 && !isSmallScreen && (

@@ -1,41 +1,50 @@
-import {
-  TimePicker as MuiTimePicker,
-  BaseTimePickerProps,
-} from "@material-ui/pickers";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
-import { Moment } from "moment";
+import { TimePicker as MuiTimePicker } from "@material-ui/pickers";
 import { useTimePickerStyles } from "./TimePickerStyle";
+import { useForm, Controller } from "react-hook-form";
 
 interface TimePickerProps {
-  value: Moment | (() => MaterialUiPickersDate) | null | Date;
+  name?: string;
   ampm?: boolean;
+  register?:
+    | ((instance: any) => void)
+    | React.RefObject<any>
+    | null
+    | undefined;
   disableToolbar?: boolean;
   className?: string;
-  onChange: (date: MaterialUiPickersDate) => void;
 }
 
 export const TimePicker = ({
-  value,
+  name = "",
   className,
   ampm = false,
+  register,
   disableToolbar = false,
-  onChange,
 }: TimePickerProps) => {
+  const { control } = useForm();
   const classes = useTimePickerStyles();
 
   return (
-    <MuiTimePicker
-      value={value}
-      inputVariant="outlined"
-      okLabel="אישור"
-      cancelLabel="ביטול"
-      clearLabel="איפוס"
-      clearable
-      ampm={ampm}
-      disableToolbar={disableToolbar}
-      InputProps={{ className: classes.input }}
-      className={className}
-      onChange={onChange}
+    <Controller
+      name="timePicker"
+      control={control}
+      defaultValue={new Date().setHours(24, 0, 0, 0)}
+      render={({ onChange, value }) => (
+        <MuiTimePicker
+          value={value}
+          inputVariant="outlined"
+          okLabel="אישור"
+          cancelLabel="ביטול"
+          clearLabel="איפוס"
+          clearable
+          ampm={ampm}
+          inputRef={register}
+          disableToolbar={disableToolbar}
+          InputProps={{ className: classes.input, name }}
+          className={className}
+          onChange={onChange}
+        />
+      )}
     />
   );
 };

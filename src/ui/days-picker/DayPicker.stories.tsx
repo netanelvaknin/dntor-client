@@ -7,16 +7,7 @@ export default {
 };
 
 export const DayPicker = () => {
-  const [days, setDays] = useState<{ active: boolean; day: string }[]>([]);
+  // const [days, setDays] = useState<{ active: boolean; day: string }[]>([]);
 
-  return (
-    <Box>
-      <DaysPicker
-        onChange={(days) => {
-          console.log(days);
-          setDays(days);
-        }}
-      />
-    </Box>
-  );
+  return <Box></Box>;
 };

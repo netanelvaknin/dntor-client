@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DaysPickerContainer, DayButtonWrapper } from "./DaysPickerStyle";
 import { Button } from "@material-ui/core";
 
 type Day = { active: boolean; day: string };
 interface DaysPickerProps {
-  days?: Day[];
+  days?: any;
   disabled?: boolean;
   className?: string;
   onChange?: (days: Day[]) => void;
@@ -16,19 +16,10 @@ export const DaysPicker = ({
   className,
   onChange,
 }: DaysPickerProps) => {
-  const [value, setValue] = useState(
-    days || [
-      { active: true, day: "א" },
-      { active: true, day: "ב" },
-      { active: true, day: "ג" },
-      { active: true, day: "ד" },
-      { active: true, day: "ה" },
-      { active: true, day: "ו" },
-      { active: true, day: "ש" },
-    ]
-  );
+  const [value, setValue] = useState(days);
 
   const handleChange = (e: any) => {
+    // Toggle active / unactive buttons of days
     const newDays = [...value];
     const clickedDay = e.target.innerText;
     const dayIndex = newDays.findIndex(({ day }) => day === clickedDay);
@@ -41,13 +32,21 @@ export const DaysPicker = ({
     }
   };
 
+  useEffect(() => {
+    setValue(days);
+
+    if (onChange) {
+      onChange(days);
+    }
+  }, [days, onChange]);
+
   return (
     <DaysPickerContainer className={className}>
-      {value.map(({ day, active }) => {
+      {value.map((day: any, index: any) => {
         return (
-          <DayButtonWrapper active={active} key={day}>
+          <DayButtonWrapper active={day.active} key={index}>
             <Button onClick={(e) => handleChange(e)} disabled={disabled}>
-              {day}
+              {day.day}
             </Button>
           </DayButtonWrapper>
         );
