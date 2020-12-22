@@ -7,7 +7,7 @@ import {
 import { useForm } from "react-hook-form";
 import { LoginCard as RegisterCard } from "../../components/index";
 import { Grid } from "@material-ui/core";
-import { emailPattern } from "../../utils/patterns";
+import { emailPattern, phoneNumberPattern } from "../../utils/patterns";
 
 export const Register = () => {
   const { register, errors, handleSubmit } = useForm();
@@ -51,7 +51,10 @@ export const Register = () => {
               type="text"
               label="נייד"
               name="phone"
-              register={register({ required: true })}
+              register={register({
+                required: true,
+                pattern: phoneNumberPattern,
+              })}
               error={!!errors.phone}
               helperText={errors.phone && "מספר טלפון נייד לא תקין"}
             />

@@ -18,6 +18,8 @@ import theme from "./theme/index";
 import { create } from "jss";
 import rtl from "jss-rtl";
 import "moment/locale/he";
+import HttpProvider from "./api/HttpProvider";
+
 moment.locale("he");
 
 const AppContainer = (props: any) => {
@@ -29,26 +31,28 @@ const AppContainer = (props: any) => {
   }
 
   return (
-    <Suspense fallback={<div>Loading</div>}>
-      <Router>
-        <MuiPickersUtilsProvider
-          libInstance={moment}
-          utils={MomentUtils}
-          locale="he"
-        >
-          <ContextContainer>
-            <StylesProvider injectFirst>
-              <MuiThemeProvider theme={theme}>
-                <ThemeProvider theme={theme}>
-                  <GlobalStyles />
-                  <RTL>{props.children}</RTL>
-                </ThemeProvider>
-              </MuiThemeProvider>
-            </StylesProvider>
-          </ContextContainer>
-        </MuiPickersUtilsProvider>
-      </Router>
-    </Suspense>
+    <HttpProvider>
+      <Suspense fallback={<div>Loading</div>}>
+        <Router>
+          <MuiPickersUtilsProvider
+            libInstance={moment}
+            utils={MomentUtils}
+            locale="he"
+          >
+            <ContextContainer>
+              <StylesProvider injectFirst>
+                <MuiThemeProvider theme={theme}>
+                  <ThemeProvider theme={theme}>
+                    <GlobalStyles />
+                    <RTL>{props.children}</RTL>
+                  </ThemeProvider>
+                </MuiThemeProvider>
+              </StylesProvider>
+            </ContextContainer>
+          </MuiPickersUtilsProvider>
+        </Router>
+      </Suspense>
+    </HttpProvider>
   );
 };
 
