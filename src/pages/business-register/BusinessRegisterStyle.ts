@@ -49,6 +49,7 @@ export const BusinessRegisterCard = styled(Card)`
         height: calc(100vh - 8.6rem);
         padding-bottom: 0;
         padding-top: 8.6rem;
+        box-shadow: none;
     }
 `;
 
@@ -71,7 +72,7 @@ export const ArrowRightButton = styled(IconButton)`
         right: 4rem;
 
         @media ${mobile} {
-            top: .5rem;
+            top: 9rem;
         }
     }
 `;

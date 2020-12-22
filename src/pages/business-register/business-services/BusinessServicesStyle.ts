@@ -41,6 +41,7 @@ export const LeftGrid = styled(Grid)`
 export const DurationText = styled.span`
     font-size: 1.8rem;
     margin-left: 6rem;
+    margin-bottom: 2rem;
 `;
 
 export const ServiceCard = styled(Card)`
@@ -52,7 +53,7 @@ export const ServiceCard = styled(Card)`
     padding: 1rem;
 
     @media ${mobile} {
-        width: 80%;
+        width: 75%;
         max-width: 32rem;
     }
 `;
