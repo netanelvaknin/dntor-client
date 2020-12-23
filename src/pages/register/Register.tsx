@@ -11,6 +11,7 @@ import { emailPattern, phoneNumberPattern } from "../../utils/patterns";
 
 export const Register = () => {
   const { register, errors, handleSubmit } = useForm();
+
   const onSubmit = (data: any) => {
     console.log(data);
   };
@@ -21,6 +22,7 @@ export const Register = () => {
         <Grid container justify="center" alignItems="center">
           <RegisterHeading variant="h1">כבר מתחילים ...</RegisterHeading>
         </Grid>
+
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
@@ -29,6 +31,7 @@ export const Register = () => {
               register={register({
                 required: true,
                 minLength: 2,
+                maxLength: 26,
               })}
               error={!!errors.full_name}
               helperText={errors.full_name && "שם לא תקין"}
@@ -63,9 +66,12 @@ export const Register = () => {
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
               name="password"
-              register={register({ required: true, minLength: 6 })}
+              register={register({
+                required: true,
+                minLength: 6,
+              })}
               error={!!errors.password}
-              helperText={errors.password && "סיסמה לא תקינה"}
+              helperText={errors.password && "הסיסמה חייבת לכלול לפחות 6 תווים"}
               type="password"
               label="סיסמה"
             />
@@ -73,7 +79,7 @@ export const Register = () => {
 
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
-              name="password"
+              name="validate_password"
               register={register({ required: true, minLength: 6 })}
               error={!!errors.password}
               helperText={errors.password && "סיסמה לא תקינה"}
@@ -81,6 +87,7 @@ export const Register = () => {
               label="אימות סיסמה"
             />
           </Grid>
+
           <Grid container justify="center" alignItems="center">
             <RegisterButton type="submit">הרשמה</RegisterButton>
           </Grid>

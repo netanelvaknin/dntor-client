@@ -10,10 +10,10 @@ import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import { useForm } from "react-hook-form";
 
 export const NotificationsManagment = () => {
-  const { register, reset, watch, getValues, handleSubmit } = useForm();
+  const { register, watch, handleSubmit } = useForm();
   const customersNotifications = watch("customers_notifications");
 
-  const [notifications, setNotifications] = useState<any>();
+  const [, setNotifications] = useState<any>();
 
   const onSubmit = (data: any) => {
     setNotifications(data);

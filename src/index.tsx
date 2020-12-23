@@ -31,15 +31,15 @@ const AppContainer = (props: any) => {
   }
 
   return (
-    <HttpProvider>
-      <Suspense fallback={<div>Loading</div>}>
-        <Router>
-          <MuiPickersUtilsProvider
-            libInstance={moment}
-            utils={MomentUtils}
-            locale="he"
-          >
-            <ContextContainer>
+    <ContextContainer>
+      <HttpProvider>
+        <Suspense fallback={<div>Loading</div>}>
+          <Router>
+            <MuiPickersUtilsProvider
+              libInstance={moment}
+              utils={MomentUtils}
+              locale="he"
+            >
               <StylesProvider injectFirst>
                 <MuiThemeProvider theme={theme}>
                   <ThemeProvider theme={theme}>
@@ -48,11 +48,11 @@ const AppContainer = (props: any) => {
                   </ThemeProvider>
                 </MuiThemeProvider>
               </StylesProvider>
-            </ContextContainer>
-          </MuiPickersUtilsProvider>
-        </Router>
-      </Suspense>
-    </HttpProvider>
+            </MuiPickersUtilsProvider>
+          </Router>
+        </Suspense>
+      </HttpProvider>
+    </ContextContainer>
   );
 };
 

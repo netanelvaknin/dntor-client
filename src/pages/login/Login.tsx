@@ -16,12 +16,18 @@ import { ReactComponent as PasswordIcon } from "../../assets/icons/password_icon
 import { useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { emailPattern } from "../../utils/patterns";
+import useFetch from "use-http";
 
 export const Login = () => {
   const history = useHistory();
   const { register, errors, handleSubmit } = useForm();
-  const onSubmit = (data: any) => {
-    console.log(data);
+
+  const { get, response, loading, error } = useFetch();
+
+  const onSubmit = async (formData: any) => {
+    console.log(formData);
+    const newTodo = await get("/rest/v2/all");
+    if (response.ok) console.log(newTodo);
   };
 
   return (

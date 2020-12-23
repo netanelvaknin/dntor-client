@@ -22,7 +22,7 @@ const NotificationsManagment = lazy(() =>
 );
 
 export const BusinessRegister = () => {
-  const [currentStep] = useState<1 | 2 | 3 | 4>(4);
+  const [currentStep] = useState<1 | 2 | 3 | 4>(2);
   const isSmallScreen = useSmallScreen();
 
   const steps = [
