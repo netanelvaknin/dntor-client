@@ -8,6 +8,7 @@ interface RootStateProps {
 export const RootState = ({ children }: RootStateProps) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState("");
 
   return (
     <RootContext.Provider
@@ -16,6 +17,8 @@ export const RootState = ({ children }: RootStateProps) => {
         setError,
         loading,
         setLoading,
+        token,
+        setToken,
       }}
     >
       {children}

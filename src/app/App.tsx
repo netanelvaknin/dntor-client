@@ -5,6 +5,7 @@ import rootContext from "../context/root/rootContext";
 import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
 import { Navbar } from "../components/index";
+import { Loader } from "../animations/index";
 
 const Login = lazy(() => import("../pages/login/Login"));
 const Register = lazy(() => import("../pages/register/Register"));
@@ -22,7 +23,11 @@ const App = () => {
   ];
 
   return (
-    <BlockUi blocking={rootState && rootState.loading} keepInView>
+    <BlockUi
+      loader={<Loader />}
+      blocking={rootState && rootState.loading}
+      keepInView
+    >
       <Navbar />
 
       <Switch>

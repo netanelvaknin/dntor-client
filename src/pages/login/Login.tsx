@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
   LoginPageStyle,
   LoginCardStyle,
@@ -17,17 +18,29 @@ import { useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { emailPattern } from "../../utils/patterns";
 import useFetch from "use-http";
+import rootContext from "../../context/root/rootContext";
 
 export const Login = () => {
   const history = useHistory();
-  const { register, errors, handleSubmit } = useForm();
+  const rootState = useContext(rootContext);
 
-  const { get, response, loading, error } = useFetch();
+  const { register, errors, handleSubmit } = useForm();
+  const { post, response } = useFetch();
 
   const onSubmit = async (formData: any) => {
-    console.log(formData);
-    const newTodo = await get("/rest/v2/all");
-    if (response.ok) console.log(newTodo);
+    const data = await post("/user/signin", {
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (response.ok) {
+      rootState?.setToken(data.res);
+
+      // check if registered business
+
+      history.push("/register");
+    } else {
+    }
   };
 
   return (

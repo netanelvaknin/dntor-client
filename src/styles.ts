@@ -15,6 +15,10 @@ const GlobalStyle = createGlobalStyle`
     font-size: 1.6rem;
   }
 
+  .block-ui-overlay {
+    opacity: 1;
+  }
+
   ::-webkit-scrollbar {
     width: 10px;
   }
