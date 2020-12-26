@@ -23,11 +23,7 @@ const App = () => {
   ];
 
   return (
-    <BlockUi
-      loader={<Loader />}
-      blocking={rootState && rootState.loading}
-      keepInView
-    >
+    <BlockUi loader={<Loader />} blocking={rootState?.loading} keepInView>
       <Navbar />
 
       <Switch>

@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { emailPattern } from "../../utils/patterns";
 import useFetch from "use-http";
 import rootContext from "../../context/root/rootContext";
+import { Alert } from "@material-ui/lab";
 
 export const Login = () => {
   const history = useHistory();
@@ -40,6 +41,7 @@ export const Login = () => {
 
       history.push("/register");
     } else {
+      rootState?.setError("שם משתמש או סיסמה לא נכונים");
     }
   };
 
@@ -72,7 +74,7 @@ export const Login = () => {
                   pattern: emailPattern,
                   required: true,
                 })}
-                error={!!errors.email}
+                error={!!errors.email || !!rootState?.error}
                 helperText={errors.email && 'כתובת דוא"ל לא תקינה'}
                 startAdornment={<EmailIcon />}
               />
@@ -84,7 +86,7 @@ export const Login = () => {
                 type="password"
                 placeholder="סיסמה"
                 register={register({ required: true, minLength: 6 })}
-                error={!!errors.password}
+                error={!!errors.password || !!rootState?.error}
                 helperText={errors.password && "סיסמה לא תקינה"}
                 startAdornment={<PasswordIcon />}
               />
@@ -96,7 +98,7 @@ export const Login = () => {
               container
               alignItems="center"
               justify="space-around"
-              style={{ margin: "3rem 0" }}
+              style={{ margin: "3rem 0 2rem" }}
             >
               <Grid item>
                 <Checkbox
@@ -109,6 +111,19 @@ export const Login = () => {
                 <Button variant="text">שכחתי סיסמה</Button>
               </Grid>
             </GridStyle>
+
+            <Grid container style={{ margin: "0rem 0 2rem" }}>
+              <Grid item md={12} xs={12}>
+                {rootState?.error && (
+                  <Alert
+                    style={{ maxWidth: "28rem", margin: "0 auto" }}
+                    severity="error"
+                  >
+                    {rootState?.error}
+                  </Alert>
+                )}
+              </Grid>
+            </Grid>
 
             <Grid item>
               <ConnectButton type="submit">כניסה</ConnectButton>

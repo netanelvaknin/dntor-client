@@ -13,6 +13,7 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
   const options = {
     interceptors: {
       request: async ({ options }: any) => {
+        rootState?.setError("");
         rootState?.setLoading(true);
 
         // First, check if token is exist
@@ -33,7 +34,6 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
       },
       response: async ({ response }: any) => {
         setTimeout(() => {
-          // minimum time to show loader
           rootState?.setLoading(false);
         }, 3000);
 
