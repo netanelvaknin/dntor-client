@@ -3,6 +3,7 @@ import RegisterBackground from '../../assets/backgrounds/login_background.svg';
 import {Typography} from '@material-ui/core';
 import {mobile} from '../../utils/screen-sizes';
 import { Button, TextField } from "../../ui/index";
+import { LoginCard } from "../../components/index";
 
 export const RegisterPageStyle = styled.div`
     display: flex;
@@ -20,6 +21,14 @@ export const RegisterPageStyle = styled.div`
     }
 `;
 
+export const RegisterCard = styled(LoginCard)`
+    margin: 3rem 0;
+
+    @media ${mobile} {
+        margin: 0;
+    }
+`;
+
 export const RegisterHeading = styled(Typography)`
     @media ${mobile} {
         &.MuiTypography-root {
@@ -30,7 +39,7 @@ export const RegisterHeading = styled(Typography)`
 
 export const RegisterButton = styled(Button)`
     &.MuiButtonBase-root {
-        margin-top: 5rem;
+        margin-top: 3rem;
         width: 28rem;
         height: 3rem;
 

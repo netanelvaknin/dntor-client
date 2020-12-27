@@ -39,7 +39,7 @@ export const Login = () => {
 
       // check if registered business
 
-      history.push("/register");
+      history.push("/business-register");
     } else {
       rootState?.setError("שם משתמש או סיסמה לא נכונים");
     }

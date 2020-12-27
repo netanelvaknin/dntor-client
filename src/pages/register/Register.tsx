@@ -1,19 +1,42 @@
+import { useContext } from "react";
 import {
   RegisterPageStyle,
+  RegisterCard,
   RegisterHeading,
   RegisterButton,
   RegisterFieldStyle,
 } from "./RegisterStyle";
 import { useForm } from "react-hook-form";
-import { LoginCard as RegisterCard } from "../../components/index";
 import { Grid } from "@material-ui/core";
 import { emailPattern, phoneNumberPattern } from "../../utils/patterns";
+import useFetch from "use-http";
+import rootContext from "../../context/root/rootContext";
+import { Alert } from "@material-ui/lab";
+import { useHistory } from "react-router-dom";
 
 export const Register = () => {
-  const { register, errors, handleSubmit } = useForm();
+  const rootState = useContext(rootContext);
+  const history = useHistory();
+  const { register, watch, errors, handleSubmit } = useForm();
+  const { post, response } = useFetch();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const password = watch("password");
+  const validatePassword = watch("validate_password");
+  const passwordsMatch = password === validatePassword;
+
+  const onSubmit = async (formData: any) => {
+    await post("/user/signup", {
+      fullname: formData.full_name,
+      email: formData.email,
+      personalPhoneNumber: formData.phone,
+      password: formData.password,
+    });
+
+    if (response.ok) {
+      history.push("/business-register");
+    } else {
+      rootState?.setError("משהו השתבש אנא נסה שנית");
+    }
   };
 
   return (
@@ -33,8 +56,8 @@ export const Register = () => {
                 minLength: 2,
                 maxLength: 26,
               })}
-              error={!!errors.full_name}
-              helperText={errors.full_name && "שם לא תקין"}
+              error={!!errors.full_name || !!rootState?.error}
+              helperText={errors.full_name && "שם מלא לא תקין"}
             />
           </Grid>
 
@@ -44,7 +67,7 @@ export const Register = () => {
               register={register({ required: true, pattern: emailPattern })}
               type="email"
               label="מייל"
-              error={!!errors.email}
+              error={!!errors.email || !!rootState?.error}
               helperText={errors.email && 'כתובת דוא"ל לא תקינה'}
             />
           </Grid>
@@ -58,8 +81,8 @@ export const Register = () => {
                 required: true,
                 pattern: phoneNumberPattern,
               })}
-              error={!!errors.phone}
-              helperText={errors.phone && "מספר טלפון נייד לא תקין"}
+              error={!!errors.phone || !!rootState?.error}
+              helperText={errors.phone && "נייד לא תקין"}
             />
           </Grid>
 
@@ -70,7 +93,7 @@ export const Register = () => {
                 required: true,
                 minLength: 6,
               })}
-              error={!!errors.password}
+              error={!!errors.password || !!rootState?.error}
               helperText={errors.password && "הסיסמה חייבת לכלול לפחות 6 תווים"}
               type="password"
               label="סיסמה"
@@ -81,11 +104,30 @@ export const Register = () => {
             <RegisterFieldStyle
               name="validate_password"
               register={register({ required: true, minLength: 6 })}
-              error={!!errors.password}
-              helperText={errors.password && "סיסמה לא תקינה"}
+              error={!!errors.password || !passwordsMatch || !!rootState?.error}
+              helperText={
+                errors.password
+                  ? "סיסמה לא תקינה"
+                  : !passwordsMatch
+                  ? "שדה 'אימות סיסמה' צריך להיות תואם לשדה סיסמה"
+                  : undefined
+              }
               type="password"
               label="אימות סיסמה"
             />
+          </Grid>
+
+          <Grid container style={{ margin: "2rem 0 0rem" }}>
+            <Grid item md={12} xs={12}>
+              {rootState?.error && (
+                <Alert
+                  style={{ maxWidth: "28rem", margin: "0 auto" }}
+                  severity="error"
+                >
+                  {rootState?.error}
+                </Alert>
+              )}
+            </Grid>
           </Grid>
 
           <Grid container justify="center" alignItems="center">
