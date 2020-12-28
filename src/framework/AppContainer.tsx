@@ -17,6 +17,7 @@ import { create } from "jss";
 import rtl from "jss-rtl";
 import "moment/locale/he";
 import HttpProvider from "./HttpProvider";
+import { CookiesProvider } from "react-cookie";
 
 moment.locale("he");
 
@@ -29,28 +30,30 @@ const AppContainer = (props: any) => {
   }
 
   return (
-    <ContextContainer>
-      <HttpProvider>
-        <Suspense fallback={<div>Loading</div>}>
-          <Router>
-            <MuiPickersUtilsProvider
-              libInstance={moment}
-              utils={MomentUtils}
-              locale="he"
-            >
-              <StylesProvider injectFirst>
-                <MuiThemeProvider theme={theme}>
-                  <ThemeProvider theme={theme}>
-                    <GlobalStyles />
-                    <RTL>{props.children}</RTL>
-                  </ThemeProvider>
-                </MuiThemeProvider>
-              </StylesProvider>
-            </MuiPickersUtilsProvider>
-          </Router>
-        </Suspense>
-      </HttpProvider>
-    </ContextContainer>
+    <Router>
+      <ContextContainer>
+        <CookiesProvider>
+          <HttpProvider>
+            <Suspense fallback={<div>Loading</div>}>
+              <MuiPickersUtilsProvider
+                libInstance={moment}
+                utils={MomentUtils}
+                locale="he"
+              >
+                <StylesProvider injectFirst>
+                  <MuiThemeProvider theme={theme}>
+                    <ThemeProvider theme={theme}>
+                      <GlobalStyles />
+                      <RTL>{props.children}</RTL>
+                    </ThemeProvider>
+                  </MuiThemeProvider>
+                </StylesProvider>
+              </MuiPickersUtilsProvider>
+            </Suspense>
+          </HttpProvider>
+        </CookiesProvider>
+      </ContextContainer>
+    </Router>
   );
 };
 

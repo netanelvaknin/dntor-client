@@ -1,14 +1,30 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import rootContext from "../context/root/rootContext";
 import { Provider } from "use-http";
-
+import { useCookies, withCookies } from "react-cookie";
+import { useLocation, useHistory } from "react-router-dom";
+import moment from "moment";
 interface HttpProviderProps {
   children?: React.ReactNode;
 }
 
 export const HttpProvider = ({ children }: HttpProviderProps) => {
+  const [cookies, remove] = useCookies();
   const rootState = useContext(rootContext);
-  const [token, setToken] = useState("token");
+  const [token, setToken] = useState("");
+  const history = useHistory();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    // Clean the error state every route change
+    rootState?.setError("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
+
+  useEffect(() => {
+    setToken(cookies.token);
+  }, [cookies]);
 
   const options = {
     interceptors: {
@@ -16,20 +32,23 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
         rootState?.setError("");
         rootState?.setLoading(true);
 
-        // First, check if token is exist
-        if (rootState?.token) {
-          setToken(rootState.token);
+        const tokenExpiredDate = cookies["token-expired-date"];
+
+        if (tokenExpiredDate) {
+          const now = moment().format("YYYY-MM-DD");
+          const isAfter = moment(now).isAfter(tokenExpiredDate, "day");
+
+          if (isAfter) {
+            // @ts-ignore
+            remove("token");
+            history.push("/login");
+          }
         }
 
-        // Then, check if expired
-        // if (isExpired(token) {
-        // token = await getNewToken();
-        // setToken(token);
-        // })
-
-        // Set the header
+        // Set headers
         options.headers.Accept = "application/json";
-        options.headers.Authorization = `Bearer ${token}`;
+        // options.headers.Authorization = `Bearer ${token}`;
+        options.headers["access-token"] = `${token || ""}`;
         return options;
       },
       response: async ({ response }: any) => {
@@ -50,4 +69,4 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
   );
 };
 
-export default HttpProvider;
+export default withCookies(HttpProvider);

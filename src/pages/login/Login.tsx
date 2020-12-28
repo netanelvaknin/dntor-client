@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import {
   LoginPageStyle,
   LoginCardStyle,
@@ -20,13 +20,21 @@ import { emailPattern } from "../../utils/patterns";
 import useFetch from "use-http";
 import rootContext from "../../context/root/rootContext";
 import { Alert } from "@material-ui/lab";
+import { useCookies } from "react-cookie";
+import moment from "moment";
 
 export const Login = () => {
   const history = useHistory();
   const rootState = useContext(rootContext);
-
+  const [cookies, setCookie] = useCookies(["token"]);
   const { register, errors, handleSubmit } = useForm();
   const { post, response } = useFetch();
+
+  useEffect(() => {
+    if (cookies.token) {
+      history.push("/business-register");
+    }
+  }, []);
 
   const onSubmit = async (formData: any) => {
     const data = await post("/user/signin", {
@@ -35,9 +43,10 @@ export const Login = () => {
     });
 
     if (response.ok) {
-      rootState?.setToken(data.res);
+      const sevenDaysFromNow = moment().add(7, "d").format("YYYY-MM-DD");
 
-      // check if registered business
+      setCookie("token", data.res, { path: "/" });
+      setCookie("token-expired-date", sevenDaysFromNow);
 
       history.push("/business-register");
     } else {

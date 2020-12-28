@@ -13,12 +13,15 @@ import useFetch from "use-http";
 import rootContext from "../../context/root/rootContext";
 import { Alert } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
+import moment from "moment";
+import { useCookies } from "react-cookie";
 
 export const Register = () => {
   const rootState = useContext(rootContext);
   const history = useHistory();
   const { register, watch, errors, handleSubmit } = useForm();
   const { post, response } = useFetch();
+  const [, setCookie] = useCookies(["token"]);
 
   const password = watch("password");
   const validatePassword = watch("validate_password");
@@ -33,9 +36,23 @@ export const Register = () => {
     });
 
     if (response.ok) {
-      history.push("/business-register");
+      const data = await post("/user/signin", {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.ok) {
+        const sevenDaysFromNow = moment().add(7, "d").format("YYYY-MM-DD");
+
+        setCookie("token", data.res, { path: "/" });
+        setCookie("token-expired-date", sevenDaysFromNow);
+
+        history.push("/business-register");
+      } else {
+        rootState?.setError("משהו השתבש. נא לנסות מאוחר יותר.");
+      }
     } else {
-      rootState?.setError("משהו השתבש אנא נסה שנית");
+      rootState?.setError("כתובת מייל קיימת במערכת. נא לבחור כתובת אחרת.");
     }
   };
 
