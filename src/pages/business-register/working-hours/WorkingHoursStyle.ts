@@ -70,3 +70,7 @@ export const WorkingHourCard = styled(Card)`
         max-width: 32rem;
     }
 `;
+
+export const MobileAddButton = styled(Button)`
+    padding: 1.5rem;
+`;

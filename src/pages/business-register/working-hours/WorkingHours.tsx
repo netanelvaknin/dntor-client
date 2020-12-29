@@ -9,6 +9,7 @@ import {
   ToText,
   AddButton,
   HoursSetupHeading,
+  MobileAddButton,
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
@@ -16,7 +17,16 @@ import PlusIcon from "../../../assets/icons/plus_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 
-export const WorkingHours = ({ setCurrentStep }: CurrentStep) => {
+interface WorkingHoursProps extends CurrentStep {
+  showMobileView?: boolean;
+  setShowMobileView?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const WorkingHours = ({
+  setCurrentStep,
+  setShowMobileView,
+  showMobileView,
+}: WorkingHoursProps) => {
   const initialTime = "00:00";
   const initialWorkingDays = [
     { active: true, day: "א" },
@@ -30,7 +40,6 @@ export const WorkingHours = ({ setCurrentStep }: CurrentStep) => {
 
   const { register, reset, getValues, handleSubmit } = useForm();
   const [days, setDays] = useState<any>(initialWorkingDays);
-  const [showMobileView, setShowMobileView] = useState(false);
   const [workingHours, setWorkingHours] = useState<any>([]);
 
   const isSmallScreen = useSmallScreen();
@@ -52,7 +61,7 @@ export const WorkingHours = ({ setCurrentStep }: CurrentStep) => {
     ]);
 
     if (isSmallScreen) {
-      setShowMobileView(true);
+      setShowMobileView && setShowMobileView(true);
     } else {
     }
 
@@ -244,12 +253,16 @@ export const WorkingHours = ({ setCurrentStep }: CurrentStep) => {
             <Grid
               item
               container
-              justify="flex-end"
-              style={{ padding: "0 1rem" }}
+              justify="center"
+              alignItems="center"
+              style={{ padding: "1rem 3rem 3rem" }}
             >
-              <IconButton onClick={() => setShowMobileView(false)}>
-                <img src={PlusIcon} alt="הוספה" />
-              </IconButton>
+              <MobileAddButton
+                variant="contained"
+                onClick={() => setShowMobileView && setShowMobileView(false)}
+              >
+                הוספת שעת פעילות
+              </MobileAddButton>
             </Grid>
 
             <LeftGrid

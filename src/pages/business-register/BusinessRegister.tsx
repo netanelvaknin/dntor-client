@@ -28,6 +28,7 @@ export interface CurrentStep {
 export const BusinessRegister = () => {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const isSmallScreen = useSmallScreen();
+  const [showMobileView, setShowMobileView] = useState(false);
 
   const steps = [
     {
@@ -38,7 +39,13 @@ export const BusinessRegister = () => {
     {
       stepNumber: 2,
       stepName: "שעות פעילות",
-      component: <WorkingHours setCurrentStep={setCurrentStep} />,
+      component: (
+        <WorkingHours
+          setCurrentStep={setCurrentStep}
+          showMobileView={showMobileView}
+          setShowMobileView={setShowMobileView}
+        />
+      ),
     },
     {
       stepNumber: 3,
@@ -53,7 +60,10 @@ export const BusinessRegister = () => {
   ];
 
   const handleBack = () => {
-    if (currentStep >= 2) {
+    // Dont go back, just flip the view to other view (mobile)
+    if (showMobileView) {
+      setShowMobileView(false);
+    } else if (currentStep >= 2) {
       // @ts-ignore
       setCurrentStep(currentStep - 1);
     }

@@ -30,7 +30,7 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <Grid container justify="center" alignItems="center">
         <Grid item>
           <Typography variant="h1" style={{ marginTop: "4rem" }}>
@@ -107,7 +107,7 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
           </Grid>
         </Grid>
 
-        <Grid container justify="center" style={{ marginTop: "2rem" }}>
+        <Grid container justify="center" style={{ margin: "2rem 0" }}>
           <Grid item>
             <ContinueButtonStyle type="submit">המשך</ContinueButtonStyle>
           </Grid>
