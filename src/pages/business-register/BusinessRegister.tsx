@@ -52,12 +52,21 @@ export const BusinessRegister = () => {
     },
   ];
 
+  const handleBack = () => {
+    if (currentStep >= 2) {
+      // @ts-ignore
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   return (
     <BusinessRegisterPageStyle>
       <BusinessRegisterCard>
-        <ArrowRightButton>
-          <img src={arrowRight} alt="כפתור חזור" />
-        </ArrowRightButton>
+        {currentStep !== 1 && (
+          <ArrowRightButton onClick={handleBack}>
+            <img src={arrowRight} alt="כפתור חזור" />
+          </ArrowRightButton>
+        )}
 
         {isSmallScreen && (
           <CardLabel>{steps[currentStep - 1].stepName}</CardLabel>
