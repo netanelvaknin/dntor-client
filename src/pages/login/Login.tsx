@@ -34,12 +34,13 @@ export const Login = () => {
     if (cookies.token) {
       history.push("/business-register");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSubmit = async (formData: any) => {
     const data = await post("/user/signin", {
-      email: formData.email,
-      password: formData.password,
+      email: formData.email.trim(),
+      password: formData.password.trim(),
     });
 
     if (response.ok) {

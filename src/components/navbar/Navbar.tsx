@@ -19,7 +19,7 @@ export const Navbar = () => {
     }
   }, [cookies]);
 
-  const onButtonClick = () => {
+  const handleButtonClick = () => {
     if (!cookies.token) {
       history.push("/login");
     } else {
@@ -34,7 +34,7 @@ export const Navbar = () => {
     <NavbarStyle>
       <Button
         style={{ margin: "10rem", width: "17rem", height: "5rem" }}
-        onClick={onButtonClick}
+        onClick={handleButtonClick}
       >
         {buttonText}
       </Button>

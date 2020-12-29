@@ -33,6 +33,7 @@ export const RegisterHeading = styled(Typography)`
     @media ${mobile} {
         &.MuiTypography-root {
             margin-top: 18rem;
+            margin-bottom: 3rem;
         }
     }
 `;

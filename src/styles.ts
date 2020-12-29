@@ -13,6 +13,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     font-size: 1.6rem;
+    background: white;
   }
 
   .block-ui-overlay {

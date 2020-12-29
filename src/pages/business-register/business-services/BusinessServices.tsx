@@ -15,8 +15,9 @@ import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import PlusIcon from "../../../assets/icons/plus_icon.svg";
 import { useForm } from "react-hook-form";
+import { CurrentStep } from "../BusinessRegister";
 
-export const BusinessServices = () => {
+export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
   const { register, reset, getValues, handleSubmit } = useForm();
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);

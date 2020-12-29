@@ -6,13 +6,13 @@ import {IconButton} from '@material-ui/core';
 import {Button} from '../../ui/index';
 
 export const BusinessRegisterPageStyle = styled.div`
-    min-height: calc(100vh - 8.6rem);
+    min-height: 100vh;
     padding: 8.6rem 0 5rem;
     background: #F5F9FF;
 
     @media ${mobile} {
         padding: 0;
-        height: calc(100vh - 8.6rem);
+        min-height: calc(100vh - 8.6rem);
     }
 
     &:after {

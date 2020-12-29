@@ -8,8 +8,9 @@ import {
 } from "./NotificationsManagmentStyle";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import { useForm } from "react-hook-form";
+import { CurrentStep } from "../BusinessRegister";
 
-export const NotificationsManagment = () => {
+export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
   const { register, watch, handleSubmit } = useForm();
   const customersNotifications = watch("customers_notifications");
 

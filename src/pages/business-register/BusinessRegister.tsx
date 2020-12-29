@@ -21,22 +21,34 @@ const NotificationsManagment = lazy(() =>
   import("./notifications-managment/NotificationsManagment")
 );
 
+export interface CurrentStep {
+  setCurrentStep: React.Dispatch<React.SetStateAction<1 | 2 | 3 | 4>>;
+}
+
 export const BusinessRegister = () => {
-  const [currentStep] = useState<1 | 2 | 3 | 4>(2);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const isSmallScreen = useSmallScreen();
 
   const steps = [
-    { stepNumber: 1, stepName: "פרופיל העסק", component: <BusinessProfile /> },
+    {
+      stepNumber: 1,
+      stepName: "פרופיל העסק",
+      component: <BusinessProfile setCurrentStep={setCurrentStep} />,
+    },
     {
       stepNumber: 2,
       stepName: "שעות פעילות",
-      component: <WorkingHours />,
+      component: <WorkingHours setCurrentStep={setCurrentStep} />,
     },
-    { stepNumber: 3, stepName: "הגדרת שירות", component: <BusinessServices /> },
+    {
+      stepNumber: 3,
+      stepName: "הגדרת שירות",
+      component: <BusinessServices setCurrentStep={setCurrentStep} />,
+    },
     {
       stepNumber: 4,
       stepName: "ניהול התראות",
-      component: <NotificationsManagment />,
+      component: <NotificationsManagment setCurrentStep={setCurrentStep} />,
     },
   ];
 

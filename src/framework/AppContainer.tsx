@@ -18,6 +18,7 @@ import rtl from "jss-rtl";
 import "moment/locale/he";
 import HttpProvider from "./HttpProvider";
 import { CookiesProvider } from "react-cookie";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 moment.locale("he");
 
@@ -44,7 +45,10 @@ const AppContainer = (props: any) => {
                   <MuiThemeProvider theme={theme}>
                     <ThemeProvider theme={theme}>
                       <GlobalStyles />
-                      <RTL>{props.children}</RTL>
+                      <RTL>
+                        <CssBaseline />
+                        {props.children}
+                      </RTL>
                     </ThemeProvider>
                   </MuiThemeProvider>
                 </StylesProvider>

@@ -2,7 +2,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export const useButtonStyles = makeStyles((theme) => ({
     root: {
-      minWidth: '10rem'
+      minWidth: '10rem',
+      lineHeight: 0                                 
     },
     outlined: {
       border: `1px solid ${theme.palette.primary.main}`,
