@@ -10,17 +10,32 @@ interface CheckboxProps {
     | null
     | undefined;
   label?: string;
+  value?: boolean;
+  disabled?: boolean;
+  onChange?:
+    | ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void)
+    | undefined;
 }
 
-export const Checkbox = ({ name, label, register }: CheckboxProps) => {
+export const Checkbox = ({
+  value,
+  name,
+  label,
+  register,
+  disabled,
+  onChange,
+}: CheckboxProps) => {
   return (
     <FormControlLabel
       control={
         <MatCheckbox
+          checked={value}
           inputRef={register}
           icon={<CheckboxCircle />}
           checkedIcon={<CheckboxChecked />}
           name={name}
+          disabled={disabled}
+          onChange={onChange}
         />
       }
       label={label}

@@ -68,3 +68,7 @@ export const AddButton = styled(Button)`
         min-width: auto;
     }
 `;
+
+export const MobileAddButton = styled(Button)`
+    padding: 1.5rem;
+`;

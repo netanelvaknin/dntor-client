@@ -1,21 +1,18 @@
 import { useState, useEffect } from "react";
-import { DaysPickerContainer, DayButtonWrapper } from "./DaysPickerStyle";
-import { Button } from "@material-ui/core";
+import {
+  DaysPickerContainer,
+  DayButtonWrapper,
+  DayButton,
+} from "./DaysPickerStyle";
 
-type Day = { active: boolean; day: string };
+type Day = { active: boolean; day: string; disabled: boolean };
 interface DaysPickerProps {
   days?: any;
-  disabled?: boolean;
   className?: string;
   onChange?: (days: Day[]) => void;
 }
 
-export const DaysPicker = ({
-  days,
-  disabled,
-  className,
-  onChange,
-}: DaysPickerProps) => {
+export const DaysPicker = ({ days, className, onChange }: DaysPickerProps) => {
   const [value, setValue] = useState(days);
 
   const handleChange = (e: any) => {
@@ -33,21 +30,20 @@ export const DaysPicker = ({
   };
 
   useEffect(() => {
-    setValue(days);
-
     if (onChange) {
       onChange(days);
     }
-  }, [days, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <DaysPickerContainer className={className}>
       {value.map((day: any, index: any) => {
         return (
           <DayButtonWrapper active={day.active} key={index}>
-            <Button onClick={(e) => handleChange(e)} disabled={disabled}>
+            <DayButton onClick={(e) => handleChange(e)} disabled={day.disabled}>
               {day.day}
-            </Button>
+            </DayButton>
           </DayButtonWrapper>
         );
       })}

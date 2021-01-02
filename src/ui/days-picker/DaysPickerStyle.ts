@@ -1,4 +1,5 @@
 import styled from 'styled-components/macro';
+import { Button } from "@material-ui/core";
 
 export const DaysPickerContainer = styled.div`
     display: flex;
@@ -26,5 +27,12 @@ export const DayButtonWrapper = styled.div<DayButtonWrapperProps>`
         .MuiButton-label {
             color: ${props => props.active ? 'white' : '#E2E2E2'};
         }
+    }
+`;
+
+export const DayButton = styled(Button)`
+    &.MuiButtonBase-root {
+        background: ${props => props.disabled && '#E2E2E2'};
+        color: ${props => props.disabled && 'white'};
     }
 `;

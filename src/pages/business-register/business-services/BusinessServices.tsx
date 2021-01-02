@@ -7,13 +7,13 @@ import {
   ServiceCard,
   ServiceText,
   AddButton,
+  MobileAddButton,
 } from "./BusinessServicesStyle";
 import { Grid, IconButton } from "@material-ui/core";
 import { TextField, DurationSelector } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
-import PlusIcon from "../../../assets/icons/plus_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 
@@ -150,7 +150,12 @@ export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
               style={{ padding: "0 1rem" }}
             >
               <IconButton onClick={() => setShowMobileView(false)}>
-                <img src={PlusIcon} alt="הוספה" />
+                <MobileAddButton
+                  variant="contained"
+                  onClick={() => setShowMobileView && setShowMobileView(false)}
+                >
+                  הוספת שעת פעילות
+                </MobileAddButton>
               </IconButton>
             </Grid>
             <LeftGrid

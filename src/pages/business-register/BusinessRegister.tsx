@@ -26,7 +26,7 @@ export interface CurrentStep {
 }
 
 export const BusinessRegister = () => {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(3);
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
 

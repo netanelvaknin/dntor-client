@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Grid, Typography, IconButton } from "@material-ui/core";
-import { DaysPicker, TimePicker } from "../../../ui/index";
+import { TimePicker, Checkbox } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import {
   RightGrid,
@@ -13,7 +13,6 @@ import {
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
-import PlusIcon from "../../../assets/icons/plus_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 
@@ -23,63 +22,115 @@ interface WorkingHoursProps extends CurrentStep {
 }
 
 export const WorkingHours = ({
-  setCurrentStep,
   setShowMobileView,
   showMobileView,
 }: WorkingHoursProps) => {
-  const initialTime = "00:00";
-  const initialWorkingDays = [
-    { active: true, day: "א" },
-    { active: true, day: "ב" },
-    { active: true, day: "ג" },
-    { active: true, day: "ד" },
-    { active: true, day: "ה" },
-    { active: true, day: "ו" },
-    { active: true, day: "ש" },
-  ];
+  const { register, getValues, setValue, handleSubmit } = useForm();
+  const [checkedDay, setCheckedDay] = useState({
+    sunday: false,
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+  });
 
-  const { register, reset, getValues, handleSubmit } = useForm();
-  const [days, setDays] = useState<any>(initialWorkingDays);
+  const [disabledDays, setDisabledDays] = useState({
+    sunday: false,
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+  });
   const [workingHours, setWorkingHours] = useState<any>([]);
 
   const isSmallScreen = useSmallScreen();
+  const initialTime = "00:00";
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCheckedDay({ ...checkedDay, [event.target.name]: event.target.checked });
+  };
 
   const handleAddWorkingHours = () => {
-    setWorkingHours([
-      ...workingHours,
-      {
-        days,
-        workingHours: {
-          from: getValues("start_working"),
-          to: getValues("end_working"),
-        },
-        breakHours: {
-          from: getValues("start_break"),
-          to: getValues("end_break"),
-        },
-      },
-    ]);
+    const hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
 
-    if (isSmallScreen) {
-      setShowMobileView && setShowMobileView(true);
-    } else {
-    }
+    const checkedDays = { ...checkedDay };
+    setDisabledDays(checkedDays);
 
-    setDays([
-      { active: true, day: "א" },
-      { active: true, day: "ב" },
-      { active: true, day: "ג" },
-      { active: true, day: "ד" },
-      { active: true, day: "ה" },
-      { active: true, day: "ו" },
-      { active: true, day: "ש" },
-    ]);
-    reset({
-      start_working: initialTime,
-      end_working: initialTime,
-      start_break: initialTime,
-      end_break: initialTime,
+    const translatedDays = Object.entries(checkedDay).map(
+      ([key, value], index) => {
+        if (value && value !== undefined) {
+          return hebrewDays[index];
+        }
+      }
+    );
+
+    const uniqueDays = translatedDays.filter((day: any) => {
+      const workingHoursCopy = JSON.stringify(workingHours);
+      if (!workingHoursCopy.includes(day)) {
+        return day;
+      }
     });
+
+    if (uniqueDays.length > 0) {
+      // Set new working days & working times & breaks times
+      setWorkingHours([
+        ...workingHours,
+        {
+          days: uniqueDays,
+          workingHours: {
+            from: getValues("start_working"),
+            to: getValues("end_working"),
+          },
+          breakHours: {
+            from: getValues("start_break"),
+            to: getValues("end_break"),
+          },
+        },
+      ]);
+
+      if (isSmallScreen) {
+        setShowMobileView && setShowMobileView(true);
+      }
+    }
+  };
+
+  const removeWorkingHours = (index: number) => {
+    const translatedDays = {
+      sunday: "א",
+      monday: "ב",
+      tuesday: "ג",
+      wednesday: "ד",
+      thursday: "ה",
+      friday: "ו",
+      saturday: "ש",
+    };
+
+    const daysBeforeRemove = workingHours[index].days;
+    const newDays = {};
+
+    Object.entries(translatedDays).forEach(([key, value], index) => {
+      if (daysBeforeRemove.includes(value)) {
+        Object.assign(newDays, { [key]: false });
+      }
+    });
+
+    setCheckedDay({
+      ...checkedDay,
+      ...newDays,
+    });
+
+    setDisabledDays({
+      ...disabledDays,
+      ...newDays,
+    });
+
+    const workingHoursCopy = [...workingHours];
+    workingHoursCopy.splice(index, 1);
+    setWorkingHours(workingHoursCopy);
   };
 
   const onSubmit = (data: any) => {
@@ -94,7 +145,6 @@ export const WorkingHours = ({
             הגדרת שעות
           </HoursSetupHeading>
         </Grid>
-
         {!showMobileView && (
           <RightGrid
             md={6}
@@ -107,8 +157,71 @@ export const WorkingHours = ({
             $workingHoursLength={workingHours.length}
             style={{ margin: "0 auto" }}
           >
-            <Grid item style={{ marginBottom: "3rem" }}>
-              <DaysPicker days={days} onChange={(days) => setDays(days)} />
+            <Grid
+              item
+              container
+              justify="center"
+              direction="column"
+              style={{ marginBottom: "3rem" }}
+            >
+              <Grid item>נא לסמן את הימים בהם העסק עובד</Grid>
+              <Grid item>
+                <Checkbox
+                  value={checkedDay.sunday}
+                  label="א"
+                  name="sunday"
+                  disabled={disabledDays.sunday}
+                  onChange={handleChange}
+                />
+                <Checkbox
+                  value={checkedDay.monday}
+                  label="ב"
+                  name="monday"
+                  register={register}
+                  disabled={disabledDays.monday}
+                  onChange={handleChange}
+                />
+                <Checkbox
+                  value={checkedDay.tuesday}
+                  label="ג"
+                  name="tuesday"
+                  register={register}
+                  disabled={disabledDays.tuesday}
+                  onChange={handleChange}
+                />
+                <Checkbox
+                  value={checkedDay.wednesday}
+                  label="ד"
+                  name="wednesday"
+                  register={register}
+                  disabled={disabledDays.wednesday}
+                  onChange={handleChange}
+                />
+                <Checkbox
+                  value={checkedDay.thursday}
+                  label="ה"
+                  name="thursday"
+                  register={register}
+                  disabled={disabledDays.thursday}
+                  onChange={handleChange}
+                />
+                <Checkbox
+                  value={checkedDay.friday}
+                  label="ו"
+                  name="friday"
+                  register={register}
+                  disabled={disabledDays.friday}
+                  onChange={handleChange}
+                />
+                <Checkbox
+                  value={checkedDay.saturday}
+                  label="ש"
+                  name="saturday"
+                  register={register}
+                  disabled={disabledDays.saturday}
+                  onChange={handleChange}
+                />
+              </Grid>
             </Grid>
 
             <Grid
@@ -183,9 +296,7 @@ export const WorkingHours = ({
                 md={12}
                 style={{ marginTop: "3rem" }}
               >
-                <AddButton variant="text" type="submit">
-                  הוספה
-                </AddButton>
+                <AddButton variant="text">הוספת שעות פעילות נוספות</AddButton>
               </Grid>
             )}
           </RightGrid>
@@ -214,16 +325,12 @@ export const WorkingHours = ({
                   <Grid container alignItems="center" key={index}>
                     <WorkingHourCard>
                       <div>
-                        {workingHour.days.map((day: any, index: number) => {
-                          if (day.active) {
-                            if (workingHour.days.length === index + 1) {
-                              return `${day.day} `;
-                            } else {
-                              return `${day.day} ,`;
-                            }
+                        {workingHour.days.map((day: any, dayIndex: number) => {
+                          if (day) {
+                            return <span key={dayIndex}>{day + " "}</span>;
                           }
 
-                          return undefined;
+                          return;
                         })}
                       </div>
                       <div>
@@ -237,7 +344,7 @@ export const WorkingHours = ({
                         {workingHour.breakHours.to}
                       </div>
                     </WorkingHourCard>
-                    <IconButton>
+                    <IconButton onClick={() => removeWorkingHours(index)}>
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -272,6 +379,12 @@ export const WorkingHours = ({
               direction="row"
               justify="center"
               alignItems="center"
+              style={{
+                maxHeight: "30rem",
+                overflowY: "auto",
+                width: "95%",
+                padding: "1rem 0",
+              }}
             >
               {workingHours.map((workingHour: any, index: any) => {
                 return (
@@ -306,7 +419,7 @@ export const WorkingHours = ({
                         {workingHour.breakHours.to}
                       </div>
                     </WorkingHourCard>
-                    <IconButton>
+                    <IconButton style={{ marginRight: "1.5rem" }}>
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -330,10 +443,10 @@ export const WorkingHours = ({
             container
             justify="center"
             alignItems="center"
-            style={{ margin: "4rem 0" }}
+            style={{ margin: "8rem 0 6rem" }}
           >
             <ContinueButtonStyle onClick={handleAddWorkingHours}>
-              {workingHours.length > 0 ? "המשך" : "אישור"}
+              {workingHours.length > 0 ? "המשך לשלב הבא" : "הוספה"}
             </ContinueButtonStyle>
           </Grid>
         )}
