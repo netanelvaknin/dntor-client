@@ -23,6 +23,7 @@ export const Navbar = () => {
     if (!cookies.token) {
       history.push("/login");
     } else {
+      console.log("run");
       remove("token", "");
       remove("token-expired-date", "");
       history.push("/");

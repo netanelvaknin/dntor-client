@@ -1,4 +1,4 @@
-import { lazy, useState } from "react";
+import { lazy, useState, useContext, useEffect } from "react";
 import {
   BusinessRegisterPageStyle,
   BusinessRegisterCard,
@@ -8,6 +8,7 @@ import {
 import Stepper from "./stepper/Stepper";
 import { useSmallScreen } from "../../hooks/index";
 import arrowRight from "../../assets/icons/arrow-right.svg";
+import rootContext from "../../context/root/rootContext";
 
 // Steps components
 const BusinessProfile = lazy(() =>
@@ -26,9 +27,15 @@ export interface CurrentStep {
 }
 
 export const BusinessRegister = () => {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(3);
+  const rootState = useContext(rootContext);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(2);
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
+
+  useEffect(() => {
+    rootState?.setError("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
 
   const steps = [
     {

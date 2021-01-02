@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import { Grid, Typography, IconButton } from "@material-ui/core";
-import { TimePicker, Checkbox } from "../../../ui/index";
+import { TimePicker } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import {
   RightGrid,
@@ -10,11 +10,15 @@ import {
   AddButton,
   HoursSetupHeading,
   MobileAddButton,
+  DayCheckbox,
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
+import rootContext from "../../../context/root/rootContext";
+import moment from "moment";
+// import { Alert } from "@material-ui/lab";
 
 interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
@@ -25,7 +29,13 @@ export const WorkingHours = ({
   setShowMobileView,
   showMobileView,
 }: WorkingHoursProps) => {
-  const { register, getValues, setValue, handleSubmit } = useForm();
+  const rootState = useContext(rootContext);
+  const { register, errors, watch, handleSubmit } = useForm();
+  const startWorking = watch("start_working");
+  const endWorking = watch("end_working");
+  const startBreak = watch("start_break");
+  const endBreak = watch("end_break");
+
   const [checkedDay, setCheckedDay] = useState({
     sunday: false,
     monday: false,
@@ -48,7 +58,6 @@ export const WorkingHours = ({
   const [workingHours, setWorkingHours] = useState<any>([]);
 
   const isSmallScreen = useSmallScreen();
-  const initialTime = "00:00";
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCheckedDay({ ...checkedDay, [event.target.name]: event.target.checked });
@@ -57,13 +66,12 @@ export const WorkingHours = ({
   const handleAddWorkingHours = () => {
     const hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
 
-    const checkedDays = { ...checkedDay };
-    setDisabledDays(checkedDays);
-
     const translatedDays = Object.entries(checkedDay).map(
       ([key, value], index) => {
         if (value && value !== undefined) {
           return hebrewDays[index];
+        } else {
+          return null;
         }
       }
     );
@@ -72,22 +80,40 @@ export const WorkingHours = ({
       const workingHoursCopy = JSON.stringify(workingHours);
       if (!workingHoursCopy.includes(day)) {
         return day;
+      } else {
+        return null;
       }
     });
 
-    if (uniqueDays.length > 0) {
+    const workStartTime = moment(startWorking, "HH:mm:ss");
+    const workEndTime = moment(endWorking, "HH:mm:ss");
+
+    var difWork = moment.duration(workEndTime.diff(workStartTime));
+    // @ts-ignore
+    const isWorkMoreThanTwentyMin = difWork._milliseconds >= 1200000;
+
+    if (!isWorkMoreThanTwentyMin) {
+      rootState?.setError("אתה עובד פחות מ-20 דק' ביום ? אתה בטוח?");
+    } else {
+      rootState?.setError("");
+    }
+
+    if (uniqueDays.length > 0 && isWorkMoreThanTwentyMin) {
+      const checkedDays = { ...checkedDay };
+      setDisabledDays(checkedDays);
+
       // Set new working days & working times & breaks times
       setWorkingHours([
         ...workingHours,
         {
           days: uniqueDays,
           workingHours: {
-            from: getValues("start_working"),
-            to: getValues("end_working"),
+            from: startWorking,
+            to: endWorking,
           },
           breakHours: {
-            from: getValues("start_break"),
-            to: getValues("end_break"),
+            from: startBreak,
+            to: endBreak,
           },
         },
       ]);
@@ -145,6 +171,7 @@ export const WorkingHours = ({
             הגדרת שעות
           </HoursSetupHeading>
         </Grid>
+
         {!showMobileView && (
           <RightGrid
             md={6}
@@ -161,61 +188,69 @@ export const WorkingHours = ({
               item
               container
               justify="center"
+              alignItems="center"
               direction="column"
               style={{ marginBottom: "3rem" }}
             >
               <Grid item>נא לסמן את הימים בהם העסק עובד</Grid>
-              <Grid item>
-                <Checkbox
+              <Grid item style={{ maxWidth: "28rem" }}>
+                <DayCheckbox
                   value={checkedDay.sunday}
                   label="א"
+                  labelPlacement="top"
                   name="sunday"
                   disabled={disabledDays.sunday}
                   onChange={handleChange}
                 />
-                <Checkbox
+                <DayCheckbox
                   value={checkedDay.monday}
                   label="ב"
+                  labelPlacement="top"
                   name="monday"
                   register={register}
                   disabled={disabledDays.monday}
                   onChange={handleChange}
                 />
-                <Checkbox
+                <DayCheckbox
                   value={checkedDay.tuesday}
                   label="ג"
+                  labelPlacement="top"
                   name="tuesday"
                   register={register}
                   disabled={disabledDays.tuesday}
                   onChange={handleChange}
                 />
-                <Checkbox
+                <DayCheckbox
                   value={checkedDay.wednesday}
                   label="ד"
+                  labelPlacement="top"
                   name="wednesday"
                   register={register}
                   disabled={disabledDays.wednesday}
                   onChange={handleChange}
                 />
-                <Checkbox
+                <DayCheckbox
                   value={checkedDay.thursday}
                   label="ה"
+                  labelPlacement="top"
                   name="thursday"
                   register={register}
                   disabled={disabledDays.thursday}
                   onChange={handleChange}
                 />
-                <Checkbox
+                <DayCheckbox
                   value={checkedDay.friday}
                   label="ו"
+                  labelPlacement="top"
                   name="friday"
                   register={register}
                   disabled={disabledDays.friday}
                   onChange={handleChange}
                 />
-                <Checkbox
+                <DayCheckbox
                   value={checkedDay.saturday}
                   label="ש"
+                  labelPlacement="top"
                   name="saturday"
                   register={register}
                   disabled={disabledDays.saturday}
@@ -224,11 +259,7 @@ export const WorkingHours = ({
               </Grid>
             </Grid>
 
-            <Grid
-              item
-              container
-              justify={isSmallScreen ? "center" : "flex-start"}
-            >
+            <Grid item container justify="center">
               <Grid item>
                 <Typography variant="h2" style={{ marginBottom: "2rem" }}>
                   שעות עבודה
@@ -240,27 +271,51 @@ export const WorkingHours = ({
               item
               container
               alignItems="center"
-              justify={isSmallScreen ? "center" : "flex-start"}
+              justify="center"
               style={{ marginBottom: "2rem" }}
             >
-              <Grid item md={5}>
-                <TimePicker register={register} name="start_working" />
+              <Grid
+                item
+                container={isSmallScreen ? false : true}
+                justify="center"
+                alignItems="center"
+                md={5}
+              >
+                <TimePicker
+                  register={register}
+                  name="start_working"
+                  error={!!rootState?.error || errors.start_working}
+                  helperText={rootState?.error && "משך עבודה לא תקין"}
+                />
               </Grid>
 
-              <Grid item md={2}>
+              <Grid
+                item
+                container={isSmallScreen ? false : true}
+                justify="center"
+                alignItems="center"
+                md={2}
+              >
                 <ToText>עד</ToText>
               </Grid>
 
-              <Grid item md={5}>
-                <TimePicker register={register} name="end_working" />
+              <Grid
+                item
+                container={isSmallScreen ? false : true}
+                justify="center"
+                alignItems="center"
+                md={5}
+              >
+                <TimePicker
+                  register={register}
+                  name="end_working"
+                  error={!!rootState?.error || errors.end_working}
+                  helperText={rootState?.error && "משך עבודה לא תקין"}
+                />
               </Grid>
             </Grid>
 
-            <Grid
-              item
-              container
-              justify={isSmallScreen ? "center" : "flex-start"}
-            >
+            <Grid item container justify="center">
               <Grid item>
                 <Typography variant="h2" style={{ marginBottom: "2rem" }}>
                   זמן הפסקה
@@ -268,21 +323,34 @@ export const WorkingHours = ({
               </Grid>
             </Grid>
 
-            <Grid
-              item
-              container
-              alignItems="center"
-              justify={isSmallScreen ? "center" : "flex-start"}
-            >
-              <Grid item md={5}>
+            <Grid item container alignItems="center" justify="center">
+              <Grid
+                item
+                container={isSmallScreen ? false : true}
+                justify="center"
+                alignItems="center"
+                md={5}
+              >
                 <TimePicker register={register} name="start_break" />
               </Grid>
 
-              <Grid item md={2}>
+              <Grid
+                item
+                container={isSmallScreen ? false : true}
+                justify="center"
+                alignItems="center"
+                md={2}
+              >
                 <ToText>עד</ToText>
               </Grid>
 
-              <Grid item md={5}>
+              <Grid
+                item
+                container={isSmallScreen ? false : true}
+                justify="center"
+                alignItems="center"
+                md={5}
+              >
                 <TimePicker register={register} name="end_break" />
               </Grid>
             </Grid>
@@ -330,7 +398,7 @@ export const WorkingHours = ({
                             return <span key={dayIndex}>{day + " "}</span>;
                           }
 
-                          return;
+                          return null;
                         })}
                       </div>
                       <div>
@@ -396,16 +464,12 @@ export const WorkingHours = ({
                   >
                     <WorkingHourCard>
                       <div>
-                        {workingHour.days.map((day: any, index: number) => {
-                          if (day.active) {
-                            if (workingHour.days.length === index + 1) {
-                              return `${day.day} `;
-                            } else {
-                              return `${day.day} ,`;
-                            }
+                        {workingHour.days.map((day: any, dayIndex: number) => {
+                          if (day) {
+                            return <span key={dayIndex}>{day + " "}</span>;
                           }
 
-                          return undefined;
+                          return null;
                         })}
                       </div>
                       <div>
@@ -419,7 +483,10 @@ export const WorkingHours = ({
                         {workingHour.breakHours.to}
                       </div>
                     </WorkingHourCard>
-                    <IconButton style={{ marginRight: "1.5rem" }}>
+                    <IconButton
+                      onClick={() => removeWorkingHours(index)}
+                      style={{ marginRight: "1.5rem" }}
+                    >
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -443,10 +510,30 @@ export const WorkingHours = ({
             container
             justify="center"
             alignItems="center"
-            style={{ margin: "8rem 0 6rem" }}
+            style={{ margin: "8rem 0 2rem" }}
           >
-            <ContinueButtonStyle onClick={handleAddWorkingHours}>
-              {workingHours.length > 0 ? "המשך לשלב הבא" : "הוספה"}
+            <ContinueButtonStyle
+              variant="contained"
+              onClick={handleAddWorkingHours}
+              disabled={false}
+            >
+              הוספה
+            </ContinueButtonStyle>
+          </Grid>
+        )}
+
+        {!showMobileView && (
+          <Grid
+            container
+            justify="center"
+            alignItems="center"
+            style={{ margin: "0rem 0 6rem" }}
+          >
+            <ContinueButtonStyle
+              onClick={handleAddWorkingHours}
+              disabled={workingHours.length === 0}
+            >
+              המשך לשלב הבא
             </ContinueButtonStyle>
           </Grid>
         )}

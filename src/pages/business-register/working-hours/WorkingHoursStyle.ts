@@ -2,7 +2,7 @@ import styled from 'styled-components/macro';
 import {TextField, Button} from '../../../ui/index';
 import {Grid, Typography} from '@material-ui/core';
 import {mobile, tablet} from '../../../utils/screen-sizes';
-import { Card } from "../../../ui/index";
+import { Card, Checkbox } from "../../../ui/index";
 interface RightGridProps {
     $workingHoursLength: number;
 }
@@ -73,4 +73,11 @@ export const WorkingHourCard = styled(Card)`
 
 export const MobileAddButton = styled(Button)`
     padding: 1.5rem;
+`;
+
+export const DayCheckbox = styled(Checkbox)`
+    margin: 10px;
+    & .PrivateSwitchBase-root-2 {
+        padding: 0;
+    }
 `;

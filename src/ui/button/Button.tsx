@@ -33,6 +33,7 @@ export const Button = ({
         outlined: classes.outlined,
         text: classes.text,
         contained: classes.contained,
+        disabled: classes.disabled,
       }}
       className={className}
       onClick={onClick}

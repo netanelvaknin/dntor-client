@@ -45,9 +45,17 @@ export const Login = () => {
 
     if (response.ok) {
       const sevenDaysFromNow = moment().add(7, "d").format("YYYY-MM-DD");
+      const dateToRemoveCookie = new Date().setTime(
+        new Date().getTime() + 7 * 24 * 60 * 60 * 1000
+      );
 
-      setCookie("token", data.res, { path: "/" });
-      setCookie("token-expired-date", sevenDaysFromNow);
+      setCookie("token", data.res, {
+        path: "/",
+        expires: new Date(dateToRemoveCookie),
+      });
+      setCookie("token-expired-date", sevenDaysFromNow, {
+        expires: new Date(dateToRemoveCookie),
+      });
 
       history.push("/business-register");
     } else {

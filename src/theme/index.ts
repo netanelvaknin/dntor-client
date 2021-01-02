@@ -24,6 +24,13 @@ export default createMuiTheme({
     }
   },
   overrides: {
+    MuiFormHelperText: {
+      root: {
+        "&$error": {
+          margin: '2px 0'
+        }
+      }
+    },
     MuiFormControl: {
       root: {
         margin: '.5rem 0'

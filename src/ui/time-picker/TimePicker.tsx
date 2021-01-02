@@ -11,6 +11,8 @@ interface TimePickerProps {
     | null
     | undefined;
   disableToolbar?: boolean;
+  error?: boolean;
+  helperText?: string;
   className?: string;
 }
 
@@ -20,6 +22,8 @@ export const TimePicker = ({
   ampm = false,
   register,
   disableToolbar = false,
+  error,
+  helperText,
 }: TimePickerProps) => {
   const { control } = useForm();
   const classes = useTimePickerStyles();
@@ -42,6 +46,8 @@ export const TimePicker = ({
           disableToolbar={disableToolbar}
           InputProps={{ className: classes.input, name }}
           className={className}
+          error={error}
+          helperText={helperText}
           onChange={onChange}
         />
       )}

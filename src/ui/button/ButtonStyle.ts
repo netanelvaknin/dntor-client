@@ -29,5 +29,10 @@ export const useButtonStyles = makeStyles((theme) => ({
       '& .MuiButton-label': {
         color: '#fff'
       }
+    },
+    disabled: {
+      '& .MuiButton-label': {
+        color: '#ccc'
+      }
     }
   }));
