@@ -60,7 +60,7 @@ export const AddButton = styled(Button)`
 
 export const WorkingHourCard = styled(Card)`
     width: 22rem;
-    height: 8.5rem;
+    min-height: 8.5rem;
     position: relative;
     margin-bottom: 2rem;
     padding: 1rem;

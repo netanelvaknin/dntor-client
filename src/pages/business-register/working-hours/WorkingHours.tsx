@@ -1,13 +1,12 @@
 import { useState, useContext } from "react";
 import { Grid, Typography, IconButton } from "@material-ui/core";
-import { TimePicker } from "../../../ui/index";
+import { TimePicker, Button } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import {
   RightGrid,
   LeftGrid,
   WorkingHourCard,
   ToText,
-  AddButton,
   HoursSetupHeading,
   MobileAddButton,
   DayCheckbox,
@@ -18,7 +17,6 @@ import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 import rootContext from "../../../context/root/rootContext";
 import moment from "moment";
-// import { Alert } from "@material-ui/lab";
 
 interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
@@ -30,12 +28,17 @@ export const WorkingHours = ({
   showMobileView,
 }: WorkingHoursProps) => {
   const rootState = useContext(rootContext);
-  const { register, errors, watch, handleSubmit } = useForm();
-  const startWorking = watch("start_working");
-  const endWorking = watch("end_working");
-  const startBreak = watch("start_break");
-  const endBreak = watch("end_break");
+  const { register, errors, reset, watch, handleSubmit } = useForm();
+  const startWorking = watch("start_working", "00:00");
+  const endWorking = watch("end_working", "00:00");
+  const startBreakOne = watch("start_break_0");
+  const endBreakOne = watch("end_break_0");
+  const startBreakTwo = watch("start_break_1");
+  const endBreakTwo = watch("end_break_1");
+  const startBreakThree = watch("start_break_2");
+  const endBreakThree = watch("end_break_2");
 
+  const [breaks, setBreaks] = useState<any>([]);
   const [checkedDay, setCheckedDay] = useState({
     sunday: false,
     monday: false,
@@ -85,20 +88,15 @@ export const WorkingHours = ({
       }
     });
 
-    const workStartTime = moment(startWorking, "HH:mm:ss");
-    const workEndTime = moment(endWorking, "HH:mm:ss");
+    const workStartTime = moment(startWorking, "hh:mm");
+    const workEndTime = moment(endWorking, "hh:mm");
+    const startIsBeforeEnd = workStartTime.isBefore(workEndTime);
 
-    var difWork = moment.duration(workEndTime.diff(workStartTime));
-    // @ts-ignore
-    const isWorkMoreThanTwentyMin = difWork._milliseconds >= 1200000;
-
-    if (!isWorkMoreThanTwentyMin) {
-      rootState?.setError("אתה עובד פחות מ-20 דק' ביום ? אתה בטוח?");
-    } else {
-      rootState?.setError("");
+    if (!startIsBeforeEnd) {
+      rootState?.setError("זמן התחלה גדול מזמן סיום");
     }
 
-    if (uniqueDays.length > 0 && isWorkMoreThanTwentyMin) {
+    if (uniqueDays.length > 0 && startIsBeforeEnd) {
       const checkedDays = { ...checkedDay };
       setDisabledDays(checkedDays);
 
@@ -111,16 +109,28 @@ export const WorkingHours = ({
             from: startWorking,
             to: endWorking,
           },
-          breakHours: {
-            from: startBreak,
-            to: endBreak,
-          },
+          breaks: [
+            { from: startBreakOne, to: endBreakOne },
+            { from: startBreakTwo, to: endBreakTwo },
+            { from: startBreakThree, to: endBreakThree },
+          ],
         },
       ]);
 
       if (isSmallScreen) {
         setShowMobileView && setShowMobileView(true);
       }
+
+      reset({
+        start_working: "00:00",
+        end_working: "00:00",
+        start_break_0: "00:00",
+        start_break_1: "00:00",
+        start_break_2: "00:00",
+        end_break_0: "00:00",
+        end_break_1: "00:00",
+        end_break_2: "00:00",
+      });
     }
   };
 
@@ -157,6 +167,54 @@ export const WorkingHours = ({
     const workingHoursCopy = [...workingHours];
     workingHoursCopy.splice(index, 1);
     setWorkingHours(workingHoursCopy);
+  };
+
+  const removeBreak = (index: number) => {
+    console.log(index);
+    const breaksCopy = [...breaks];
+    console.log(breaksCopy);
+    // breaksCopy.splice(index, 1);
+    // setBreaks(breaksCopy);
+  };
+
+  const Break = ({ index }: { index: number }) => {
+    console.log(breaks);
+    return (
+      <>
+        <Grid
+          item
+          container={isSmallScreen ? false : true}
+          justify="center"
+          alignItems="center"
+          md={5}
+        >
+          <TimePicker register={register} name={"start_break_" + index} />
+        </Grid>
+
+        <Grid
+          item
+          container={isSmallScreen ? false : true}
+          justify="center"
+          alignItems="center"
+          md={2}
+        >
+          <ToText>עד</ToText>
+        </Grid>
+
+        <Grid
+          item
+          container={isSmallScreen ? false : true}
+          justify="center"
+          alignItems="center"
+          md={5}
+        >
+          <TimePicker register={register} name={"end_break_" + index} />
+        </Grid>
+        <Button variant="text" onClick={() => removeBreak(index)}>
+          הסרה
+        </Button>
+      </>
+    );
   };
 
   const onSubmit = (data: any) => {
@@ -282,10 +340,11 @@ export const WorkingHours = ({
                 md={5}
               >
                 <TimePicker
+                  // ampm
                   register={register}
                   name="start_working"
-                  error={!!rootState?.error || errors.start_working}
-                  helperText={rootState?.error && "משך עבודה לא תקין"}
+                  error={errors.start_working}
+                  helperText={errors.start_working && "משך עבודה לא תקין"}
                 />
               </Grid>
 
@@ -307,64 +366,62 @@ export const WorkingHours = ({
                 md={5}
               >
                 <TimePicker
+                  // ampm
                   register={register}
                   name="end_working"
-                  error={!!rootState?.error || errors.end_working}
-                  helperText={rootState?.error && "משך עבודה לא תקין"}
+                  error={errors.end_working}
+                  helperText={errors.end_working && "משך עבודה לא תקין"}
                 />
               </Grid>
             </Grid>
 
-            <Grid item container justify="center">
-              <Grid item>
-                <Typography variant="h2" style={{ marginBottom: "2rem" }}>
-                  זמן הפסקה
-                </Typography>
-              </Grid>
-            </Grid>
+            {breaks.map((Break: any, index: number) => {
+              if (index < 3) {
+                return (
+                  <Grid
+                    item
+                    container
+                    alignItems="center"
+                    justify="center"
+                    style={{ marginBottom: "2rem" }}
+                    key={index}
+                  >
+                    <Grid item container justify="center">
+                      <Grid item>
+                        <Typography
+                          variant="h2"
+                          style={{ marginBottom: "2rem" }}
+                        >
+                          הפסקה {index + 1}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    {Break}
+                  </Grid>
+                );
+              } else {
+                return null;
+              }
+            })}
 
-            <Grid item container alignItems="center" justify="center">
-              <Grid
-                item
-                container={isSmallScreen ? false : true}
-                justify="center"
-                alignItems="center"
-                md={5}
-              >
-                <TimePicker register={register} name="start_break" />
-              </Grid>
-
-              <Grid
-                item
-                container={isSmallScreen ? false : true}
-                justify="center"
-                alignItems="center"
-                md={2}
-              >
-                <ToText>עד</ToText>
-              </Grid>
-
-              <Grid
-                item
-                container={isSmallScreen ? false : true}
-                justify="center"
-                alignItems="center"
-                md={5}
-              >
-                <TimePicker register={register} name="end_break" />
-              </Grid>
-            </Grid>
-
-            {workingHours.length > 0 && !isSmallScreen && (
+            {breaks.length < 3 && (
               <Grid
                 container
-                justify="center"
-                item
-                xs={12}
                 md={12}
+                justify="center"
+                alignItems="center"
                 style={{ marginTop: "3rem" }}
               >
-                <AddButton variant="text">הוספת שעות פעילות נוספות</AddButton>
+                <Grid item>
+                  <Button
+                    variant="text"
+                    onClick={() => {
+                      setBreaks([...breaks, <Break index={breaks.length} />]);
+                    }}
+                  >
+                    הוסף הפסקה
+                  </Button>
+                </Grid>
               </Grid>
             )}
           </RightGrid>
@@ -401,15 +458,31 @@ export const WorkingHours = ({
                           return null;
                         })}
                       </div>
-                      <div>
+                      <div style={{ marginTop: "1rem" }}>
+                        <strong>שעות עבודה:</strong> <br />
                         {workingHour.workingHours.from}
                         <strong style={{ margin: "0 1rem" }}>עד</strong>
                         {workingHour.workingHours.to}
                       </div>
-                      <div>
-                        {workingHour.breakHours.from}
-                        <strong style={{ margin: "0 1rem" }}>עד</strong>
-                        {workingHour.breakHours.to}
+
+                      <div style={{ marginTop: "1rem" }}>
+                        <strong>זמני הפסקה:</strong> <br />
+                        {workingHour.breaks.map((b: any, index: number) => {
+                          if (b.from === undefined && b.to === undefined) {
+                            return null;
+                          } else {
+                            return (
+                              <div key={index}>
+                                {b.from}
+                                <strong style={{ margin: "0 1rem" }}>
+                                  {" "}
+                                  עד{" "}
+                                </strong>
+                                {b.to}
+                              </div>
+                            );
+                          }
+                        })}
                       </div>
                     </WorkingHourCard>
                     <IconButton onClick={() => removeWorkingHours(index)}>
@@ -478,9 +551,8 @@ export const WorkingHours = ({
                         {workingHour.workingHours.to}
                       </div>
                       <div>
-                        {workingHour.breakHours.from}
                         <strong style={{ margin: "0 1rem" }}>עד</strong>
-                        {workingHour.breakHours.to}
+                        {/* {workingHour.breakHours.to} */}
                       </div>
                     </WorkingHourCard>
                     <IconButton
@@ -510,7 +582,7 @@ export const WorkingHours = ({
             container
             justify="center"
             alignItems="center"
-            style={{ margin: "8rem 0 2rem" }}
+            style={{ margin: "5rem 0 2rem" }}
           >
             <ContinueButtonStyle
               variant="contained"
@@ -532,6 +604,7 @@ export const WorkingHours = ({
             <ContinueButtonStyle
               onClick={handleAddWorkingHours}
               disabled={workingHours.length === 0}
+              type="submit"
             >
               המשך לשלב הבא
             </ContinueButtonStyle>
