@@ -15,6 +15,7 @@ interface TimePickerProps {
   error?: boolean;
   helperText?: string;
   className?: string;
+  defaultValue?: number;
 }
 
 export const TimePicker = ({
@@ -25,6 +26,7 @@ export const TimePicker = ({
   disableToolbar = false,
   error,
   helperText,
+  defaultValue,
 }: TimePickerProps) => {
   const { control } = useForm();
   const classes = useTimePickerStyles();
@@ -47,7 +49,7 @@ export const TimePicker = ({
     <Controller
       name="timePicker"
       control={control}
-      defaultValue={new Date().setHours(24, 0, 0, 0)}
+      defaultValue={defaultValue || new Date().setHours(24, 0, 0, 0)}
       render={({ onChange, value }) => (
         <MuiTimePicker
           value={value}

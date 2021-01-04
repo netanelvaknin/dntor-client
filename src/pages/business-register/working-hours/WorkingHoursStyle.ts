@@ -76,8 +76,16 @@ export const MobileAddButton = styled(Button)`
 `;
 
 export const DayCheckbox = styled(Checkbox)`
-    margin: 10px;
+    margin: 8px!important;
     & .PrivateSwitchBase-root-2 {
         padding: 0;
+    }
+`;
+
+export const BreakButton = styled(Button)`
+    margin: 1rem 0;
+
+    & .MuiButton-label {
+        text-decoration: none;
     }
 `;

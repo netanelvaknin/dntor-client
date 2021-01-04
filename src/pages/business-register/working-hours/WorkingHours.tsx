@@ -1,6 +1,6 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Grid, Typography, IconButton } from "@material-ui/core";
-import { TimePicker, Button } from "../../../ui/index";
+import { TimePicker } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
 import {
   RightGrid,
@@ -10,6 +10,7 @@ import {
   HoursSetupHeading,
   MobileAddButton,
   DayCheckbox,
+  BreakButton,
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
@@ -17,6 +18,8 @@ import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 import rootContext from "../../../context/root/rootContext";
 import moment from "moment";
+import { Delete } from "@material-ui/icons";
+import { Alert } from "@material-ui/lab";
 
 interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
@@ -28,17 +31,14 @@ export const WorkingHours = ({
   showMobileView,
 }: WorkingHoursProps) => {
   const rootState = useContext(rootContext);
-  const { register, errors, reset, watch, handleSubmit } = useForm();
-  const startWorking = watch("start_working", "00:00");
-  const endWorking = watch("end_working", "00:00");
-  const startBreakOne = watch("start_break_0");
-  const endBreakOne = watch("end_break_0");
-  const startBreakTwo = watch("start_break_1");
-  const endBreakTwo = watch("end_break_1");
-  const startBreakThree = watch("start_break_2");
-  const endBreakThree = watch("end_break_2");
+  const { register, errors, reset, getValues, watch, handleSubmit } = useForm();
+  const startWorking = watch("start_working", "08:00");
+  const endWorking = watch("end_working", "18:00");
 
+  const [canAdd, setCanAdd] = useState(false);
+  const [error, setError] = useState("");
   const [breaks, setBreaks] = useState<any>([]);
+  const [allDaysChecked, setAllDaysChecked] = useState(false);
   const [checkedDay, setCheckedDay] = useState({
     sunday: false,
     monday: false,
@@ -82,6 +82,7 @@ export const WorkingHours = ({
     const uniqueDays = translatedDays.filter((day: any) => {
       const workingHoursCopy = JSON.stringify(workingHours);
       if (!workingHoursCopy.includes(day)) {
+        !allDaysChecked && setAllDaysChecked(false);
         return day;
       } else {
         return null;
@@ -96,41 +97,132 @@ export const WorkingHours = ({
       rootState?.setError("זמן התחלה גדול מזמן סיום");
     }
 
-    if (uniqueDays.length > 0 && startIsBeforeEnd) {
-      const checkedDays = { ...checkedDay };
-      setDisabledDays(checkedDays);
+    const breaks = [];
+    let breaksError = false;
+    const startBreakOne = getValues("start_break_0");
+    const endBreakOne = getValues("end_break_0");
+    const startBreakTwo = getValues("start_break_1");
+    const endBreakTwo = getValues("end_break_1");
+    const startBreakThree = getValues("start_break_2");
+    const endBreakThree = getValues("end_break_2");
 
-      // Set new working days & working times & breaks times
-      setWorkingHours([
-        ...workingHours,
-        {
-          days: uniqueDays,
-          workingHours: {
-            from: startWorking,
-            to: endWorking,
-          },
-          breaks: [
-            { from: startBreakOne, to: endBreakOne },
-            { from: startBreakTwo, to: endBreakTwo },
-            { from: startBreakThree, to: endBreakThree },
-          ],
-        },
-      ]);
+    const startBreakOneTime = moment(startBreakOne, "hh:mm");
+    const endBreakOneTime = moment(endBreakOne, "hh:mm");
+    const startBreakTwoTime = moment(startBreakTwo, "hh:mm");
+    const endBreakTwoTime = moment(endBreakTwo, "hh:mm");
+    const startBreakThreeTime = moment(startBreakThree, "hh:mm");
+    const endBreakThreeTime = moment(endBreakThree, "hh:mm");
 
-      if (isSmallScreen) {
-        setShowMobileView && setShowMobileView(true);
-      }
+    const isStartBreakOneValid =
+      startBreakOneTime.isBetween(workStartTime, workEndTime) &&
+      startBreakOneTime.isAfter(workStartTime) &&
+      startBreakOneTime.isBefore(endBreakOneTime);
+    const isEndBreakOneValid =
+      endBreakOneTime.isBetween(workStartTime, workEndTime) &&
+      endBreakOneTime.isBefore(workEndTime) &&
+      endBreakOneTime.isBefore(startBreakOneTime);
 
-      reset({
-        start_working: "00:00",
-        end_working: "00:00",
-        start_break_0: "00:00",
-        start_break_1: "00:00",
-        start_break_2: "00:00",
-        end_break_0: "00:00",
-        end_break_1: "00:00",
-        end_break_2: "00:00",
+    const isStartBreakTwoValid =
+      startBreakTwoTime.isBetween(workStartTime, workEndTime) &&
+      startBreakTwoTime.isAfter(workStartTime) &&
+      startBreakTwoTime.isBefore(endBreakTwoTime);
+    const isEndBreakTwoValid =
+      endBreakTwoTime.isBetween(workStartTime, workEndTime) &&
+      endBreakTwoTime.isBefore(workEndTime) &&
+      endBreakTwoTime.isBefore(startBreakTwoTime);
+
+    const isStartBreakThreeValid =
+      startBreakThreeTime.isBetween(workStartTime, workEndTime) &&
+      startBreakThreeTime.isAfter(workStartTime) &&
+      startBreakThreeTime.isBefore(endBreakThreeTime);
+    const isEndBreakThreeValid =
+      endBreakThreeTime.isBetween(workStartTime, workEndTime) &&
+      endBreakThreeTime.isBefore(workEndTime) &&
+      endBreakThreeTime.isBefore(startBreakThreeTime);
+
+    if (startBreakOne && endBreakOne) {
+      breaks.push({
+        from: startBreakOne,
+        to: endBreakOne,
       });
+    }
+
+    if (startBreakTwo && endBreakTwo) {
+      breaks.push({
+        from: startBreakTwo,
+        to: endBreakTwo,
+      });
+    }
+
+    if (startBreakThree && endBreakThree) {
+      breaks.push({
+        from: startBreakThree,
+        to: endBreakThree,
+      });
+    }
+
+    if (
+      startBreakOne &&
+      endBreakOne &&
+      !isStartBreakOneValid &&
+      !isEndBreakOneValid
+    ) {
+      breaksError = true;
+    }
+
+    if (
+      startBreakTwo &&
+      endBreakTwo &&
+      !isStartBreakTwoValid &&
+      !isEndBreakTwoValid
+    ) {
+      breaksError = true;
+    }
+
+    if (
+      startBreakThree &&
+      endBreakThree &&
+      !isStartBreakThreeValid &&
+      !isEndBreakThreeValid
+    ) {
+      breaksError = true;
+    }
+
+    if (uniqueDays.length > 0 && startIsBeforeEnd) {
+      if (!breaksError) {
+        breaksError = false;
+        setError("");
+        const checkedDays = { ...checkedDay };
+        setDisabledDays(checkedDays);
+
+        // Set new working days & working times & breaks times
+        setWorkingHours([
+          ...workingHours,
+          {
+            days: uniqueDays,
+            workingHours: {
+              from: startWorking,
+              to: endWorking,
+            },
+            breaks,
+          },
+        ]);
+
+        if (isSmallScreen) {
+          setShowMobileView && setShowMobileView(true);
+        }
+
+        reset({ start_working: "08:00", end_working: "18:00" });
+        setBreaks([]);
+      } else if (breaksError) {
+        setError(
+          "נא לבדוק ששעות ההפסקה שהוגדרו הגיוניות ובין שעות העבודה של העסק"
+        );
+      }
+    } else {
+      setError(
+        "נא לבדוק שנבחרו ימי עבודה ושזמני תחילת העבודה וסיום העבודה הם תקינים"
+      );
     }
   };
 
@@ -170,15 +262,12 @@ export const WorkingHours = ({
   };
 
   const removeBreak = (index: number) => {
-    console.log(index);
     const breaksCopy = [...breaks];
-    console.log(breaksCopy);
-    // breaksCopy.splice(index, 1);
-    // setBreaks(breaksCopy);
+    breaksCopy.splice(index, 1);
+    setBreaks(breaksCopy);
   };
 
   const Break = ({ index }: { index: number }) => {
-    console.log(breaks);
     return (
       <>
         <Grid
@@ -210,12 +299,24 @@ export const WorkingHours = ({
         >
           <TimePicker register={register} name={"end_break_" + index} />
         </Grid>
-        <Button variant="text" onClick={() => removeBreak(index)}>
-          הסרה
-        </Button>
       </>
     );
   };
+
+  useEffect(() => {
+    const workingHoursCopy = JSON.stringify(workingHours);
+    const days = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+    const allDaysAreChecked = days.every((day: any) => {
+      return workingHoursCopy.includes(day);
+    });
+
+    setAllDaysChecked(allDaysAreChecked);
+  }, [workingHours]);
+
+  useEffect(() => {
+    const atLeastOneChecked = Object.values(checkedDay).every((v) => !v);
+    setCanAdd(atLeastOneChecked);
+  }, [checkedDay]);
 
   const onSubmit = (data: any) => {
     console.log(data);
@@ -340,7 +441,7 @@ export const WorkingHours = ({
                 md={5}
               >
                 <TimePicker
-                  // ampm
+                  defaultValue={new Date().setHours(8, 0, 0, 0)}
                   register={register}
                   name="start_working"
                   error={errors.start_working}
@@ -366,7 +467,7 @@ export const WorkingHours = ({
                 md={5}
               >
                 <TimePicker
-                  // ampm
+                  defaultValue={new Date().setHours(18, 0, 0, 0)}
                   register={register}
                   name="end_working"
                   error={errors.end_working}
@@ -388,15 +489,21 @@ export const WorkingHours = ({
                   >
                     <Grid item container justify="center">
                       <Grid item>
-                        <Typography
-                          variant="h2"
-                          style={{ marginBottom: "2rem" }}
-                        >
-                          הפסקה {index + 1}
+                        <Typography variant="h2">
+                          הפסקה מספר {index + 1}
                         </Typography>
                       </Grid>
                     </Grid>
                     {Break}
+                    <BreakButton
+                      variant="text"
+                      onClick={() => removeBreak(index)}
+                    >
+                      <Grid container justify="center" alignItems="center">
+                        <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה
+                        מספר {index + 1}
+                      </Grid>
+                    </BreakButton>
                   </Grid>
                 );
               } else {
@@ -405,22 +512,16 @@ export const WorkingHours = ({
             })}
 
             {breaks.length < 3 && (
-              <Grid
-                container
-                md={12}
-                justify="center"
-                alignItems="center"
-                style={{ marginTop: "3rem" }}
-              >
+              <Grid container item md={12} justify="center" alignItems="center">
                 <Grid item>
-                  <Button
+                  <BreakButton
                     variant="text"
                     onClick={() => {
                       setBreaks([...breaks, <Break index={breaks.length} />]);
                     }}
                   >
-                    הוסף הפסקה
-                  </Button>
+                    הוסף הפסקה {breaks.length >= 1 && "נוספת"}
+                  </BreakButton>
                 </Grid>
               </Grid>
             )}
@@ -466,19 +567,21 @@ export const WorkingHours = ({
                       </div>
 
                       <div style={{ marginTop: "1rem" }}>
-                        <strong>זמני הפסקה:</strong> <br />
                         {workingHour.breaks.map((b: any, index: number) => {
                           if (b.from === undefined && b.to === undefined) {
                             return null;
                           } else {
                             return (
                               <div key={index}>
-                                {b.from}
-                                <strong style={{ margin: "0 1rem" }}>
-                                  {" "}
-                                  עד{" "}
-                                </strong>
-                                {b.to}
+                                <strong>זמני הפסקה {index + 1}:</strong> <br />
+                                <div>
+                                  {b.from}
+                                  <strong style={{ margin: "0 1rem" }}>
+                                    {" "}
+                                    עד{" "}
+                                  </strong>
+                                  {b.to}
+                                </div>
                               </div>
                             );
                           }
@@ -577,6 +680,19 @@ export const WorkingHours = ({
           </Grid>
         )}
 
+        <Grid container style={{ margin: "2rem 0 0" }}>
+          <Grid item md={12} xs={12}>
+            {error && (
+              <Alert
+                style={{ maxWidth: "28rem", margin: "0 auto" }}
+                severity="error"
+              >
+                {error}
+              </Alert>
+            )}
+          </Grid>
+        </Grid>
+
         {!showMobileView && (
           <Grid
             container
@@ -587,7 +703,7 @@ export const WorkingHours = ({
             <ContinueButtonStyle
               variant="contained"
               onClick={handleAddWorkingHours}
-              disabled={false}
+              disabled={allDaysChecked || canAdd || !!error}
             >
               הוספה
             </ContinueButtonStyle>

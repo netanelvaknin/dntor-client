@@ -32,7 +32,7 @@ export const useButtonStyles = makeStyles((theme) => ({
     },
     disabled: {
       '& .MuiButton-label': {
-        color: '#ccc'
+        color: '#b1b1b1'
       }
     }
   }));
