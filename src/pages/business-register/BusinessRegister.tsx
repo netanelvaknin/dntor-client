@@ -28,7 +28,7 @@ export interface CurrentStep {
 
 export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(2);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(4);
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
 
@@ -57,7 +57,13 @@ export const BusinessRegister = () => {
     {
       stepNumber: 3,
       stepName: "הגדרת שירות",
-      component: <BusinessServices setCurrentStep={setCurrentStep} />,
+      component: (
+        <BusinessServices
+          setCurrentStep={setCurrentStep}
+          showMobileView={showMobileView}
+          setShowMobileView={setShowMobileView}
+        />
+      ),
     },
     {
       stepNumber: 4,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   BusinessServicesHeading,
   DurationText,
@@ -6,7 +6,6 @@ import {
   LeftGrid,
   ServiceCard,
   ServiceText,
-  AddButton,
   MobileAddButton,
 } from "./BusinessServicesStyle";
 import { Grid, IconButton } from "@material-ui/core";
@@ -16,36 +15,84 @@ import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
+import useFetch from "use-http";
+import rootContext from "../../../context/root/rootContext";
 
-export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
-  const { register, reset, getValues, handleSubmit } = useForm();
-  const isSmallScreen = useSmallScreen();
-  const [showMobileView, setShowMobileView] = useState(false);
+interface BusinessServicesProps extends CurrentStep {
+  showMobileView?: boolean;
+  setShowMobileView?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const BusinessServices = ({
+  setCurrentStep,
+  showMobileView,
+  setShowMobileView,
+}: BusinessServicesProps) => {
+  const { register, reset, watch, handleSubmit } = useForm();
+  const { post, response } = useFetch();
+  const rootState = useContext(rootContext);
+
   const [duration, setDuration] = useState<any>();
   const [services, setServices] = useState<any>([]);
+  const [canAdd, setCanAdd] = useState(false);
+  const serviceName = watch("service_name");
+  const isSmallScreen = useSmallScreen();
 
   const handleAddWorkingHours = () => {
-    setServices([
-      ...services,
-      {
-        serviceName: getValues("service_name"),
-        serviceDuration: duration,
-      },
-    ]);
+    if (serviceName && (duration.hours > 0 || duration.minutes > 0)) {
+      const { hours, minutes } = duration;
+      let finalDuration = "";
 
-    if (isSmallScreen) {
-      setShowMobileView(true);
+      if (hours.toString().length < 2) {
+        finalDuration = `0${hours}:`;
+      } else {
+        finalDuration = `${hours}:`;
+      }
+
+      if (minutes.toString().length < 2) {
+        finalDuration = `${finalDuration}0${minutes}`;
+      } else {
+        finalDuration = `${finalDuration}${minutes}`;
+      }
+
+      setServices([
+        ...services,
+        {
+          serviceName: serviceName,
+          duration: finalDuration,
+        },
+      ]);
+
+      if (isSmallScreen) {
+        setShowMobileView && setShowMobileView(true);
+      }
+
+      reset({
+        service_name: "",
+      });
     }
-
-    reset({
-      service_name: "",
-    });
   };
 
-  console.log(services);
+  const removeService = (index: number) => {
+    const servicesCopy = [...services];
+    servicesCopy.splice(index, 1);
+    setServices(servicesCopy);
+  };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  useEffect(() => {
+    if (serviceName && (duration.hours > 0 || duration.minutes > 0)) {
+      setCanAdd(true);
+    } else {
+      setCanAdd(false);
+    }
+  }, [serviceName, duration]);
+
+  const onSubmit = async () => {
+    await post("/business/upsertServices", services);
+
+    if (response.ok) {
+      setCurrentStep(4);
+    }
   };
 
   return (
@@ -86,17 +133,6 @@ export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
               <DurationText>קביעת משך התור</DurationText>
               <DurationSelector onChange={(value: any) => setDuration(value)} />
             </Grid>
-
-            {services.length > 0 && !isSmallScreen && (
-              <Grid
-                container
-                item
-                justify="center"
-                style={{ marginTop: "3rem" }}
-              >
-                <AddButton variant="text">הוספה</AddButton>
-              </Grid>
-            )}
           </RightGrid>
         )}
 
@@ -125,12 +161,13 @@ export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
                       <ServiceText style={{ fontWeight: "bold" }}>
                         {service.serviceName}
                       </ServiceText>
+                      <strong>משך התור: </strong>
                       <ServiceText>
-                        {service.serviceDuration.hours} שעות ו -{" "}
-                        {service.serviceDuration.minutes} דק'
+                        {service.duration.split(":")[0]} שעות ו-{" "}
+                        {service.duration.split(":")[1]} דק'
                       </ServiceText>
                     </ServiceCard>
-                    <IconButton>
+                    <IconButton onClick={() => removeService(index)}>
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -143,21 +180,6 @@ export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
         {/* MOBILE VIEW OF SELECTED HOURS */}
         {isSmallScreen && showMobileView && (
           <Grid container>
-            <Grid
-              item
-              container
-              justify="flex-end"
-              style={{ padding: "0 1rem" }}
-            >
-              <IconButton onClick={() => setShowMobileView(false)}>
-                <MobileAddButton
-                  variant="contained"
-                  onClick={() => setShowMobileView && setShowMobileView(false)}
-                >
-                  הוספת שעת פעילות
-                </MobileAddButton>
-              </IconButton>
-            </Grid>
             <LeftGrid
               md={6}
               container
@@ -175,12 +197,17 @@ export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
                     style={{ maxWidth: "32rem" }}
                   >
                     <ServiceCard>
-                      {service.serviceName}
-                      {service.serviceDuration.hours} שעות ו -{" "}
-                      {service.serviceDuration.minutes} דק'
+                      <ServiceText style={{ fontWeight: "bold" }}>
+                        {service.serviceName}
+                      </ServiceText>
+                      <strong>משך התור: </strong>
+                      <ServiceText>
+                        {service.duration.split(":")[0]} שעות ו-{" "}
+                        {service.duration.split(":")[1]} דק'
+                      </ServiceText>
                     </ServiceCard>
 
-                    <IconButton>
+                    <IconButton onClick={() => removeService(index)}>
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -188,28 +215,45 @@ export const BusinessServices = ({ setCurrentStep }: CurrentStep) => {
               })}
             </LeftGrid>
 
-            <Grid
-              container
-              justify="center"
-              alignItems="center"
-              style={{ margin: "3rem 0" }}
-            >
-              <ContinueButtonStyle>המשך</ContinueButtonStyle>
+            <Grid item container justify="center" style={{ margin: "2rem 0" }}>
+              <MobileAddButton
+                variant="contained"
+                onClick={() => setShowMobileView && setShowMobileView(false)}
+              >
+                הוספת שירות נוסף
+              </MobileAddButton>
+            </Grid>
+
+            <Grid container justify="center" alignItems="center">
+              <ContinueButtonStyle type="submit" disabled={services.length < 1}>
+                סיימתי, המשך לשלב הבא
+              </ContinueButtonStyle>
             </Grid>
           </Grid>
         )}
 
         {!showMobileView && (
-          <Grid
-            container
-            justify="center"
-            alignItems="center"
-            style={{ margin: "4rem 0" }}
-          >
-            <ContinueButtonStyle onClick={handleAddWorkingHours}>
-              אישור
-            </ContinueButtonStyle>
-          </Grid>
+          <>
+            <Grid container justify="center" alignItems="center">
+              <ContinueButtonStyle
+                variant="contained"
+                onClick={handleAddWorkingHours}
+                disabled={!canAdd}
+              >
+                הוספה
+              </ContinueButtonStyle>
+            </Grid>
+            <Grid
+              container
+              justify="center"
+              alignItems="center"
+              style={{ margin: "2rem 0 4rem" }}
+            >
+              <ContinueButtonStyle type="submit" disabled={services.length < 1}>
+                סיימתי, המשך לשלב הבא
+              </ContinueButtonStyle>
+            </Grid>
+          </>
         )}
       </Grid>
     </form>

@@ -10,8 +10,10 @@ export const useSwitchStyles = makeStyles((theme) => ({
       },
       switchBase: {
         padding: 1,
+        color: '#e5e3e3',
+        top: -1,
         '&$checked': {
-          transform: 'translate(20px, -1px)',
+          transform: 'translate(20px, 0px)',
           color: '#FFF',
           '& + $track': {
             backgroundColor: theme.palette.primary.main,

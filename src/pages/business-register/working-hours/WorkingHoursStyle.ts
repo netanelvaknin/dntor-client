@@ -8,7 +8,7 @@ interface RightGridProps {
 }
 export const RightGrid = styled(Grid)<RightGridProps>`
     margin: 0 auto;
-    padding: 0rem 3rem 0rem;
+    padding: 0rem 2rem 0rem;
     max-width: ${props => props.$workingHoursLength > 0 ? '32rem': 'auto'};
 
     @media ${mobile} {
@@ -77,12 +77,12 @@ export const MobileAddButton = styled(Button)`
 `;
 
 export const DayCheckbox = styled(Checkbox)`
-    margin: 8px!important;
+    margin: 10px!important;
 
     @media ${mobile} {
         margin: 10px!important;
     }
-    
+
     & span {
         padding: 0;
     }

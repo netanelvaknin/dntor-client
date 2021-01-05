@@ -34,7 +34,7 @@ export const LeftGrid = styled(Grid)`
 
     @media ${mobile} {
         border-right: 0;
-        padding: 0rem 1rem 0rem;
+        /* padding: 0rem 1rem 0rem; */
     }
 `;
 
@@ -63,12 +63,9 @@ export const ServiceText = styled.span`
     display: block;
 `;
 
-export const AddButton = styled(Button)`
-    &.MuiButtonBase-root {
-        min-width: auto;
-    }
-`;
 
 export const MobileAddButton = styled(Button)`
     padding: 1.5rem;
+    width: 28rem;
+    height: 3rem;
 `;

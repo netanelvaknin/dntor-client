@@ -31,6 +31,7 @@ interface WorkingHoursProps extends CurrentStep {
 export const WorkingHours = ({
   setShowMobileView,
   showMobileView,
+  setCurrentStep,
 }: WorkingHoursProps) => {
   const rootState = useContext(rootContext);
   const { post, response } = useFetch();
@@ -121,10 +122,14 @@ export const WorkingHours = ({
       startBreakOneTime.isBetween(workStartTime, workEndTime) &&
       startBreakOneTime.isAfter(workStartTime) &&
       startBreakOneTime.isBefore(endBreakOneTime);
+
+    console.log(
+      "start break one time is between work hours: ",
+      startBreakOneTime.isBetween(workStartTime, workEndTime)
+    );
     const isEndBreakOneValid =
       endBreakOneTime.isBetween(workStartTime, workEndTime) &&
-      endBreakOneTime.isBefore(workEndTime) &&
-      endBreakOneTime.isBefore(startBreakOneTime);
+      endBreakOneTime.isBefore(workEndTime);
 
     const isStartBreakTwoValid =
       startBreakTwoTime.isBetween(workStartTime, workEndTime) &&
@@ -165,31 +170,22 @@ export const WorkingHours = ({
       });
     }
 
-    if (
-      startBreakOne &&
-      endBreakOne &&
-      !isStartBreakOneValid &&
-      !isEndBreakOneValid
-    ) {
-      breaksError = true;
+    if (startBreakOne && endBreakOne) {
+      if (!isStartBreakOneValid || !isEndBreakOneValid) {
+        breaksError = true;
+      }
     }
 
-    if (
-      startBreakTwo &&
-      endBreakTwo &&
-      !isStartBreakTwoValid &&
-      !isEndBreakTwoValid
-    ) {
-      breaksError = true;
+    if (startBreakTwo && endBreakTwo) {
+      if (!isStartBreakTwoValid && !isEndBreakTwoValid) {
+        breaksError = true;
+      }
     }
 
-    if (
-      startBreakThree &&
-      endBreakThree &&
-      !isStartBreakThreeValid &&
-      !isEndBreakThreeValid
-    ) {
-      breaksError = true;
+    if (startBreakThree && endBreakThree) {
+      if (!isStartBreakThreeValid && !isEndBreakThreeValid) {
+        breaksError = true;
+      }
     }
 
     if (uniqueDays.length > 0 && startIsBeforeEnd) {
@@ -355,7 +351,7 @@ export const WorkingHours = ({
     await post("/business/upsertWorkTimes", workingHoursCopy);
 
     if (response.ok) {
-      console.log("OMG!");
+      setCurrentStep(3);
     }
   };
 
@@ -375,7 +371,7 @@ export const WorkingHours = ({
             container
             item
             direction="column"
-            justify="center"
+            justify="flex-start"
             alignItems="center"
             $workingHoursLength={workingHours.length}
             style={{ margin: "0 auto" }}
@@ -468,14 +464,15 @@ export const WorkingHours = ({
               container
               alignItems="center"
               justify="center"
-              style={{ marginBottom: "2rem" }}
+              style={{ marginBottom: "2rem", maxWidth: "32rem" }}
             >
               <Grid
                 item
-                container={isSmallScreen ? false : true}
-                justify={!isSmallScreen ? "center" : undefined}
-                alignItems={!isSmallScreen ? "center" : undefined}
+                container
+                alignItems="center"
+                justify="center"
                 md={5}
+                xs={4}
               >
                 <TimePicker
                   defaultValue={new Date().setHours(8, 0, 0, 0)}
@@ -488,20 +485,22 @@ export const WorkingHours = ({
 
               <Grid
                 item
-                container={isSmallScreen ? false : true}
-                justify={!isSmallScreen ? "center" : undefined}
-                alignItems={!isSmallScreen ? "center" : undefined}
+                container
+                alignItems="center"
+                justify="center"
                 md={2}
+                xs={3}
               >
                 <ToText>עד</ToText>
               </Grid>
 
               <Grid
                 item
-                container={isSmallScreen ? false : true}
-                justify={!isSmallScreen ? "center" : undefined}
-                alignItems={!isSmallScreen ? "center" : undefined}
+                container
+                alignItems="center"
+                justify="center"
                 md={5}
+                xs={4}
               >
                 <TimePicker
                   defaultValue={new Date().setHours(18, 0, 0, 0)}
@@ -578,7 +577,7 @@ export const WorkingHours = ({
           >
             <div
               style={{
-                maxHeight: "30rem",
+                maxHeight: "60rem",
                 overflow: "auto",
                 padding: ".5rem .5rem .5rem 2rem",
               }}
@@ -610,7 +609,8 @@ export const WorkingHours = ({
                           } else {
                             return (
                               <div key={index}>
-                                <strong>זמני הפסקה {index + 1}:</strong> <br />
+                                <strong>זמני הפסקה מספר {index + 1}:</strong>{" "}
+                                <br />
                                 <div>
                                   {b.from}
                                   <strong style={{ margin: "0 1rem" }}>
@@ -684,7 +684,8 @@ export const WorkingHours = ({
                           } else {
                             return (
                               <div key={index}>
-                                <strong>זמני הפסקה {index + 1}:</strong> <br />
+                                <strong>זמני הפסקה מספר {index + 1}:</strong>{" "}
+                                <br />
                                 <div>
                                   {b.from}
                                   <strong style={{ margin: "0 1rem" }}>
@@ -762,7 +763,7 @@ export const WorkingHours = ({
             <ContinueButtonStyle
               variant="contained"
               onClick={handleAddWorkingHours}
-              disabled={allDaysChecked || canAdd || !!error}
+              disabled={allDaysChecked || canAdd}
             >
               הוספה
             </ContinueButtonStyle>
