@@ -73,11 +73,17 @@ export const WorkingHourCard = styled(Card)`
 
 export const MobileAddButton = styled(Button)`
     padding: 1.5rem;
+    width: 28rem;
 `;
 
 export const DayCheckbox = styled(Checkbox)`
     margin: 8px!important;
-    & .PrivateSwitchBase-root-2 {
+
+    @media ${mobile} {
+        margin: 10px!important;
+    }
+    
+    & span {
         padding: 0;
     }
 `;
@@ -88,4 +94,13 @@ export const BreakButton = styled(Button)`
     & .MuiButton-label {
         text-decoration: none;
     }
+`;
+
+export const NoWorkingHoursFound = styled.span`
+    text-align: center;
+    width: 100%;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #BABABA;
+    margin-bottom: 3rem;
 `;

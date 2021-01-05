@@ -11,6 +11,7 @@ import {
   MobileAddButton,
   DayCheckbox,
   BreakButton,
+  NoWorkingHoursFound,
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
@@ -20,6 +21,7 @@ import rootContext from "../../../context/root/rootContext";
 import moment from "moment";
 import { Delete } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
+import useFetch from "use-http";
 
 interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
@@ -31,6 +33,8 @@ export const WorkingHours = ({
   showMobileView,
 }: WorkingHoursProps) => {
   const rootState = useContext(rootContext);
+  const { post, response } = useFetch();
+
   const { register, errors, reset, getValues, watch, handleSubmit } = useForm();
   const startWorking = watch("start_working", "08:00");
   const endWorking = watch("end_working", "18:00");
@@ -273,8 +277,8 @@ export const WorkingHours = ({
         <Grid
           item
           container={isSmallScreen ? false : true}
-          justify="center"
-          alignItems="center"
+          justify={!isSmallScreen ? "center" : undefined}
+          alignItems={!isSmallScreen ? "center" : undefined}
           md={5}
         >
           <TimePicker register={register} name={"start_break_" + index} />
@@ -283,8 +287,8 @@ export const WorkingHours = ({
         <Grid
           item
           container={isSmallScreen ? false : true}
-          justify="center"
-          alignItems="center"
+          justify={!isSmallScreen ? "center" : undefined}
+          alignItems={!isSmallScreen ? "center" : undefined}
           md={2}
         >
           <ToText>עד</ToText>
@@ -293,8 +297,8 @@ export const WorkingHours = ({
         <Grid
           item
           container={isSmallScreen ? false : true}
-          justify="center"
-          alignItems="center"
+          justify={!isSmallScreen ? "center" : undefined}
+          alignItems={!isSmallScreen ? "center" : undefined}
           md={5}
         >
           <TimePicker register={register} name={"end_break_" + index} />
@@ -314,12 +318,45 @@ export const WorkingHours = ({
   }, [workingHours]);
 
   useEffect(() => {
+    setError("");
+
     const atLeastOneChecked = Object.values(checkedDay).every((v) => !v);
     setCanAdd(atLeastOneChecked);
   }, [checkedDay]);
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async () => {
+    const workingHoursCopy = [...workingHours];
+
+    // Translate the days to english
+    workingHoursCopy.forEach(function (currentValue, index, array) {
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("א", "sunday")
+      );
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("ב", "monday")
+      );
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("ג", "tuesday")
+      );
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("ד", "wednesday")
+      );
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("ה", "thursday")
+      );
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("ו", "friday")
+      );
+      array[index] = JSON.parse(
+        JSON.stringify(array[index]).replace("ש", "saturday")
+      );
+    });
+
+    await post("/business/upsertWorkTimes", workingHoursCopy);
+
+    if (response.ok) {
+      console.log("OMG!");
+    }
   };
 
   return (
@@ -436,8 +473,8 @@ export const WorkingHours = ({
               <Grid
                 item
                 container={isSmallScreen ? false : true}
-                justify="center"
-                alignItems="center"
+                justify={!isSmallScreen ? "center" : undefined}
+                alignItems={!isSmallScreen ? "center" : undefined}
                 md={5}
               >
                 <TimePicker
@@ -452,8 +489,8 @@ export const WorkingHours = ({
               <Grid
                 item
                 container={isSmallScreen ? false : true}
-                justify="center"
-                alignItems="center"
+                justify={!isSmallScreen ? "center" : undefined}
+                alignItems={!isSmallScreen ? "center" : undefined}
                 md={2}
               >
                 <ToText>עד</ToText>
@@ -462,8 +499,8 @@ export const WorkingHours = ({
               <Grid
                 item
                 container={isSmallScreen ? false : true}
-                justify="center"
-                alignItems="center"
+                justify={!isSmallScreen ? "center" : undefined}
+                alignItems={!isSmallScreen ? "center" : undefined}
                 md={5}
               >
                 <TimePicker
@@ -512,7 +549,7 @@ export const WorkingHours = ({
             })}
 
             {breaks.length < 3 && (
-              <Grid container item md={12} justify="center" alignItems="center">
+              <Grid container justify="center" alignItems="center">
                 <Grid item>
                   <BreakButton
                     variant="text"
@@ -601,21 +638,6 @@ export const WorkingHours = ({
         {/* MOBILE VIEW OF SELECTED HOURS */}
         {isSmallScreen && showMobileView && (
           <Grid container>
-            <Grid
-              item
-              container
-              justify="center"
-              alignItems="center"
-              style={{ padding: "1rem 3rem 3rem" }}
-            >
-              <MobileAddButton
-                variant="contained"
-                onClick={() => setShowMobileView && setShowMobileView(false)}
-              >
-                הוספת שעת פעילות
-              </MobileAddButton>
-            </Grid>
-
             <LeftGrid
               md={6}
               container
@@ -636,7 +658,7 @@ export const WorkingHours = ({
                     container
                     alignItems="center"
                     key={index}
-                    style={{ maxWidth: "32rem" }}
+                    style={{ maxWidth: "30rem" }}
                   >
                     <WorkingHourCard>
                       <div>
@@ -648,14 +670,33 @@ export const WorkingHours = ({
                           return null;
                         })}
                       </div>
-                      <div>
+                      <div style={{ marginTop: "1rem" }}>
+                        <strong>שעות עבודה:</strong> <br />
                         {workingHour.workingHours.from}
                         <strong style={{ margin: "0 1rem" }}>עד</strong>
                         {workingHour.workingHours.to}
                       </div>
-                      <div>
-                        <strong style={{ margin: "0 1rem" }}>עד</strong>
-                        {/* {workingHour.breakHours.to} */}
+
+                      <div style={{ marginTop: "1rem" }}>
+                        {workingHour.breaks.map((b: any, index: number) => {
+                          if (b.from === undefined && b.to === undefined) {
+                            return null;
+                          } else {
+                            return (
+                              <div key={index}>
+                                <strong>זמני הפסקה {index + 1}:</strong> <br />
+                                <div>
+                                  {b.from}
+                                  <strong style={{ margin: "0 1rem" }}>
+                                    {" "}
+                                    עד{" "}
+                                  </strong>
+                                  {b.to}
+                                </div>
+                              </div>
+                            );
+                          }
+                        })}
                       </div>
                     </WorkingHourCard>
                     <IconButton
@@ -669,13 +710,31 @@ export const WorkingHours = ({
               })}
             </LeftGrid>
 
+            {workingHours.length <= 0 && (
+              <NoWorkingHoursFound>לא נבחרו ימי עבודה</NoWorkingHoursFound>
+            )}
+
+            <Grid
+              item
+              container
+              justify="center"
+              alignItems="center"
+              style={{ padding: "1rem 3rem 0" }}
+            >
+              <MobileAddButton
+                variant="contained"
+                onClick={() => setShowMobileView && setShowMobileView(false)}
+              >
+                הוספת ימי עבודה נוספים
+              </MobileAddButton>
+            </Grid>
             <Grid
               container
               justify="center"
               alignItems="center"
-              style={{ margin: "3rem 0" }}
+              style={{ margin: "2rem 0" }}
             >
-              <ContinueButtonStyle>המשך</ContinueButtonStyle>
+              <ContinueButtonStyle>סיימתי, המשך לשלב הבא</ContinueButtonStyle>
             </Grid>
           </Grid>
         )}
@@ -698,7 +757,7 @@ export const WorkingHours = ({
             container
             justify="center"
             alignItems="center"
-            style={{ margin: "5rem 0 2rem" }}
+            style={{ margin: "2rem 0 2rem" }}
           >
             <ContinueButtonStyle
               variant="contained"
@@ -718,7 +777,6 @@ export const WorkingHours = ({
             style={{ margin: "0rem 0 6rem" }}
           >
             <ContinueButtonStyle
-              onClick={handleAddWorkingHours}
               disabled={workingHours.length === 0}
               type="submit"
             >
