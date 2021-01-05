@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {
   BusinessServicesHeading,
   DurationText,
@@ -16,7 +16,7 @@ import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 import useFetch from "use-http";
-import rootContext from "../../../context/root/rootContext";
+// import rootContext from "../../../context/root/rootContext";
 
 interface BusinessServicesProps extends CurrentStep {
   showMobileView?: boolean;
@@ -30,7 +30,7 @@ export const BusinessServices = ({
 }: BusinessServicesProps) => {
   const { register, reset, watch, handleSubmit } = useForm();
   const { post, response } = useFetch();
-  const rootState = useContext(rootContext);
+  // const rootState = useContext(rootContext);
 
   const [duration, setDuration] = useState<any>();
   const [services, setServices] = useState<any>([]);
