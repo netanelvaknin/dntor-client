@@ -2,17 +2,15 @@ import { useContext, useState, useEffect } from "react";
 import rootContext from "../context/root/rootContext";
 import { Provider } from "use-http";
 import { useCookies, withCookies } from "react-cookie";
-import { useLocation, useHistory } from "react-router-dom";
-import moment from "moment";
+import { useLocation } from "react-router-dom";
 interface HttpProviderProps {
   children?: React.ReactNode;
 }
 
 export const HttpProvider = ({ children }: HttpProviderProps) => {
-  const [cookies, remove] = useCookies();
+  const [cookies] = useCookies();
   const rootState = useContext(rootContext);
   const [token, setToken] = useState("");
-  const history = useHistory();
 
   const location = useLocation();
 
@@ -31,19 +29,6 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
       request: async ({ options }: any) => {
         rootState?.setError("");
         rootState?.setLoading(true);
-
-        const tokenExpiredDate = cookies["token-expired-date"];
-
-        if (tokenExpiredDate) {
-          const now = moment().format("YYYY-MM-DD");
-          const isAfter = moment(now).isAfter(tokenExpiredDate, "day");
-
-          if (isAfter) {
-            // @ts-ignore
-            remove("token");
-            history.push("/login");
-          }
-        }
 
         // Set headers
         options.headers.Accept = "application/json";

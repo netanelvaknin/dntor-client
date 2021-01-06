@@ -1,10 +1,11 @@
 import React, { lazy, useContext } from "react";
 
 import { Switch, Route } from "react-router-dom";
+import ProtectedRoute from "../framework/ProtectedRoute";
 import rootContext from "../context/root/rootContext";
 import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
-import { Navbar } from "../components/index";
+import { Navbar } from "../ui/index";
 import { Loader } from "../animations/index";
 
 const Login = lazy(() => import("../pages/login/Login"));
@@ -16,9 +17,12 @@ const BusinessRegister = lazy(() =>
 const App = () => {
   const rootState = useContext(rootContext);
 
-  const appRoutes = [
+  const publicRoutes = [
     { path: "/login", component: <Login /> },
     { path: "/register", component: <Register /> },
+  ];
+
+  const protectedRoutes = [
     { path: "/business-register", component: <BusinessRegister /> },
   ];
 
@@ -27,11 +31,22 @@ const App = () => {
       <Navbar />
 
       <Switch>
-        {appRoutes.map((route) => {
+        {publicRoutes.map((route) => {
           return (
             <Route key={route.path} exact path={route.path}>
               {route.component}
             </Route>
+          );
+        })}
+
+        {protectedRoutes.map((route) => {
+          return (
+            <ProtectedRoute
+              key={route.path}
+              exact
+              component={route.component}
+              path={route.path}
+            />
           );
         })}
       </Switch>

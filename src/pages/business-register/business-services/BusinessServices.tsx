@@ -92,6 +92,7 @@ export const BusinessServices = ({
 
     if (response.ok) {
       setCurrentStep(4);
+      setShowMobileView && setShowMobileView(false);
     }
   };
 

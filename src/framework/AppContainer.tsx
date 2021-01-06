@@ -35,7 +35,7 @@ const AppContainer = (props: any) => {
       <ContextContainer>
         <CookiesProvider>
           <HttpProvider>
-            <Suspense fallback={<div>Loading</div>}>
+            <Suspense fallback={<></>}>
               <MuiPickersUtilsProvider
                 libInstance={moment}
                 utils={MomentUtils}

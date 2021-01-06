@@ -17,7 +17,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .block-ui-overlay {
-    opacity: 1;
+    opacity: .7;
     min-height: 100vh;
     position: fixed;
   }

@@ -32,7 +32,8 @@ export const Login = () => {
 
   useEffect(() => {
     if (cookies.token) {
-      history.push("/business-register");
+      console.log(history);
+      history.goBack();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

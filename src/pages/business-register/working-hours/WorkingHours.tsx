@@ -352,6 +352,7 @@ export const WorkingHours = ({
 
     if (response.ok) {
       setCurrentStep(3);
+      setShowMobileView && setShowMobileView(false);
     }
   };
 
@@ -735,7 +736,12 @@ export const WorkingHours = ({
               alignItems="center"
               style={{ margin: "2rem 0" }}
             >
-              <ContinueButtonStyle>סיימתי, המשך לשלב הבא</ContinueButtonStyle>
+              <ContinueButtonStyle
+                disabled={workingHours.length === 0}
+                type="submit"
+              >
+                סיימתי, המשך לשלב הבא
+              </ContinueButtonStyle>
             </Grid>
           </Grid>
         )}
