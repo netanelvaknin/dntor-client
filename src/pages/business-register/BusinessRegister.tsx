@@ -9,6 +9,8 @@ import Stepper from "./stepper/Stepper";
 import { useSmallScreen } from "../../hooks/index";
 import arrowRight from "../../assets/icons/arrow-right.svg";
 import rootContext from "../../context/root/rootContext";
+import useFetch from "use-http";
+import { useHistory } from "react-router-dom";
 
 // Steps components
 const BusinessProfile = lazy(() =>
@@ -31,11 +33,51 @@ export const BusinessRegister = () => {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
+  const { get, response } = useFetch();
+  const [businessData, setBusinessData] = useState();
+  const [workTimesData, setWorkTimesData] = useState();
+  const [servicesData, setServicesData] = useState();
+  const history = useHistory();
 
   useEffect(() => {
     rootState?.setError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
+
+  async function getBusinessData() {
+    const data = await get("/business");
+    if (response.ok) setBusinessData(data);
+  }
+
+  async function getWorkTimesData() {
+    const data = await get("business/businessWorkTimes");
+    if (response.ok) setWorkTimesData(data);
+  }
+
+  async function getServicesData() {
+    const data = await get("/business/services");
+    if (response.ok) setServicesData(data);
+  }
+
+  useEffect(() => {
+    getBusinessData();
+    getWorkTimesData();
+    getServicesData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    /*
+     * For better ux, we want to redirect the user to relevant route.
+     * In addition, We want to autofill the forms if the user already
+     * filled him before and quit.
+     *
+     */
+
+    if (businessData && servicesData && workTimesData) {
+      history.push("/admin-panel");
+    }
+  }, [businessData, servicesData, workTimesData, history]);
 
   const steps = [
     {

@@ -13,6 +13,7 @@ const Register = lazy(() => import("../pages/register/Register"));
 const BusinessRegister = lazy(() =>
   import("../pages/business-register/BusinessRegister")
 );
+const AdminPanel = lazy(() => import("../pages/admin-panel/AdminPanel"));
 
 const App = () => {
   const rootState = useContext(rootContext);
@@ -24,6 +25,7 @@ const App = () => {
 
   const protectedRoutes = [
     { path: "/business-register", component: <BusinessRegister /> },
+    { path: "/admin-panel", component: <AdminPanel /> },
   ];
 
   return (

@@ -16,6 +16,10 @@ const GlobalStyle = createGlobalStyle`
     background: white;
   }
 
+  .block-ui {
+    height: 100vh;
+  }
+
   .block-ui-overlay {
     opacity: .7;
     min-height: 100vh;
