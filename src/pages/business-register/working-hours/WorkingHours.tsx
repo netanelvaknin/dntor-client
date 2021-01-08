@@ -66,7 +66,7 @@ export const WorkingHours = ({
     saturday: false,
   });
   const [workingHours, setWorkingHours] = useState<any>(
-    initialWorkTimesData.res.days || []
+    initialWorkTimesData?.res.days || []
   );
 
   const isSmallScreen = useSmallScreen();

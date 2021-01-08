@@ -15,6 +15,8 @@ interface TextFieldProps {
   control?: any;
   required?: boolean;
   pattern?: any;
+  minLength?: number;
+  maxLength?: number;
 }
 
 export const TextField = ({
@@ -30,6 +32,8 @@ export const TextField = ({
   control,
   required,
   pattern,
+  minLength,
+  maxLength,
 }: TextFieldProps) => {
   const classes = useTextFieldStyles();
 
@@ -58,6 +62,8 @@ export const TextField = ({
       rules={{
         required,
         pattern,
+        minLength,
+        maxLength,
       }}
     />
   );

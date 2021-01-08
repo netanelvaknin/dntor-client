@@ -19,7 +19,15 @@ import { useCookies } from "react-cookie";
 export const Register = () => {
   const rootState = useContext(rootContext);
   const history = useHistory();
-  const { control, register, watch, errors, handleSubmit } = useForm();
+  const { control, register, watch, errors, handleSubmit } = useForm({
+    defaultValues: {
+      full_name: "",
+      email: "",
+      phone: "",
+      password: "",
+      validate_password: "",
+    },
+  });
   const { post, response } = useFetch();
   const [, setCookie] = useCookies(["token"]);
 
@@ -68,11 +76,10 @@ export const Register = () => {
             <RegisterFieldStyle
               name="full_name"
               label="שם מלא"
-              register={register({
-                required: true,
-                minLength: 2,
-                maxLength: 26,
-              })}
+              register={register}
+              required
+              minLength={2}
+              maxLength={26}
               error={!!errors.full_name || !!rootState?.error}
               helperText={errors.full_name && "שם מלא לא תקין"}
               control={control}
@@ -82,7 +89,9 @@ export const Register = () => {
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
               name="email"
-              register={register({ required: true, pattern: emailPattern })}
+              register={register}
+              required
+              pattern={emailPattern}
               type="email"
               label="מייל"
               error={!!errors.email || !!rootState?.error}
@@ -96,10 +105,9 @@ export const Register = () => {
               type="text"
               label="נייד"
               name="phone"
-              register={register({
-                required: true,
-                pattern: phoneNumberPattern,
-              })}
+              register={register}
+              required
+              pattern={phoneNumberPattern}
               error={!!errors.phone || !!rootState?.error}
               helperText={errors.phone && "נייד לא תקין"}
               control={control}
@@ -109,12 +117,11 @@ export const Register = () => {
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
               name="password"
-              register={register({
-                required: true,
-                minLength: 6,
-              })}
+              register={register}
+              required
+              minLength={7}
               error={!!errors.password || !!rootState?.error}
-              helperText={errors.password && "הסיסמה חייבת לכלול לפחות 6 תווים"}
+              helperText={errors.password && "הסיסמה חייבת לכלול לפחות 7 תווים"}
               type="password"
               label="סיסמה"
               control={control}
@@ -124,7 +131,9 @@ export const Register = () => {
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
               name="validate_password"
-              register={register({ required: true, minLength: 6 })}
+              register={register}
+              required
+              minLength={7}
               error={!!errors.password || !passwordsMatch || !!rootState?.error}
               helperText={
                 errors.password
