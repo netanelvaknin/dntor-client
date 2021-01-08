@@ -30,7 +30,7 @@ export interface CurrentStep {
 
 export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(2);
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
   const { get, response } = useFetch();

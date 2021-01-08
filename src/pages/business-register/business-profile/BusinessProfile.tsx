@@ -83,6 +83,7 @@ export const BusinessProfile = ({
             <TextField
               label="טלפון העסק"
               name="business_phone"
+              type="number"
               register={register}
               required
               pattern={phoneNumberPattern}

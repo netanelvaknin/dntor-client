@@ -57,7 +57,7 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
   }, [hourBefore, twoDaysBefore, dayBefore, rootState]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <Grid
         container
         justify="center"

@@ -4,7 +4,7 @@ import { Controller } from "react-hook-form";
 
 interface TextFieldProps {
   name?: string;
-  type?: "text" | "email" | "password";
+  type?: "text" | "email" | "password" | "number";
   label?: string;
   error?: boolean;
   helperText?: string;

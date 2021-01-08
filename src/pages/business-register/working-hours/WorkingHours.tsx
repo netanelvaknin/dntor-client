@@ -14,6 +14,7 @@ import {
   NoWorkingHoursFound,
 } from "./WorkingHoursStyle";
 import { useSmallScreen } from "../../../hooks/index";
+import { Button } from "../../../ui/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
@@ -405,7 +406,7 @@ export const WorkingHours = ({
   }, [initialWorkTimesData]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <Grid container direction="row">
         <Grid md={12} justify="center" alignItems="center" container item>
           <HoursSetupHeading variant="h1" style={{ textAlign: "center" }}>
@@ -569,7 +570,13 @@ export const WorkingHours = ({
                     container
                     alignItems="center"
                     justify="center"
-                    style={{ marginBottom: "2rem" }}
+                    style={{
+                      marginBottom: "2rem",
+                      border: "1px solid #ccc",
+                      borderRadius: "1.5rem",
+                      padding: "1rem",
+                      maxWidth: "32rem",
+                    }}
                     key={index}
                   >
                     <Grid item container justify="center">
@@ -597,7 +604,12 @@ export const WorkingHours = ({
             })}
 
             {breaks.length < 3 && (
-              <Grid container justify="center" alignItems="center">
+              <Grid
+                container
+                justify="center"
+                alignItems="center"
+                style={{ marginBottom: "2rem" }}
+              >
                 <Grid item>
                   <BreakButton
                     variant="text"
@@ -605,12 +617,30 @@ export const WorkingHours = ({
                       setBreaks([...breaks, <Break index={breaks.length} />]);
                     }}
                   >
-                    הוסף הפסקה {breaks.length >= 1 && "נוספת"}
+                    הוספת הפסקה {breaks.length >= 1 && "נוספת"}
                   </BreakButton>
                 </Grid>
               </Grid>
             )}
           </RightGrid>
+        )}
+
+        {workingHours.length > 0 && !showMobileView && isSmallScreen && (
+          <Grid
+            md={12}
+            justify="center"
+            alignItems="center"
+            container
+            item
+            style={{ marginTop: "3rem" }}
+          >
+            <Button
+              variant="text"
+              onClick={() => setShowMobileView && setShowMobileView(true)}
+            >
+              לצפיה בשעות הפעילות שכבר נבחרו
+            </Button>
+          </Grid>
         )}
 
         {/* DESKTOP VIEW OF SELECTED HOURS */}
@@ -772,10 +802,10 @@ export const WorkingHours = ({
               style={{ padding: "1rem 3rem 0" }}
             >
               <MobileAddButton
-                variant="contained"
+                variant="outlined"
                 onClick={() => setShowMobileView && setShowMobileView(false)}
               >
-                הוספת ימי עבודה נוספים
+                הוספת זמני פעילות נוספים
               </MobileAddButton>
             </Grid>
             <Grid
@@ -787,8 +817,9 @@ export const WorkingHours = ({
               <ContinueButtonStyle
                 disabled={workingHours.length === 0}
                 type="submit"
+                variant="contained"
               >
-                סיימתי, המשך לשלב הבא
+                סיימתי כאן, המשך לשלב הבא
               </ContinueButtonStyle>
             </Grid>
           </Grid>
@@ -812,14 +843,14 @@ export const WorkingHours = ({
             container
             justify="center"
             alignItems="center"
-            style={{ margin: "2rem 0 2rem" }}
+            style={{ margin: "1rem 0 2rem" }}
           >
             <ContinueButtonStyle
-              variant="contained"
+              variant="outlined"
               onClick={handleAddWorkingHours}
               disabled={allDaysChecked || canAdd}
             >
-              הוספה
+              הוספת זמני פעילות
             </ContinueButtonStyle>
           </Grid>
         )}
@@ -834,6 +865,7 @@ export const WorkingHours = ({
             <ContinueButtonStyle
               disabled={workingHours.length === 0}
               type="submit"
+              variant="contained"
             >
               המשך לשלב הבא
             </ContinueButtonStyle>

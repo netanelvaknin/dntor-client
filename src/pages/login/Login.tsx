@@ -27,7 +27,12 @@ export const Login = () => {
   const history = useHistory();
   const rootState = useContext(rootContext);
   const [cookies, setCookie] = useCookies(["token"]);
-  const { control, register, errors, handleSubmit } = useForm();
+  const { control, register, errors, handleSubmit } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
   const { post, response } = useFetch();
 
   useEffect(() => {
@@ -89,10 +94,9 @@ export const Login = () => {
                 control={control}
                 name="email"
                 placeholder="מייל"
-                register={register({
-                  pattern: emailPattern,
-                  required: true,
-                })}
+                register={register}
+                required
+                pattern={emailPattern}
                 error={!!errors.email || !!rootState?.error}
                 helperText={errors.email && 'כתובת דוא"ל לא תקינה'}
                 startAdornment={<EmailIcon />}
@@ -104,7 +108,9 @@ export const Login = () => {
                 name="password"
                 type="password"
                 placeholder="סיסמה"
-                register={register({ required: true, minLength: 6 })}
+                register={register}
+                required
+                minLength={6}
                 error={!!errors.password || !!rootState?.error}
                 helperText={errors.password && "סיסמה לא תקינה"}
                 startAdornment={<PasswordIcon />}

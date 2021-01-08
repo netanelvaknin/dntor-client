@@ -1,4 +1,5 @@
 import { Checkbox as MatCheckbox, FormControlLabel } from "@material-ui/core";
+import { useCheckboxStyles } from "./CheckboxStyle";
 import { ReactComponent as CheckboxCircle } from "../../assets/icons/checkbox_circle.svg";
 import { ReactComponent as CheckboxChecked } from "../../assets/icons/checkbox_checked.svg";
 
@@ -29,13 +30,17 @@ export const Checkbox = ({
   className,
   onChange,
 }: CheckboxProps) => {
+  const classes = useCheckboxStyles();
+
   return (
     <FormControlLabel
       labelPlacement={labelPlacement}
       className={className}
+      defaultChecked={false}
+      classes={{ disabled: classes.disabled }}
       control={
         <MatCheckbox
-          checked={value || false}
+          checked={value}
           inputRef={register}
           icon={<CheckboxCircle />}
           checkedIcon={<CheckboxChecked />}

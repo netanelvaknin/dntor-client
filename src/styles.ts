@@ -38,6 +38,26 @@ const GlobalStyle = createGlobalStyle`
     background-color: #265fb1d4;  
     border-radius: 20px;      
   }
+
+  /* Remove Input type number arrows */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Remove Input type number arrows - Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  } 
+
+  /* Remove the default autofill background inside inputs */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active  {
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
 `
 
 export default GlobalStyle;

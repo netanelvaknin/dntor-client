@@ -102,7 +102,7 @@ export const Register = () => {
 
           <Grid container justify="center" alignItems="center">
             <RegisterFieldStyle
-              type="text"
+              type="number"
               label="נייד"
               name="phone"
               register={register}

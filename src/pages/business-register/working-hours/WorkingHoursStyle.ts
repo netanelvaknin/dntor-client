@@ -18,10 +18,10 @@ export const RightGrid = styled(Grid)<RightGridProps>`
 
 export const HoursSetupHeading = styled(Typography)`
     &.MuiTypography-root {
-        margin: 5rem 0 4rem;
+        margin: 5rem 0 2rem;
 
         @media ${mobile} {
-            margin: 3rem 0 4rem;
+            margin: 3rem 0 3rem;
         }
     }
 `;
