@@ -35,7 +35,7 @@ export const Checkbox = ({
       className={className}
       control={
         <MatCheckbox
-          checked={value}
+          checked={value || false}
           inputRef={register}
           icon={<CheckboxCircle />}
           checkedIcon={<CheckboxChecked />}

@@ -25,6 +25,7 @@ import useFetch from "use-http";
 
 interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
+  initialWorkTimesData?: any;
   setShowMobileView?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -32,6 +33,7 @@ export const WorkingHours = ({
   setShowMobileView,
   showMobileView,
   setCurrentStep,
+  initialWorkTimesData,
 }: WorkingHoursProps) => {
   const rootState = useContext(rootContext);
   const { post, response } = useFetch();
@@ -63,7 +65,9 @@ export const WorkingHours = ({
     friday: false,
     saturday: false,
   });
-  const [workingHours, setWorkingHours] = useState<any>([]);
+  const [workingHours, setWorkingHours] = useState<any>(
+    initialWorkTimesData.res.days || []
+  );
 
   const isSmallScreen = useSmallScreen();
 
@@ -123,10 +127,6 @@ export const WorkingHours = ({
       startBreakOneTime.isAfter(workStartTime) &&
       startBreakOneTime.isBefore(endBreakOneTime);
 
-    console.log(
-      "start break one time is between work hours: ",
-      startBreakOneTime.isBetween(workStartTime, workEndTime)
-    );
     const isEndBreakOneValid =
       endBreakOneTime.isBetween(workStartTime, workEndTime) &&
       endBreakOneTime.isBefore(workEndTime);
@@ -355,6 +355,54 @@ export const WorkingHours = ({
       setShowMobileView && setShowMobileView(false);
     }
   };
+
+  useEffect(() => {
+    if (initialWorkTimesData) {
+      const daysToActivateAndDisabled: any = [];
+
+      const days = initialWorkTimesData.res.days;
+      const daysCopy = [...days];
+
+      // Translate the days to english
+      daysCopy.forEach(function (currentValue, index, array) {
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("sunday", "א")
+        );
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("monday", "ב")
+        );
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("tuesday", "ג")
+        );
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("wednesday", "ד")
+        );
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("thursday", "ה")
+        );
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("friday", "ו")
+        );
+        array[index] = JSON.parse(
+          JSON.stringify(array[index]).replace("saturday", "ש")
+        );
+      });
+
+      initialWorkTimesData.res.days.map((item: any) => {
+        return daysToActivateAndDisabled.push(item.days);
+      });
+
+      const checkedCopy: any = {};
+      daysToActivateAndDisabled.flat().forEach((day: any) => {
+        checkedCopy[day] = true;
+      });
+
+      setCheckedDay({ ...checkedCopy });
+      setDisabledDays({ ...checkedCopy });
+
+      setWorkingHours(daysCopy);
+    }
+  }, [initialWorkTimesData]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

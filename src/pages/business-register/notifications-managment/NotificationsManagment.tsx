@@ -46,7 +46,7 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
     }
 
     if (response.ok) {
-      console.log(dataCopy);
+      // console.log(dataCopy);
     }
   };
 

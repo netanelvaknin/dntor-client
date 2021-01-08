@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Grid, Typography } from "@material-ui/core";
 import { TextField } from "../../../ui/index";
 import { ContinueButtonStyle } from "../BusinessRegisterStyle";
@@ -9,8 +9,22 @@ import { emailPattern, phoneNumberPattern } from "../../../utils/patterns";
 import rootContext from "../../../context/root/rootContext";
 import { Alert } from "@material-ui/lab";
 
-export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
-  const { register, errors, handleSubmit } = useForm();
+interface BusinessProfileProps extends CurrentStep {
+  initialBusinessProfileData?: any;
+}
+
+export const BusinessProfile = ({
+  initialBusinessProfileData,
+  setCurrentStep,
+}: BusinessProfileProps) => {
+  const { control, errors, register, setValue, handleSubmit } = useForm({
+    defaultValues: {
+      business_name: "",
+      business_phone: "",
+      business_email: "",
+      business_address: "",
+    },
+  });
   const { post, response } = useFetch();
   const rootState = useContext(rootContext);
 
@@ -28,6 +42,15 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
       rootState?.setError("אופס! משהו השתבש... שננסה שוב ?");
     }
   };
+
+  useEffect(() => {
+    if (initialBusinessProfileData) {
+      setValue("business_name", initialBusinessProfileData?.res.name);
+      setValue("business_phone", initialBusinessProfileData?.res.phone);
+      setValue("business_email", initialBusinessProfileData?.res.email);
+      setValue("business_address", initialBusinessProfileData?.res.address);
+    }
+  }, [initialBusinessProfileData, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
@@ -48,9 +71,11 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
             <TextField
               label="שם העסק"
               name="business_name"
-              register={register({ required: true })}
+              register={register}
+              required
               error={!!errors.business_name || !!rootState?.error}
               helperText={errors.business_name && "נא למלא שם עסק"}
+              control={control}
             />
           </Grid>
 
@@ -58,14 +83,14 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
             <TextField
               label="טלפון העסק"
               name="business_phone"
-              register={register({
-                required: true,
-                pattern: phoneNumberPattern,
-              })}
+              register={register}
+              required
+              pattern={phoneNumberPattern}
               error={!!errors.business_phone || !!rootState?.error}
               helperText={
                 errors.business_phone && "נא למלא מספר טלפון תקין וללא סימנים"
               }
+              control={control}
             />
           </Grid>
 
@@ -74,12 +99,12 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
               label="מייל"
               type="email"
               name="business_email"
-              register={register({
-                pattern: emailPattern,
-                required: true,
-              })}
+              register={register}
+              required
+              pattern={emailPattern}
               error={!!errors.business_email || !!rootState?.error}
               helperText={errors.business_email && 'כתובת דוא"ל לא תקינה'}
+              control={control}
             />
           </Grid>
 
@@ -87,9 +112,11 @@ export const BusinessProfile = ({ setCurrentStep }: CurrentStep) => {
             <TextField
               label="כתובת"
               name="business_address"
-              register={register({ required: true })}
+              register={register}
+              required
               error={!!errors.business_address || !!rootState?.error}
               helperText={errors.business_address && "נא למלא כתובת תקינה"}
+              control={control}
             />
           </Grid>
         </Grid>

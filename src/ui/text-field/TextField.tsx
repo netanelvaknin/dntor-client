@@ -1,25 +1,23 @@
 import { TextField as MuiTextField } from "@material-ui/core";
 import { useTextFieldStyles } from "./TextFieldStyle";
+import { Controller } from "react-hook-form";
+
 interface TextFieldProps {
-  value?: string;
   name?: string;
   type?: "text" | "email" | "password";
   label?: string;
   error?: boolean;
   helperText?: string;
   startAdornment?: React.ReactNode;
-  register?:
-    | ((instance: any) => void)
-    | React.RefObject<any>
-    | null
-    | undefined;
+  register?: any;
   placeholder?: string;
   className?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  control?: any;
+  required?: boolean;
+  pattern?: any;
 }
 
 export const TextField = ({
-  value,
   name = "",
   type = "text",
   label,
@@ -29,25 +27,37 @@ export const TextField = ({
   register,
   placeholder,
   className,
-  onChange,
+  control,
+  required,
+  pattern,
 }: TextFieldProps) => {
   const classes = useTextFieldStyles();
 
   return (
-    <MuiTextField
+    <Controller
+      render={({ onChange, value }) => (
+        <MuiTextField
+          value={value}
+          name={name}
+          label={label}
+          type={type}
+          error={error}
+          helperText={helperText}
+          ref={register}
+          placeholder={placeholder}
+          className={className}
+          classes={{ root: classes.root }}
+          InputProps={{
+            startAdornment: startAdornment,
+          }}
+          onChange={onChange}
+        />
+      )}
       name={name}
-      type={type}
-      label={label}
-      error={error}
-      helperText={helperText}
-      inputRef={register}
-      placeholder={placeholder}
-      className={className}
-      onChange={onChange}
-      value={value}
-      classes={{ root: classes.root }}
-      InputProps={{
-        startAdornment: startAdornment,
+      control={control}
+      rules={{
+        required,
+        pattern,
       }}
     />
   );

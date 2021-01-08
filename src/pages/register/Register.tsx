@@ -19,7 +19,7 @@ import { useCookies } from "react-cookie";
 export const Register = () => {
   const rootState = useContext(rootContext);
   const history = useHistory();
-  const { register, watch, errors, handleSubmit } = useForm();
+  const { control, register, watch, errors, handleSubmit } = useForm();
   const { post, response } = useFetch();
   const [, setCookie] = useCookies(["token"]);
 
@@ -75,6 +75,7 @@ export const Register = () => {
               })}
               error={!!errors.full_name || !!rootState?.error}
               helperText={errors.full_name && "שם מלא לא תקין"}
+              control={control}
             />
           </Grid>
 
@@ -86,6 +87,7 @@ export const Register = () => {
               label="מייל"
               error={!!errors.email || !!rootState?.error}
               helperText={errors.email && 'כתובת דוא"ל לא תקינה'}
+              control={control}
             />
           </Grid>
 
@@ -100,6 +102,7 @@ export const Register = () => {
               })}
               error={!!errors.phone || !!rootState?.error}
               helperText={errors.phone && "נייד לא תקין"}
+              control={control}
             />
           </Grid>
 
@@ -114,6 +117,7 @@ export const Register = () => {
               helperText={errors.password && "הסיסמה חייבת לכלול לפחות 6 תווים"}
               type="password"
               label="סיסמה"
+              control={control}
             />
           </Grid>
 
@@ -131,6 +135,7 @@ export const Register = () => {
               }
               type="password"
               label="אימות סיסמה"
+              control={control}
             />
           </Grid>
 

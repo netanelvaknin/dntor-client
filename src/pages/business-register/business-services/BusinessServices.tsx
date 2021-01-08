@@ -21,14 +21,20 @@ import useFetch from "use-http";
 interface BusinessServicesProps extends CurrentStep {
   showMobileView?: boolean;
   setShowMobileView?: React.Dispatch<React.SetStateAction<boolean>>;
+  initialServicesData?: any;
 }
 
 export const BusinessServices = ({
   setCurrentStep,
   showMobileView,
   setShowMobileView,
+  initialServicesData,
 }: BusinessServicesProps) => {
-  const { register, reset, watch, handleSubmit } = useForm();
+  const { control, register, reset, watch, handleSubmit } = useForm({
+    defaultValues: {
+      service_name: "",
+    },
+  });
   const { post, response } = useFetch();
   // const rootState = useContext(rootContext);
 
@@ -96,6 +102,17 @@ export const BusinessServices = ({
     }
   };
 
+  useEffect(() => {
+    if (initialServicesData) {
+      const servicesCopy = initialServicesData.res.services;
+      servicesCopy.forEach((service: any, index: number) => {
+        delete servicesCopy[index]._id;
+      });
+
+      setServices(servicesCopy);
+    }
+  }, [initialServicesData]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container direction="row">
@@ -118,6 +135,7 @@ export const BusinessServices = ({
             style={{ margin: "0 auto" }}
           >
             <TextField
+              control={control}
               label="שם השירות"
               helperText="לדוגמא: תספורת, בניית ציפורניים ועוד"
               register={register}

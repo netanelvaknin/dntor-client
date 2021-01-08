@@ -75,7 +75,7 @@ export const BusinessRegister = () => {
      */
 
     if (businessData && servicesData && workTimesData) {
-      history.push("/admin-panel");
+      // history.push("/admin-panel");
     }
   }, [businessData, servicesData, workTimesData, history]);
 
@@ -83,13 +83,19 @@ export const BusinessRegister = () => {
     {
       stepNumber: 1,
       stepName: "פרופיל העסק",
-      component: <BusinessProfile setCurrentStep={setCurrentStep} />,
+      component: (
+        <BusinessProfile
+          initialBusinessProfileData={businessData}
+          setCurrentStep={setCurrentStep}
+        />
+      ),
     },
     {
       stepNumber: 2,
       stepName: "שעות פעילות",
       component: (
         <WorkingHours
+          initialWorkTimesData={workTimesData}
           setCurrentStep={setCurrentStep}
           showMobileView={showMobileView}
           setShowMobileView={setShowMobileView}
@@ -101,6 +107,7 @@ export const BusinessRegister = () => {
       stepName: "הגדרת שירות",
       component: (
         <BusinessServices
+          initialServicesData={servicesData}
           setCurrentStep={setCurrentStep}
           showMobileView={showMobileView}
           setShowMobileView={setShowMobileView}

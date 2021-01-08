@@ -15,42 +15,41 @@ export const TextFields = () => {
 
   return (
     <>
-      <Box mt={10} ml={10} mb={10}>
-        <TextField
-          value={value}
+      {/* <Box mt={10} ml={10} mb={10}></Box> */}
+      {/* <TextField
+          // value={value}
           label="אימייל"
           type="email"
-          onChange={handleChange}
+          // onChange={handleChange}
         />
       </Box>
 
       <Box mt={10} ml={10} mb={10}>
         <TextField
-          value={value}
+          // value={value}
           label="טקסט"
           type="text"
-          onChange={handleChange}
+          // onChange={handleChange}
         />
       </Box>
 
       <Box mt={10} ml={10} mb={10}>
         <TextField
-          value={value}
+          // value={value}
           label="ססמא"
           type="password"
-          onChange={handleChange}
+          // onChange={handleChange}
         />
       </Box>
 
       <Box mt={10} ml={10} mb={10}>
         <TextField
-          value={value}
+          // value={value}
           label="with start adornment"
           type="text"
           startAdornment={<span>:)</span>}
-          onChange={handleChange}
-        />
-      </Box>
+          // onChange={handleChange}
+        /> </Box> */}
     </>
   );
 };

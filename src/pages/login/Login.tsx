@@ -27,12 +27,11 @@ export const Login = () => {
   const history = useHistory();
   const rootState = useContext(rootContext);
   const [cookies, setCookie] = useCookies(["token"]);
-  const { register, errors, handleSubmit } = useForm();
+  const { control, register, errors, handleSubmit } = useForm();
   const { post, response } = useFetch();
 
   useEffect(() => {
     if (cookies.token) {
-      console.log(history);
       history.goBack();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,6 +86,7 @@ export const Login = () => {
 
             <Grid item md={12}>
               <TextFieldStyle
+                control={control}
                 name="email"
                 placeholder="מייל"
                 register={register({
@@ -108,6 +108,7 @@ export const Login = () => {
                 error={!!errors.password || !!rootState?.error}
                 helperText={errors.password && "סיסמה לא תקינה"}
                 startAdornment={<PasswordIcon />}
+                control={control}
               />
             </Grid>
 
