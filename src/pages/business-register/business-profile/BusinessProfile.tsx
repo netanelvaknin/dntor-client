@@ -50,7 +50,8 @@ export const BusinessProfile = ({
       setValue("business_email", initialBusinessProfileData?.res.email);
       setValue("business_address", initialBusinessProfileData?.res.address);
     }
-  }, [initialBusinessProfileData, setValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialBusinessProfileData]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">

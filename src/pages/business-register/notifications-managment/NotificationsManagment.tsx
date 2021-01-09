@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Switch, Checkbox } from "../../../ui/index";
 import { Grid, Box } from "@material-ui/core";
 import {
@@ -15,13 +15,22 @@ import { Alert } from "@material-ui/lab";
 
 export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
   const { register, watch, handleSubmit } = useForm();
+  const [notificationTiming, setNotificationTiming] = useState({
+    hourBefore: false,
+    dayBefore: false,
+    twoDaysBefore: false,
+  });
   const { post, response } = useFetch();
   const rootState = useContext(rootContext);
 
   const customersNotifications = watch("customerSmsRemainderActive");
-  const hourBefore = watch("hourBefore");
-  const dayBefore = watch("dayBefore");
-  const twoDaysBefore = watch("twoDaysBefore");
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNotificationTiming({
+      ...notificationTiming,
+      [event.target.name]: event.target.checked,
+    });
+  };
 
   const onSubmit = async (data: any) => {
     const dataCopy = data;
@@ -36,7 +45,11 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
     delete dataCopy.hourBefore;
 
     if (dataCopy.customerSmsRemainderActive) {
-      if (!hourBefore && !dayBefore && !twoDaysBefore) {
+      if (
+        !notificationTiming.hourBefore &&
+        !notificationTiming.dayBefore &&
+        !notificationTiming.twoDaysBefore
+      ) {
         rootState?.setError("נא לבחור לפחות תזמון תזכורת אחד");
       } else {
         await post("/business/upsert", dataCopy);
@@ -51,10 +64,19 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
   };
 
   useEffect(() => {
-    if (hourBefore || twoDaysBefore || dayBefore) {
+    if (
+      notificationTiming.hourBefore ||
+      notificationTiming.twoDaysBefore ||
+      notificationTiming.dayBefore
+    ) {
       rootState?.setError("");
     }
-  }, [hourBefore, twoDaysBefore, dayBefore, rootState]);
+  }, [
+    notificationTiming.hourBefore,
+    notificationTiming.twoDaysBefore,
+    notificationTiming.dayBefore,
+    rootState,
+  ]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
@@ -90,23 +112,26 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
           <Grid item container justify="flex-start">
             <Box mt="0.5rem" mb="0.5rem">
               <Checkbox
+                value={notificationTiming.hourBefore}
                 label="שעה לפני התור"
                 name="hourBefore"
-                register={register}
+                onChange={handleChange}
               />
             </Box>
 
             <Box mb="0.5rem">
               <Checkbox
+                value={notificationTiming.dayBefore}
                 label="יום לפני התור"
                 name="dayBefore"
-                register={register}
+                onChange={handleChange}
               />
             </Box>
             <Checkbox
+              value={notificationTiming.twoDaysBefore}
               label="יומיים לפני התור"
               name="twoDaysBefore"
-              register={register}
+              onChange={handleChange}
             />
           </Grid>
         )}
@@ -127,7 +152,7 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
 
       <Grid container justify="center" style={{ paddingBottom: "5rem" }}>
         <ContinueButtonStyle type="submit" disabled={!!rootState?.error}>
-          סיימתי, בואו נתחיל !
+          בואו נעבור למערכת !
         </ContinueButtonStyle>
       </Grid>
     </form>

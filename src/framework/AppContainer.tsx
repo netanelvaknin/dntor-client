@@ -19,7 +19,6 @@ import "moment/locale/he";
 import HttpProvider from "./HttpProvider";
 import { CookiesProvider } from "react-cookie";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { Loader } from "../animations/index";
 
 moment.locale("he");
 
@@ -36,7 +35,7 @@ const AppContainer = (props: any) => {
       <ContextContainer>
         <CookiesProvider>
           <HttpProvider>
-            <Suspense fallback={<Loader />}>
+            <Suspense fallback={<></>}>
               <MuiPickersUtilsProvider
                 libInstance={moment}
                 utils={MomentUtils}

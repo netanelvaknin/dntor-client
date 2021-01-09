@@ -118,7 +118,7 @@ export const BusinessServices = ({
       <Grid container direction="row">
         <Grid md={12} justify="center" alignItems="center" container item>
           <BusinessServicesHeading variant="h1">
-            הגדרת שירות
+            הגדרת שירותים
           </BusinessServicesHeading>
         </Grid>
 
@@ -253,7 +253,12 @@ export const BusinessServices = ({
 
         {!showMobileView && (
           <>
-            <Grid container justify="center" alignItems="center">
+            <Grid
+              container
+              justify="center"
+              alignItems="center"
+              style={{ marginTop: "2rem" }}
+            >
               <ContinueButtonStyle
                 variant="contained"
                 onClick={handleAddWorkingHours}

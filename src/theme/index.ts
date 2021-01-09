@@ -24,6 +24,14 @@ export default createMuiTheme({
     }
   },
   overrides: {
+    MuiToolbar: {
+      root: {
+        '& .MuiPickersTimePickerToolbar-ampmSelection .MuiPickersToolbarText-toolbarBtnSelected': {
+          border: '1px solid white',
+          padding: '.5rem'
+        }
+      },
+    },
     MuiFormHelperText: {
       root: {
         "&$error": {

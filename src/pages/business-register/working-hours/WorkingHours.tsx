@@ -28,6 +28,7 @@ interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
   initialWorkTimesData?: any;
   setShowMobileView?: React.Dispatch<React.SetStateAction<boolean>>;
+  currentStep?: 1 | 2 | 3 | 4;
 }
 
 export const WorkingHours = ({
@@ -35,6 +36,7 @@ export const WorkingHours = ({
   showMobileView,
   setCurrentStep,
   initialWorkTimesData,
+  currentStep,
 }: WorkingHoursProps) => {
   const rootState = useContext(rootContext);
   const { post, response } = useFetch();
@@ -56,7 +58,6 @@ export const WorkingHours = ({
     friday: false,
     saturday: false,
   });
-
   const [disabledDays, setDisabledDays] = useState({
     sunday: false,
     monday: false,
@@ -66,9 +67,7 @@ export const WorkingHours = ({
     friday: false,
     saturday: false,
   });
-  const [workingHours, setWorkingHours] = useState<any>(
-    initialWorkTimesData?.res.days || []
-  );
+  const [workingHours, setWorkingHours] = useState<any>([]);
 
   const isSmallScreen = useSmallScreen();
 
@@ -398,9 +397,8 @@ export const WorkingHours = ({
         checkedCopy[day] = true;
       });
 
-      setCheckedDay({ ...checkedCopy });
-      setDisabledDays({ ...checkedCopy });
-
+      setCheckedDay({ ...checkedDay, ...checkedCopy });
+      setDisabledDays({ ...disabledDays, ...checkedCopy });
       setWorkingHours(daysCopy);
     }
   }, [initialWorkTimesData]);

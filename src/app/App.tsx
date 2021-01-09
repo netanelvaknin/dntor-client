@@ -19,6 +19,12 @@ const App = () => {
   const rootState = useContext(rootContext);
 
   const publicRoutes = [
+    {
+      path: "/",
+      component: (
+        <div style={{ margin: "15rem", fontWeight: "bold" }}>Landing page</div>
+      ),
+    },
     { path: "/login", component: <Login /> },
     { path: "/register", component: <Register /> },
   ];

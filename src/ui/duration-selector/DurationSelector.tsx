@@ -19,16 +19,21 @@ export const DurationSelector = ({ onChange }: DurationSelectorProps) => {
 
   useEffect(() => {
     // Change language from english to hebrew (No support)
-    const hoursColumn = document.querySelectorAll(".rdp-text-overlay div")[0];
-    const minutesColumn = document.querySelectorAll(".rdp-text-overlay div")[1];
 
     setTimeout(() => {
+      const hoursColumn = document.querySelectorAll(".rdp-text-overlay div")[0];
+      const minutesColumn = document.querySelectorAll(
+        ".rdp-text-overlay div"
+      )[1];
+
       // Stupid library changing the value names after some ms
       // So I override it after 100ms
-      hoursColumn.innerHTML = "שעות";
-      minutesColumn.innerHTML = "דקות";
-    }, 100);
-  }, []);
+      if (hoursColumn && minutesColumn) {
+        hoursColumn.innerHTML = "שעות";
+        minutesColumn.innerHTML = "דקות";
+      }
+    }, 500);
+  });
 
   return (
     <DurationSelectorContainer>

@@ -21,7 +21,7 @@ interface CheckboxProps {
 }
 
 export const Checkbox = ({
-  value,
+  value = false,
   name,
   label,
   labelPlacement = "end",

@@ -10,7 +10,7 @@ import { useSmallScreen } from "../../hooks/index";
 import arrowRight from "../../assets/icons/arrow-right.svg";
 import rootContext from "../../context/root/rootContext";
 import useFetch from "use-http";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 
 // Steps components
 const BusinessProfile = lazy(() =>
@@ -30,14 +30,14 @@ export interface CurrentStep {
 
 export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(2);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const isSmallScreen = useSmallScreen();
   const [showMobileView, setShowMobileView] = useState(false);
   const { get, response } = useFetch();
   const [businessData, setBusinessData] = useState();
   const [workTimesData, setWorkTimesData] = useState();
   const [servicesData, setServicesData] = useState();
-  const history = useHistory();
+  // const history = useHistory();
 
   useEffect(() => {
     rootState?.setError("");
@@ -59,25 +59,32 @@ export const BusinessRegister = () => {
     if (response.ok) setServicesData(data);
   }
 
-  useEffect(() => {
-    getBusinessData();
-    getWorkTimesData();
-    getServicesData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    /*
-     * For better ux, we want to redirect the user to relevant route.
-     * In addition, We want to autofill the forms if the user already
-     * filled him before and quit.
-     *
-     */
-
-    if (businessData && servicesData && workTimesData) {
-      // history.push("/admin-panel");
+  const getData = () => {
+    if (currentStep === 1) {
+      getBusinessData();
+    } else if (currentStep === 2) {
+      getWorkTimesData();
+    } else if (currentStep === 3) {
+      getServicesData();
     }
-  }, [businessData, servicesData, workTimesData, history]);
+  };
+
+  useEffect(() => {
+    getData();
+  }, [currentStep]);
+
+  // useEffect(() => {
+  //   /*
+  //    * For better ux, we want to redirect the user to relevant route.
+  //    * In addition, We want to autofill the forms if the user already
+  //    * filled him before and quit.
+  //    *
+  //    */
+
+  //   if (businessData && servicesData && workTimesData) {
+  //     // history.push("/admin-panel");
+  //   }
+  // }, [businessData, servicesData, workTimesData, history]);
 
   const steps = [
     {
@@ -99,6 +106,7 @@ export const BusinessRegister = () => {
           setCurrentStep={setCurrentStep}
           showMobileView={showMobileView}
           setShowMobileView={setShowMobileView}
+          currentStep={currentStep}
         />
       ),
     },
@@ -126,8 +134,10 @@ export const BusinessRegister = () => {
     if (showMobileView) {
       setShowMobileView(false);
     } else if (currentStep >= 2) {
+      getData();
+
       // @ts-ignore
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((c) => c - 1);
     }
   };
 
