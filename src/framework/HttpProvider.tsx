@@ -25,6 +25,7 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
   }, [cookies]);
 
   const options = {
+    cachePolicy: "no-cache",
     interceptors: {
       request: async ({ options }: any) => {
         rootState?.setError("");
@@ -39,7 +40,7 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
       response: async ({ response }: any) => {
         setTimeout(() => {
           rootState?.setLoading(false);
-        }, 3000);
+        }, 2000);
 
         const res = response;
         return res;
@@ -48,6 +49,7 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
   };
 
   return (
+    // @ts-ignore
     <Provider url="https://dev.dntor.com" options={options}>
       {children}
     </Provider>

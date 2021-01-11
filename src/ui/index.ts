@@ -7,3 +7,4 @@ export * from './checkbox/Checkbox';
 export * from './switch/Switch';
 export * from './duration-selector/DurationSelector';
 export * from './navbar/Navbar';
+export * from './block-ui/BlockUI';

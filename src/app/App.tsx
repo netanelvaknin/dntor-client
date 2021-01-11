@@ -3,10 +3,8 @@ import React, { lazy, useContext } from "react";
 import { Switch, Route } from "react-router-dom";
 import ProtectedRoute from "../framework/ProtectedRoute";
 import rootContext from "../context/root/rootContext";
-import BlockUi from "react-block-ui";
 import "react-block-ui/style.css";
-import { Navbar } from "../ui/index";
-import { Loader } from "../animations/index";
+import { Navbar, BlockUI } from "../ui/index";
 
 const Login = lazy(() => import("../pages/login/Login"));
 const Register = lazy(() => import("../pages/register/Register"));
@@ -35,11 +33,8 @@ const App = () => {
   ];
 
   return (
-    <BlockUi
-      loader={rootState?.loader || <Loader />}
-      blocking={rootState?.loading}
-      keepInView
-    >
+    <>
+      <BlockUI blocking={rootState?.loading} />
       <Navbar />
 
       <Switch>
@@ -62,7 +57,7 @@ const App = () => {
           );
         })}
       </Switch>
-    </BlockUi>
+    </>
   );
 };
 

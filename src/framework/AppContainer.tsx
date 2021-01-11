@@ -19,6 +19,7 @@ import "moment/locale/he";
 import HttpProvider from "./HttpProvider";
 import { CookiesProvider } from "react-cookie";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { LastLocationProvider } from "react-router-last-location";
 
 moment.locale("he");
 
@@ -36,23 +37,25 @@ const AppContainer = (props: any) => {
         <CookiesProvider>
           <HttpProvider>
             <Suspense fallback={<></>}>
-              <MuiPickersUtilsProvider
-                libInstance={moment}
-                utils={MomentUtils}
-                locale="he"
-              >
-                <StylesProvider injectFirst>
-                  <MuiThemeProvider theme={theme}>
-                    <ThemeProvider theme={theme}>
-                      <GlobalStyles />
-                      <RTL>
-                        <CssBaseline />
-                        {props.children}
-                      </RTL>
-                    </ThemeProvider>
-                  </MuiThemeProvider>
-                </StylesProvider>
-              </MuiPickersUtilsProvider>
+              <LastLocationProvider>
+                <MuiPickersUtilsProvider
+                  libInstance={moment}
+                  utils={MomentUtils}
+                  locale="he"
+                >
+                  <StylesProvider injectFirst>
+                    <MuiThemeProvider theme={theme}>
+                      <ThemeProvider theme={theme}>
+                        <GlobalStyles />
+                        <RTL>
+                          <CssBaseline />
+                          {props.children}
+                        </RTL>
+                      </ThemeProvider>
+                    </MuiThemeProvider>
+                  </StylesProvider>
+                </MuiPickersUtilsProvider>
+              </LastLocationProvider>
             </Suspense>
           </HttpProvider>
         </CookiesProvider>

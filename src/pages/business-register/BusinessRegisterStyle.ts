@@ -4,6 +4,7 @@ import {mobile, tablet} from '../../utils/screen-sizes';
 import cardLabelBackground from '../../assets/backgrounds/card-label-background.svg';
 import {IconButton} from '@material-ui/core';
 import {Button} from '../../ui/index';
+import {makeStyles} from '@material-ui/core/styles';
 
 export const BusinessRegisterPageStyle = styled.div`
     min-height: 100vh;
@@ -80,4 +81,26 @@ export const ArrowRightButton = styled(IconButton)`
 export const ContinueButtonStyle = styled(Button)`
     width: 28rem;
     height: 3rem;
+`;
+
+export const useDialogStyles = makeStyles({
+    paper: {
+        width: '50rem',
+        minHeight: '30rem',
+        padding: '2rem',
+        '& .MuiButtonBase-root': {
+            margin: '5rem auto 0'
+        }
+    }
+});
+
+export const DialogHeading = styled.h1`
+    text-align: center;
+    font-size: 4.5rem;
+`;
+
+export const DialogText = styled.p`
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 3rem;
 `;

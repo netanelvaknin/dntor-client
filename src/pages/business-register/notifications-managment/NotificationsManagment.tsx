@@ -12,18 +12,66 @@ import { CurrentStep } from "../BusinessRegister";
 import rootContext from "../../../context/root/rootContext";
 import useFetch from "use-http";
 import { Alert } from "@material-ui/lab";
+import { useHistory } from "react-router-dom";
 
-export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
+interface NotificationsManagmentProps extends CurrentStep {}
+
+export const NotificationsManagment = ({
+  setCurrentStep,
+}: NotificationsManagmentProps) => {
   const { register, watch, handleSubmit } = useForm();
   const [notificationTiming, setNotificationTiming] = useState({
     hourBefore: false,
     dayBefore: false,
     twoDaysBefore: false,
   });
-  const { post, response } = useFetch();
+  const [businessData, setBusinessData] = useState<any>();
+  const [servicesData, setServicesData] = useState<any>();
+  const [workTimesData, setWorkTimesData] = useState<any>();
+  const [everyStepsAreAlreadyFilled, setEveryStepsAreAlreadyFilled] = useState(
+    false
+  );
+  const { get, post, response } = useFetch();
   const rootState = useContext(rootContext);
+  const history = useHistory();
 
   const customersNotifications = watch("customerSmsRemainderActive");
+
+  async function getBusinessData() {
+    const data = await get("/business");
+    if (response.ok) setBusinessData(data);
+  }
+
+  async function getWorkTimesData() {
+    const data = await get("business/businessWorkTimes");
+    if (response.ok) setWorkTimesData(data);
+  }
+
+  async function getServicesData() {
+    const data = await get("/business/services");
+    if (response.ok) setServicesData(data);
+  }
+
+  const getAllData = () => {
+    getBusinessData();
+    getWorkTimesData();
+    getServicesData();
+  };
+
+  useEffect(() => {
+    getAllData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (
+      businessData?.res?.name &&
+      servicesData?.res?.services?.length > 0 &&
+      workTimesData?.res?.days?.length > 0
+    ) {
+      setEveryStepsAreAlreadyFilled(true);
+    }
+  }, [businessData, servicesData, workTimesData]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNotificationTiming({
@@ -34,10 +82,11 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
 
   const onSubmit = async (data: any) => {
     const dataCopy = data;
+
     dataCopy.customerSmsRemainderTimes = {
-      twoDaysBefore: !!dataCopy.twoDaysBefore,
-      dayBefore: !!dataCopy.dayBefore,
-      hourBefore: !!dataCopy.hourBefore,
+      twoDaysBefore: notificationTiming.twoDaysBefore,
+      dayBefore: notificationTiming.dayBefore,
+      hourBefore: notificationTiming.hourBefore,
     };
 
     delete dataCopy.twoDaysBefore;
@@ -58,8 +107,11 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
       await post("/business/upsert", dataCopy);
     }
 
-    if (response.ok) {
-      // console.log(dataCopy);
+    if (response.ok && everyStepsAreAlreadyFilled) {
+      setCurrentStep(1);
+      history.push("/admin-panel");
+    } else {
+      rootState?.setError("אירעה שגיאה. אנא נסה שנית מאוחר יותר");
     }
   };
 
@@ -152,7 +204,7 @@ export const NotificationsManagment = ({ setCurrentStep }: CurrentStep) => {
 
       <Grid container justify="center" style={{ paddingBottom: "5rem" }}>
         <ContinueButtonStyle type="submit" disabled={!!rootState?.error}>
-          בואו נעבור למערכת !
+          בואו נעבור ליומן !
         </ContinueButtonStyle>
       </Grid>
     </form>

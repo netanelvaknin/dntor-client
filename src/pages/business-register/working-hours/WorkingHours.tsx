@@ -68,7 +68,6 @@ export const WorkingHours = ({
     saturday: false,
   });
   const [workingHours, setWorkingHours] = useState<any>([]);
-
   const isSmallScreen = useSmallScreen();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -357,7 +356,7 @@ export const WorkingHours = ({
   };
 
   useEffect(() => {
-    if (initialWorkTimesData) {
+    if (initialWorkTimesData?.res?.days) {
       const daysToActivateAndDisabled: any = [];
 
       const days = initialWorkTimesData.res.days;
@@ -401,7 +400,8 @@ export const WorkingHours = ({
       setDisabledDays({ ...disabledDays, ...checkedCopy });
       setWorkingHours(daysCopy);
     }
-  }, [initialWorkTimesData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialWorkTimesData, currentStep]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">

@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { NavbarStyle } from "./NavbarStyle";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { Button } from "@material-ui/core";
 import { useCookies, withCookies } from "react-cookie";
+import businessRegisterContext from "../../context/business-register/businessRegisterContext";
 
-export const Navbar = () => {
+export const Navbar = (props: any) => {
+  console.log(props);
+  const businessRegisterState = useContext(businessRegisterContext);
   const loginAndRegisterText = "התחברות / הרשמה";
   const logOutText = "התנתקות";
   const history = useHistory();
+  const location = useLocation();
   const [cookies, remove] = useCookies();
   const [buttonText, setButtonText] = useState(loginAndRegisterText);
 
@@ -27,13 +31,22 @@ export const Navbar = () => {
       remove("token-expired-date", "");
       history.push("/");
       setButtonText(loginAndRegisterText);
+
+      businessRegisterState && businessRegisterState.setServicesData({});
+      businessRegisterState && businessRegisterState.setWorkTimesData({});
+      businessRegisterState && businessRegisterState.setBusinessData({});
     }
   };
 
   return (
     <NavbarStyle>
+      {location.pathname === "/" && cookies.token && (
+        <Button onClick={() => history.push("/business-register")}>
+          כניסה למערכת
+        </Button>
+      )}
       <Button
-        style={{ margin: "10rem", width: "17rem", height: "5rem" }}
+        style={{ width: "17rem", height: "5rem" }}
         onClick={handleButtonClick}
       >
         {buttonText}

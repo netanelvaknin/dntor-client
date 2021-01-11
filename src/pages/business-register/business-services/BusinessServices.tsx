@@ -103,7 +103,7 @@ export const BusinessServices = ({
   };
 
   useEffect(() => {
-    if (initialServicesData) {
+    if (initialServicesData?.res?.services) {
       const servicesCopy = initialServicesData.res.services;
       servicesCopy.forEach((service: any, index: number) => {
         delete servicesCopy[index]._id;

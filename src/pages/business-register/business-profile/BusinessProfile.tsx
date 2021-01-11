@@ -44,7 +44,7 @@ export const BusinessProfile = ({
   };
 
   useEffect(() => {
-    if (initialBusinessProfileData) {
+    if (initialBusinessProfileData?.res?.name) {
       setValue("business_name", initialBusinessProfileData?.res.name);
       setValue("business_phone", initialBusinessProfileData?.res.phone);
       setValue("business_email", initialBusinessProfileData?.res.email);
