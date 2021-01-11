@@ -20,7 +20,7 @@ const App = () => {
     {
       path: "/",
       component: (
-        <div style={{ margin: "15rem", fontWeight: "bold" }}>Landing page</div>
+        <div style={{ margin: "15rem", fontWeight: "bold" }}>דף נחיתה</div>
       ),
     },
     { path: "/login", component: <Login /> },

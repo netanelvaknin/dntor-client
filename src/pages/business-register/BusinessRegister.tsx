@@ -39,6 +39,7 @@ export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
   const businessRegisterState = useContext(businessRegisterContext);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [, setState] = useState({});
   const [showMobileView, setShowMobileView] = useState(false);
   const [open, setOpen] = useState(false);
   const { get, response } = useFetch();
@@ -49,7 +50,20 @@ export const BusinessRegister = () => {
   const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
+    if (lastLocation?.pathname === "/") {
+      setTimeout(() => {
+        setOpen(true);
+      }, 300);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     rootState?.setError("");
+
+    if (currentStep > 1) {
+      setOpen(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
@@ -89,6 +103,10 @@ export const BusinessRegister = () => {
 
   useEffect(() => {
     getAllData();
+
+    return () => {
+      setState({});
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -100,8 +118,6 @@ export const BusinessRegister = () => {
       !businessRegisterState.fetchedOnce
     ) {
       history.push("/admin-panel");
-    } else if (lastLocation?.pathname === "/") {
-      setOpen(true);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,6 +125,10 @@ export const BusinessRegister = () => {
 
   useEffect(() => {
     getDataByStep();
+
+    return () => {
+      setState({});
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
@@ -168,6 +188,7 @@ export const BusinessRegister = () => {
     } else if (currentStep >= 2) {
       businessRegisterState && businessRegisterState.setFechedOnce(true);
       getDataByStep();
+
       // @ts-ignore
       setCurrentStep((c) => c - 1);
     }

@@ -1,12 +1,21 @@
 import { useState, useEffect, useContext } from "react";
-import { NavbarStyle } from "./NavbarStyle";
+import {
+  NavbarStyle,
+  ConnectAndRegisterButton,
+  TemporaryLogo,
+  IconButtonStyle,
+  AdminActionsContainer,
+} from "./NavbarStyle";
 import { useHistory, useLocation } from "react-router-dom";
-import { Button } from "@material-ui/core";
 import { useCookies, withCookies } from "react-cookie";
 import businessRegisterContext from "../../context/business-register/businessRegisterContext";
+import { useSmallScreen } from "../../hooks/index";
+import DotsIcon from "../../assets/icons/mobile_dots.svg";
+import NotificationsIcon from "../../assets/icons/notifications.svg";
+import ShareIcon from "../../assets/icons/share.svg";
+import ProfileIcon from "../../assets/icons/profile.svg";
 
 export const Navbar = (props: any) => {
-  console.log(props);
   const businessRegisterState = useContext(businessRegisterContext);
   const loginAndRegisterText = "התחברות / הרשמה";
   const logOutText = "התנתקות";
@@ -14,6 +23,7 @@ export const Navbar = (props: any) => {
   const location = useLocation();
   const [cookies, remove] = useCookies();
   const [buttonText, setButtonText] = useState(loginAndRegisterText);
+  const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
     if (!cookies.token) {
@@ -40,17 +50,67 @@ export const Navbar = (props: any) => {
 
   return (
     <NavbarStyle>
-      {location.pathname === "/" && cookies.token && (
-        <Button onClick={() => history.push("/business-register")}>
-          כניסה למערכת
-        </Button>
+      <TemporaryLogo onClick={() => history.push("/")}>
+        יהיה כאן לוגו
+      </TemporaryLogo>
+
+      <div>
+        {!isSmallScreen ? (
+          <>
+            {location.pathname === "/" && (
+              <ConnectAndRegisterButton
+                variant="outlined"
+                onClick={handleButtonClick}
+              >
+                {buttonText}
+              </ConnectAndRegisterButton>
+            )}
+
+            {location.pathname === "/" && cookies.token && (
+              <ConnectAndRegisterButton
+                variant="contained"
+                onClick={() => history.push("/business-register")}
+              >
+                כניסה למערכת
+              </ConnectAndRegisterButton>
+            )}
+          </>
+        ) : (
+          <IconButtonStyle>
+            <img src={DotsIcon} alt="" />
+          </IconButtonStyle>
+        )}
+      </div>
+
+      {location.pathname === "/admin-panel" && (
+        <>
+          {!isSmallScreen && (
+            <>
+              <AdminActionsContainer>
+                <span>יומן תורים</span>
+                <span>קביעת תור</span>
+                <span>חסימת תור</span>
+              </AdminActionsContainer>
+
+              <div>
+                <IconButtonStyle style={{ margin: "0 1rem" }}>
+                  <img src={ShareIcon} alt="שיתוף לינק לקביעת תורים" />
+                </IconButtonStyle>
+                <IconButtonStyle style={{ margin: "0 1rem" }}>
+                  <img src={NotificationsIcon} alt="צפיה בעדכונים אחרונים" />
+                </IconButtonStyle>
+                <IconButtonStyle style={{ margin: "0 1rem" }}>
+                  <img
+                    src={ProfileIcon}
+                    alt="פתיחת פעולות פרופיל"
+                    style={{ width: "4rem", height: "4rem" }}
+                  />
+                </IconButtonStyle>
+              </div>
+            </>
+          )}
+        </>
       )}
-      <Button
-        style={{ width: "17rem", height: "5rem" }}
-        onClick={handleButtonClick}
-      >
-        {buttonText}
-      </Button>
     </NavbarStyle>
   );
 };

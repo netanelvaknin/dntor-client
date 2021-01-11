@@ -89,7 +89,10 @@ export const useDialogStyles = makeStyles({
         minHeight: '30rem',
         padding: '2rem',
         '& .MuiButtonBase-root': {
-            margin: '5rem auto 0'
+            margin: '5rem auto 0',
+            '@media (max-width: 767px)': {
+                width: '21rem'
+            }
         }
     }
 });
@@ -97,10 +100,18 @@ export const useDialogStyles = makeStyles({
 export const DialogHeading = styled.h1`
     text-align: center;
     font-size: 4.5rem;
+
+    @media ${mobile} {
+        font-size: 3.5rem;
+    }
 `;
 
 export const DialogText = styled.p`
     text-align: center;
     font-size: 2rem;
     margin-top: 3rem;
+
+    @media ${mobile} {
+        font-size: 1.8rem;
+    }
 `;
