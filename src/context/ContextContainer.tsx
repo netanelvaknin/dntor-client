@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import RootState from "./root/RootState";
 import BusinessRegister from "./business-register/BusinessRegisterState";
+import AdminPanel from "./admin-panel/AdminPanelState";
 
 interface ContextContainerProps {
   children?: ReactNode;
@@ -9,7 +10,9 @@ interface ContextContainerProps {
 export const ContextContainer = ({ children }: ContextContainerProps) => {
   return (
     <RootState>
-      <BusinessRegister>{children}</BusinessRegister>
+      <BusinessRegister>
+        <AdminPanel>{children}</AdminPanel>
+      </BusinessRegister>
     </RootState>
   );
 };

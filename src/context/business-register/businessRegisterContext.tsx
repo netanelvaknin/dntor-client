@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-type rootContextType =
+type businessRegisterContextType =
   | {
       businessData: any;
       workTimesData: any;
@@ -13,4 +13,4 @@ type rootContextType =
     }
   | undefined;
 
-export default createContext<rootContextType>(undefined);
+export default createContext<businessRegisterContextType>(undefined);

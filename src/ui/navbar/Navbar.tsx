@@ -1,10 +1,10 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   NavbarStyle,
   ConnectAndRegisterButton,
-  TemporaryLogo,
   IconButtonStyle,
   AdminActionsContainer,
+  AdminPanelActionButton,
 } from "./NavbarStyle";
 import { useHistory, useLocation } from "react-router-dom";
 import { useCookies, withCookies } from "react-cookie";
@@ -14,24 +14,19 @@ import DotsIcon from "../../assets/icons/mobile_dots.svg";
 import NotificationsIcon from "../../assets/icons/notifications.svg";
 import ShareIcon from "../../assets/icons/share.svg";
 import ProfileIcon from "../../assets/icons/profile.svg";
+import TempLogo from "../../assets/icons/default.svg";
+import NavbarDropdown from "./navbar-dropdown/NavbarDropdown";
+import adminPanelContext from "../../context/admin-panel/adminPanelContext";
 
-export const Navbar = (props: any) => {
+export const Navbar = () => {
+  const adminPanelState = useContext(adminPanelContext);
   const businessRegisterState = useContext(businessRegisterContext);
-  const loginAndRegisterText = "התחברות / הרשמה";
-  const logOutText = "התנתקות";
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const history = useHistory();
   const location = useLocation();
   const [cookies, remove] = useCookies();
-  const [buttonText, setButtonText] = useState(loginAndRegisterText);
   const isSmallScreen = useSmallScreen();
-
-  useEffect(() => {
-    if (!cookies.token) {
-      setButtonText(loginAndRegisterText);
-    } else {
-      setButtonText(logOutText);
-    }
-  }, [cookies]);
+  const useProfileRef = useRef(null);
 
   const handleButtonClick = () => {
     if (!cookies.token) {
@@ -40,7 +35,6 @@ export const Navbar = (props: any) => {
       remove("token", "");
       remove("token-expired-date", "");
       history.push("/");
-      setButtonText(loginAndRegisterText);
 
       businessRegisterState && businessRegisterState.setServicesData({});
       businessRegisterState && businessRegisterState.setWorkTimesData({});
@@ -49,57 +43,89 @@ export const Navbar = (props: any) => {
   };
 
   return (
-    <NavbarStyle>
-      <TemporaryLogo onClick={() => history.push("/")}>
-        יהיה כאן לוגו
-      </TemporaryLogo>
+    <NavbarStyle isAdminPanel={location.pathname === "/admin-panel"}>
+      <div onClick={() => history.push("/")} style={{ maxHeight: "100%" }}>
+        <img
+          src={TempLogo}
+          alt="temporary-logo"
+          style={{ width: "9rem", maxHeight: "100%", cursor: "pointer" }}
+        />
+      </div>
 
       <div>
-        {!isSmallScreen ? (
-          <>
-            {location.pathname === "/" && (
-              <ConnectAndRegisterButton
-                variant="outlined"
-                onClick={handleButtonClick}
-              >
-                {buttonText}
-              </ConnectAndRegisterButton>
-            )}
+        <>
+          {location.pathname === "/business-register" && (
+            <ConnectAndRegisterButton
+              variant="outlined"
+              onClick={handleButtonClick}
+            >
+              התנתקות
+            </ConnectAndRegisterButton>
+          )}
 
-            {location.pathname === "/" && cookies.token && (
-              <ConnectAndRegisterButton
-                variant="contained"
-                onClick={() => history.push("/business-register")}
-              >
-                כניסה למערכת
-              </ConnectAndRegisterButton>
-            )}
-          </>
-        ) : (
-          <IconButtonStyle>
-            <img src={DotsIcon} alt="" />
-          </IconButtonStyle>
-        )}
+          {location.pathname === "/" && (
+            <ConnectAndRegisterButton
+              variant="outlined"
+              onClick={() => history.push("/business-register")}
+            >
+              כניסה
+            </ConnectAndRegisterButton>
+          )}
+        </>
       </div>
 
       {location.pathname === "/admin-panel" && (
         <>
-          {!isSmallScreen && (
+          {!isSmallScreen ? (
             <>
               <AdminActionsContainer>
-                <span>יומן תורים</span>
-                <span>קביעת תור</span>
-                <span>חסימת תור</span>
+                <AdminPanelActionButton
+                  variant="text"
+                  activeNavItem={
+                    adminPanelState?.activeNavItem === "יומן תורים"
+                  }
+                  onClick={() =>
+                    adminPanelState &&
+                    adminPanelState.setActiveNavItem("יומן תורים")
+                  }
+                >
+                  יומן תורים
+                </AdminPanelActionButton>
+                <AdminPanelActionButton
+                  variant="text"
+                  activeNavItem={adminPanelState?.activeNavItem === "קביעת תור"}
+                  onClick={() =>
+                    adminPanelState &&
+                    adminPanelState.setActiveNavItem("קביעת תור")
+                  }
+                >
+                  קביעת תור
+                </AdminPanelActionButton>
+                <AdminPanelActionButton
+                  variant="text"
+                  activeNavItem={adminPanelState?.activeNavItem === "חסימת תור"}
+                  onClick={() =>
+                    adminPanelState &&
+                    adminPanelState.setActiveNavItem("חסימת תור")
+                  }
+                >
+                  חסימת תור
+                </AdminPanelActionButton>
               </AdminActionsContainer>
 
-              <div>
+              <div style={{ maxWidth: "27rem" }}>
                 <IconButtonStyle style={{ margin: "0 1rem" }}>
                   <img src={ShareIcon} alt="שיתוף לינק לקביעת תורים" />
                 </IconButtonStyle>
                 <IconButtonStyle style={{ margin: "0 1rem" }}>
                   <img src={NotificationsIcon} alt="צפיה בעדכונים אחרונים" />
                 </IconButtonStyle>
-                <IconButtonStyle style={{ margin: "0 1rem" }}>
+
+                <IconButtonStyle
+                  style={{ margin: "0 1rem" }}
+                  onClick={() => setProfileDropdownOpen(true)}
+                  ref={useProfileRef}
+                >
                   <img
                     src={ProfileIcon}
                     alt="פתיחת פעולות פרופיל"
@@ -108,7 +134,20 @@ export const Navbar = (props: any) => {
                 </IconButtonStyle>
               </div>
             </>
+          ) : (
+            <IconButtonStyle
+              onClick={() => setProfileDropdownOpen(true)}
+              ref={useProfileRef}
+            >
+              <img src={DotsIcon} alt="" />
+            </IconButtonStyle>
           )}
+
+          <NavbarDropdown
+            open={profileDropdownOpen}
+            anchorEl={useProfileRef.current}
+            onClose={setProfileDropdownOpen}
+          />
         </>
       )}
     </NavbarStyle>

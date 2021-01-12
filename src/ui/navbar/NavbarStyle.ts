@@ -3,11 +3,15 @@ import { Button } from "../index";
 import {IconButton} from '@material-ui/core';
 import {mobile} from '../../utils/screen-sizes';
 
-export const NavbarStyle = styled.nav`
+interface NavbarStyleProps {
+    isAdminPanel: boolean;
+}
+
+export const NavbarStyle = styled.nav<NavbarStyleProps>`
     height: 8.5rem;
     width: 100%;
     background: #fff;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.03);
+    box-shadow: ${props => !props.isAdminPanel && '0px 4px 4px rgba(0, 0, 0, 0.03)'};
     padding: 0 4rem;
     position: absolute;
     top: 0;
@@ -16,18 +20,19 @@ export const NavbarStyle = styled.nav`
     align-items: center;
     justify-content: space-between;
     z-index: 12;
+
+    @media ${mobile} {
+        padding: 0 1rem;
+    }
 `;
 
 export const ConnectAndRegisterButton = styled(Button)`
     height: 4rem;
-    margin-right: 3rem;
-`;
+    min-width: 12rem;
 
-export const TemporaryLogo = styled.div`
-    border: 1px solid black;
-    padding: 1rem;
-    border-radius: 25px;
-    cursor: pointer;
+    @media ${mobile} {
+        min-width: 10rem;
+    }
 `;
 
 export const IconButtonStyle = styled(IconButton)`
@@ -39,7 +44,6 @@ export const IconButtonStyle = styled(IconButton)`
 `;
 
 export const AdminActionsContainer = styled.div`
-    min-width: 40%;
     height: 100%;
     display: flex;
     justify-content: space-between;
@@ -51,5 +55,24 @@ export const AdminActionsContainer = styled.div`
         justify-content: center;
         font-size: 1.8rem;
         cursor: pointer;
+    }
+`;
+
+interface AdminPanelActionButtonProps {
+    activeNavItem: boolean;
+}
+
+export const AdminPanelActionButton = styled(Button)<AdminPanelActionButtonProps>`
+    padding: 0 2rem;
+    border-radius: 0;
+
+    &,
+    &:hover {
+        background: ${props => props.activeNavItem && props.theme.palette.primary.light}!important;
+    }
+
+    & .MuiButton-label {
+        text-decoration: none;
+        color: black;
     }
 `;
