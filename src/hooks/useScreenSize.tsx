@@ -5,10 +5,10 @@ export const useScreenSize = (minWidth: number, maxWidth: number) => {
     return window.innerWidth > minWidth && window.innerWidth <= maxWidth;
   };
 
-  const [isBetweenWidths, setIsBetweenWidths] = useState(getScreenSize());
+  const [isBetween, setIsBetween] = useState(getScreenSize());
 
   useEffect(() => {
-    const handleResize = () => setIsBetweenWidths(getScreenSize());
+    const handleResize = () => setIsBetween(getScreenSize());
 
     window.addEventListener("resize", handleResize);
 
@@ -18,7 +18,7 @@ export const useScreenSize = (minWidth: number, maxWidth: number) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return isBetweenWidths;
+  return isBetween;
 };
 
 export default useScreenSize;
