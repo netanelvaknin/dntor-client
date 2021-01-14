@@ -408,7 +408,7 @@ export const WorkingHours = ({
       <Grid container direction="row">
         <Grid md={12} justify="center" alignItems="center" container item>
           <HoursSetupHeading variant="h1" style={{ textAlign: "center" }}>
-            הגדרת שעות
+            הגדרת זמני פעילות
           </HoursSetupHeading>
         </Grid>
 
@@ -789,7 +789,7 @@ export const WorkingHours = ({
             </LeftGrid>
 
             {workingHours.length <= 0 && (
-              <NoWorkingHoursFound>לא נבחרו ימי עבודה</NoWorkingHoursFound>
+              <NoWorkingHoursFound>לא נבחרו זמני פעילות</NoWorkingHoursFound>
             )}
 
             <Grid
@@ -803,7 +803,7 @@ export const WorkingHours = ({
                 variant="outlined"
                 onClick={() => setShowMobileView && setShowMobileView(false)}
               >
-                הוספת זמני פעילות נוספים
+                הוספת זמני פעילות {workingHours.length > 0 ? "נוספים" : ""}
               </MobileAddButton>
             </Grid>
             <Grid

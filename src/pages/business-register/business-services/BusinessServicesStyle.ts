@@ -9,7 +9,7 @@ export const BusinessServicesHeading = styled(Typography)`
         margin: 5rem 0 4rem;
 
         @media ${mobile} {
-            margin: 3rem 0 4rem;
+            margin: 3rem 0 2rem;
         }
     }
 `;
@@ -41,12 +41,12 @@ export const LeftGrid = styled(Grid)`
 export const DurationText = styled.span`
     font-size: 1.8rem;
     margin-left: 6rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 `;
 
 export const ServiceCard = styled(Card)`
     width: 22rem;
-    height: 8.5rem;
+    min-height: 8.5rem;
     position: relative;
     margin-bottom: 2rem;
     margin-left: .5rem;

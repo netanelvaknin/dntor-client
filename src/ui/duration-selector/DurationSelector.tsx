@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import DurationPicker from "react-duration-picker";
 import { DurationSelectorContainer } from "./DurationSelectorStyle";
 
+// Needs followup in this link for fix "unable to preventDefault... " error:
+// https://github.com/flurmbo/react-duration-picker/issues/41
+
 interface DurationSelectorProps {
   onChange: any;
 }

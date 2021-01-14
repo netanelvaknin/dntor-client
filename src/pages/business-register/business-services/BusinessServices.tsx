@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import {
   BusinessServicesHeading,
   DurationText,
@@ -16,8 +16,9 @@ import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 import useFetch from "use-http";
+import { Alert } from "@material-ui/lab";
 
-// import rootContext from "../../../context/root/rootContext";
+import rootContext from "../../../context/root/rootContext";
 
 interface BusinessServicesProps extends CurrentStep {
   showMobileView?: boolean;
@@ -32,84 +33,102 @@ export const BusinessServices = ({
   initialServicesData,
 }: BusinessServicesProps) => {
   const serviceNameRef = useRef<HTMLElement | null>(null);
+  const servicePriceRef = useRef<HTMLElement | null>(null);
+
   const { control, register, reset, watch, handleSubmit } = useForm({
     defaultValues: {
       service_name: "",
+      service_price: "",
     },
   });
+
   const { post, response } = useFetch();
-  // const rootState = useContext(rootContext);
+  const rootState = useContext(rootContext);
 
   const [duration, setDuration] = useState<any>();
   const [services, setServices] = useState<any>([]);
   const [canAdd, setCanAdd] = useState(false);
   const serviceName = watch("service_name");
+  const servicePrice = watch("service_price");
+
   const isSmallScreen = useSmallScreen();
 
   const handleAddWorkingHours = () => {
-    if (serviceName && (duration.hours > 0 || duration.minutes > 0)) {
-      const { hours, minutes } = duration;
-      let finalDuration = "";
+    if (serviceName.length < 2) {
+      rootState?.setError("שם השירות לא תקין");
+    } else {
+      if (serviceName && (duration.hours > 0 || duration.minutes > 0)) {
+        rootState?.setError("");
+        const { hours, minutes } = duration;
+        let finalDuration = "";
 
-      if (hours.toString().length < 2) {
-        finalDuration = `0${hours}:`;
+        if (hours.toString().length < 2) {
+          finalDuration = `0${hours}:`;
+        } else {
+          finalDuration = `${hours}:`;
+        }
+
+        if (minutes.toString().length < 2) {
+          finalDuration = `${finalDuration}0${minutes}`;
+        } else {
+          finalDuration = `${finalDuration}${minutes}`;
+        }
+
+        setServices([
+          ...services,
+          {
+            serviceName: serviceName,
+            price: Number(servicePrice),
+            duration: finalDuration,
+          },
+        ]);
+
+        if (isSmallScreen) {
+          setShowMobileView && setShowMobileView(true);
+        }
+
+        reset({
+          service_name: "",
+          service_price: "",
+        });
       } else {
-        finalDuration = `${hours}:`;
+        rootState?.setError("נא לבדוק שמילאת את שם ומשך השירות");
       }
-
-      if (minutes.toString().length < 2) {
-        finalDuration = `${finalDuration}0${minutes}`;
-      } else {
-        finalDuration = `${finalDuration}${minutes}`;
-      }
-
-      setServices([
-        ...services,
-        {
-          serviceName: serviceName,
-          duration: finalDuration,
-        },
-      ]);
-
-      if (isSmallScreen) {
-        setShowMobileView && setShowMobileView(true);
-      }
-
-      reset({
-        service_name: "",
-      });
     }
   };
 
-  const removeService = (index: number) => {
+  const removeService = (index: number, serviceId: string) => {
     const servicesCopy = [...services];
     servicesCopy.splice(index, 1);
     setServices(servicesCopy);
+
+    if (serviceId) {
+      post("/business/removeService", { serviceId });
+    }
   };
 
   useEffect(() => {
-    if (serviceName && (duration.hours > 0 || duration.minutes > 0)) {
+    if (serviceName) {
       setCanAdd(true);
     } else {
       setCanAdd(false);
     }
-  }, [serviceName, duration]);
+  }, [serviceName]);
 
   const onSubmit = async () => {
-    await post("/business/upsertServices", services);
+    await post("/business/insertServices", services);
 
     if (response.ok) {
+      rootState?.setLoading(true);
       setCurrentStep(4);
       setShowMobileView && setShowMobileView(false);
+      rootState?.setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (initialServicesData?.res?.services) {
-      const servicesCopy = initialServicesData.res.services;
-      servicesCopy.forEach((service: any, index: number) => {
-        delete servicesCopy[index]._id;
-      });
+    if (!initialServicesData?.res.Error) {
+      const servicesCopy = initialServicesData?.res;
 
       setServices(servicesCopy);
     }
@@ -118,6 +137,10 @@ export const BusinessServices = ({
   useEffect(() => {
     if (serviceNameRef.current !== null) {
       serviceNameRef.current.blur();
+    }
+
+    if (servicePriceRef.current !== null) {
+      servicePriceRef.current.blur();
     }
   }, [duration]);
 
@@ -146,9 +169,27 @@ export const BusinessServices = ({
               control={control}
               label="שם השירות"
               inputRef={serviceNameRef}
-              helperText="לדוגמא: תספורת, בניית ציפורניים ועוד"
+              helperText="לדוגמא: תספורת גבר, בניית ציפורניים ועוד"
               register={register}
               name="service_name"
+            />
+
+            <TextField
+              control={control}
+              label="מחיר השירות (בשקלים)"
+              inputRef={servicePriceRef}
+              type="number"
+              helperText={
+                <span>
+                  <span style={{ color: "#265FB1", fontWeight: "bold" }}>
+                    לא חובה
+                  </span>{" "}
+                  אך מומלץ להוסיף
+                </span>
+              }
+              register={register}
+              name="service_price"
+              min={10}
             />
 
             <Grid
@@ -194,8 +235,18 @@ export const BusinessServices = ({
                         {service.duration.split(":")[0]} שעות ו-{" "}
                         {service.duration.split(":")[1]} דק'
                       </ServiceText>
+                      {service.price && (
+                        <>
+                          <strong>מחיר: </strong>
+                          <span style={{ display: "inline" }}>
+                            {service.price} ש"ח
+                          </span>
+                        </>
+                      )}
                     </ServiceCard>
-                    <IconButton onClick={() => removeService(index)}>
+                    <IconButton
+                      onClick={() => removeService(index, service._id)}
+                    >
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -233,9 +284,19 @@ export const BusinessServices = ({
                         {service.duration.split(":")[0]} שעות ו-{" "}
                         {service.duration.split(":")[1]} דק'
                       </ServiceText>
+                      {service.price && (
+                        <>
+                          <strong>מחיר: </strong>
+                          <span style={{ display: "inline" }}>
+                            {service.price} ש"ח
+                          </span>
+                        </>
+                      )}
                     </ServiceCard>
 
-                    <IconButton onClick={() => removeService(index)}>
+                    <IconButton
+                      onClick={() => removeService(index, service._id)}
+                    >
                       <img src={TrashIcon} alt="מחיקה" />
                     </IconButton>
                   </Grid>
@@ -248,7 +309,7 @@ export const BusinessServices = ({
                 variant="contained"
                 onClick={() => setShowMobileView && setShowMobileView(false)}
               >
-                הוספת שירות נוסף
+                חזור להוספת שירות נוסף
               </MobileAddButton>
             </Grid>
 
@@ -260,14 +321,33 @@ export const BusinessServices = ({
           </Grid>
         )}
 
+        {isSmallScreen && !showMobileView && services.length > 0 && (
+          <Grid item container justify="center" style={{ margin: "2rem 0 0" }}>
+            <MobileAddButton
+              variant="text"
+              onClick={() => setShowMobileView && setShowMobileView(true)}
+            >
+              הצג את השירותים שכבר הוספתי
+            </MobileAddButton>
+          </Grid>
+        )}
+
+        <Grid container style={{ margin: "2rem 0 0rem" }}>
+          <Grid item md={12} xs={12}>
+            {rootState?.error && (
+              <Alert
+                style={{ maxWidth: "28rem", margin: "0 auto" }}
+                severity="error"
+              >
+                {rootState?.error}
+              </Alert>
+            )}
+          </Grid>
+        </Grid>
+
         {!showMobileView && (
           <>
-            <Grid
-              container
-              justify="center"
-              alignItems="center"
-              style={{ marginTop: "2rem" }}
-            >
+            <Grid container justify="center" alignItems="center">
               <ContinueButtonStyle
                 variant="contained"
                 onClick={handleAddWorkingHours}

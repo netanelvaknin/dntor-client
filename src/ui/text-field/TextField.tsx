@@ -7,7 +7,7 @@ interface TextFieldProps {
   type?: "text" | "email" | "password" | "number";
   label?: string;
   error?: boolean;
-  helperText?: string;
+  helperText?: React.ReactNode;
   startAdornment?: React.ReactNode;
   register?: any;
   inputRef?: any;
@@ -18,6 +18,8 @@ interface TextFieldProps {
   pattern?: any;
   minLength?: number;
   maxLength?: number;
+  min?: number;
+  max?: number;
 }
 
 export const TextField = ({
@@ -36,6 +38,8 @@ export const TextField = ({
   pattern,
   minLength,
   maxLength,
+  min,
+  max,
 }: TextFieldProps) => {
   const classes = useTextFieldStyles();
 
@@ -63,6 +67,8 @@ export const TextField = ({
       name={name}
       control={control}
       rules={{
+        min,
+        max,
         required,
         pattern,
         minLength,

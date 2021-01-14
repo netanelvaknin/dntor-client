@@ -29,7 +29,6 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
     interceptors: {
       request: async ({ options }: any) => {
         rootState?.setError("");
-        rootState?.setLoading(true);
 
         // Set headers
         options.headers.Accept = "application/json";
@@ -38,10 +37,6 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
         return options;
       },
       response: async ({ response }: any) => {
-        setTimeout(() => {
-          rootState?.setLoading(false);
-        }, 2000);
-
         const res = response;
         return res;
       },
