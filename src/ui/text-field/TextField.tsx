@@ -10,6 +10,7 @@ interface TextFieldProps {
   helperText?: string;
   startAdornment?: React.ReactNode;
   register?: any;
+  inputRef?: any;
   placeholder?: string;
   className?: string;
   control?: any;
@@ -27,6 +28,7 @@ export const TextField = ({
   helperText,
   startAdornment,
   register,
+  inputRef,
   placeholder,
   className,
   control,
@@ -48,6 +50,7 @@ export const TextField = ({
           error={error}
           helperText={helperText}
           ref={register}
+          inputRef={inputRef}
           placeholder={placeholder}
           className={className}
           classes={{ root: classes.root }}

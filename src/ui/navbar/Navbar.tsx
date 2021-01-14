@@ -48,7 +48,7 @@ export const Navbar = () => {
         <img
           src={TempLogo}
           alt="temporary-logo"
-          style={{ width: "9rem", maxHeight: "100%", cursor: "pointer" }}
+          style={{ width: "15rem", maxHeight: "100%", cursor: "pointer" }}
         />
       </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   BusinessServicesHeading,
   DurationText,
@@ -16,6 +16,7 @@ import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import { useForm } from "react-hook-form";
 import { CurrentStep } from "../BusinessRegister";
 import useFetch from "use-http";
+
 // import rootContext from "../../../context/root/rootContext";
 
 interface BusinessServicesProps extends CurrentStep {
@@ -30,6 +31,7 @@ export const BusinessServices = ({
   setShowMobileView,
   initialServicesData,
 }: BusinessServicesProps) => {
+  const serviceNameRef = useRef<HTMLElement | null>(null);
   const { control, register, reset, watch, handleSubmit } = useForm({
     defaultValues: {
       service_name: "",
@@ -113,6 +115,12 @@ export const BusinessServices = ({
     }
   }, [initialServicesData]);
 
+  useEffect(() => {
+    if (serviceNameRef.current !== null) {
+      serviceNameRef.current.blur();
+    }
+  }, [duration]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <Grid container direction="row">
@@ -137,6 +145,7 @@ export const BusinessServices = ({
             <TextField
               control={control}
               label="שם השירות"
+              inputRef={serviceNameRef}
               helperText="לדוגמא: תספורת, בניית ציפורניים ועוד"
               register={register}
               name="service_name"

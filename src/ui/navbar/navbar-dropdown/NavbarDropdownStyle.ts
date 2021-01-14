@@ -5,7 +5,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 export const MenuStyle = styled(Menu)`
     & .MuiPaper-root {
-        opacity: 0.8!important;
         width: 32rem;
         padding: 1rem;
     }

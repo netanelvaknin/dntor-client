@@ -21,9 +21,9 @@ export const BlockUIContainer = styled.div`
 export const Overlay = styled.div`
   width: 100%;
   height: 100%;
-  opacity: 0.75;
+  opacity: 1;
   filter: alpha(opacity=50);
-  background-color: rgba(255, 255, 255, .9);
+  background-color: rgb(255, 255, 255);
 `;
 
 export const MessageContainer = styled.div`

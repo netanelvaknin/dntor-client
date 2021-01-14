@@ -3,7 +3,7 @@ import businessRegisterContext from "../../context/business-register/businessReg
 import adminPanelContext from "../../context/admin-panel/adminPanelContext";
 import useFetch from "use-http";
 import { useHistory } from "react-router-dom";
-import { SubMenu } from "./AdminPanelStyle";
+import { AdminPanelContainer } from "./AdminPanelStyle";
 
 const AppointmentsLog = lazy(() =>
   import("./appointments-log/AppointmentsLog")
@@ -81,12 +81,7 @@ export const AdminPanel = () => {
     }
   };
 
-  return (
-    <div>
-      <SubMenu></SubMenu>
-      {renderScreen()}
-    </div>
-  );
+  return <AdminPanelContainer>{renderScreen()}</AdminPanelContainer>;
 };
 
 export default AdminPanel;

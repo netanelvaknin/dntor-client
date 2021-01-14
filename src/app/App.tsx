@@ -7,6 +7,8 @@ import "react-block-ui/style.css";
 import { Navbar, BlockUI } from "../ui/index";
 
 const Login = lazy(() => import("../pages/login/Login"));
+const LandingPage = lazy(() => import("../pages/landing-page/LandingPage"));
+
 const Register = lazy(() => import("../pages/register/Register"));
 const BusinessRegister = lazy(() =>
   import("../pages/business-register/BusinessRegister")
@@ -19,9 +21,7 @@ const App = () => {
   const publicRoutes = [
     {
       path: "/",
-      component: (
-        <div style={{ margin: "15rem", fontWeight: "bold" }}>דף נחיתה</div>
-      ),
+      component: <LandingPage />,
     },
     { path: "/login", component: <Login /> },
     { path: "/register", component: <Register /> },

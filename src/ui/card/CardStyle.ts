@@ -16,6 +16,9 @@ export const useAccordionStyle = makeStyles((theme) => ({
         boxShadow: '2px 2px 8px rgba(0, 0, 0, 0.08)',
         borderRadius: '8px',
         fontFamily: theme.typography.fontFamily, // Add it becase shitty accordion not add it by himself
+        '&:before': {
+            background: 'transparent',
+        },
         '& .MuiAccordionSummary-content': {
             fontSize: '1.6rem',
             borderRadius: '8px',
