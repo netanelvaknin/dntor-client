@@ -26,8 +26,16 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
 
   const options = {
     cachePolicy: "no-cache",
+    timeout: 10000,
+    onTimeout: () => {
+      console.log("REQUEST TIMEOUT");
+    },
+    onError: (e: any) => {
+      console.log(e);
+    },
     interceptors: {
       request: async ({ options }: any) => {
+        rootState?.setLoading(true);
         rootState?.setError("");
 
         // Set headers
@@ -37,6 +45,10 @@ export const HttpProvider = ({ children }: HttpProviderProps) => {
         return options;
       },
       response: async ({ response }: any) => {
+        setTimeout(() => {
+          rootState?.setLoading(false);
+        }, 2000);
+
         const res = response;
         return res;
       },

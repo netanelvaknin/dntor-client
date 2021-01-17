@@ -58,10 +58,9 @@ export const AdminPanel = () => {
   }, []);
 
   useEffect(() => {
-    console.log(businessRegisterState?.servicesData?.res[0]._id);
     if (
       businessRegisterState?.businessData?.res?.name &&
-      businessRegisterState?.servicesData?.res[0]._id &&
+      businessRegisterState?.servicesData?.res?.services?.length > 0 &&
       businessRegisterState?.workTimesData?.res?.days?.length > 0
     ) {
       return;

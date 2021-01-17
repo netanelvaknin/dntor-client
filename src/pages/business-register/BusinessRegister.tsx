@@ -190,7 +190,7 @@ export const BusinessRegister = () => {
       getDataByStep();
 
       // @ts-ignore
-      setCurrentStep((c) => c - 1);
+      setCurrentStep(currentStep - 1);
     }
   };
 

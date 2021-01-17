@@ -66,10 +66,9 @@ export const NotificationsManagment = ({
   useEffect(() => {
     if (
       businessData?.res?.name &&
-      servicesData?.res[0]._id &&
+      servicesData?.res?.services?.length > 0 &&
       workTimesData?.res?.days?.length > 0
     ) {
-      console.log("check");
       setEveryStepsAreAlreadyFilled(true);
     }
   }, [businessData, servicesData, workTimesData]);

@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { TimePicker as MuiTimePicker } from "@material-ui/pickers";
 import { useTimePickerStyles } from "./TimePickerStyle";
 import { useForm, Controller } from "react-hook-form";
+import TimePickerToolbar from "./time-picker-toolbar/TimePickerToolbar";
+
 interface TimePickerProps {
   name?: string;
   ampm?: boolean;
@@ -21,7 +23,6 @@ interface TimePickerProps {
 export const TimePicker = ({
   name = "",
   className,
-  ampm = true,
   autoOk = true,
   register,
   disableToolbar = false,
@@ -29,22 +30,9 @@ export const TimePicker = ({
   helperText,
   defaultValue,
 }: TimePickerProps) => {
+  const [ampm, setAmpm] = useState(true);
   const { control } = useForm();
   const classes = useTimePickerStyles();
-
-  useEffect(() => {
-    const AMButton = document.querySelectorAll(
-      ".MuiPickersTimePickerToolbar-ampmSelection .MuiButton-label h6"
-    )[0];
-    const PMButton = document.querySelectorAll(
-      ".MuiPickersTimePickerToolbar-ampmSelection .MuiButton-label h6"
-    )[1];
-
-    if (AMButton && PMButton) {
-      AMButton.innerHTML = "בבוקר";
-      PMButton.innerHTML = "אחר הצהריים";
-    }
-  });
 
   return (
     <Controller
@@ -57,8 +45,7 @@ export const TimePicker = ({
           inputVariant="outlined"
           okLabel="אישור"
           cancelLabel="ביטול"
-          clearLabel="איפוס"
-          clearable
+          clearable={false}
           ampm={ampm}
           autoOk={autoOk}
           format="HH:mm"
@@ -69,6 +56,9 @@ export const TimePicker = ({
           error={error}
           helperText={helperText}
           onChange={onChange}
+          ToolbarComponent={(props) => (
+            <TimePickerToolbar {...props} setAmpm={setAmpm} />
+          )}
         />
       )}
     />

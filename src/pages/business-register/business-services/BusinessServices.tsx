@@ -78,7 +78,7 @@ export const BusinessServices = ({
           ...services,
           {
             serviceName: serviceName,
-            price: Number(servicePrice),
+            price: servicePrice || null,
             duration: finalDuration,
           },
         ]);
@@ -116,7 +116,22 @@ export const BusinessServices = ({
   }, [serviceName]);
 
   const onSubmit = async () => {
-    await post("/business/insertServices", services);
+    const servicesCopy = services.filter((service: any) => {
+      if (!service._id) {
+        return service;
+      }
+
+      return null;
+    });
+
+    if (servicesCopy.length > 0) {
+      await post("/business/insertServices", servicesCopy);
+    } else if (servicesCopy.length < 1 && services.length > 0) {
+      rootState?.setLoading(true);
+      setCurrentStep(4);
+      setShowMobileView && setShowMobileView(false);
+      rootState?.setLoading(false);
+    }
 
     if (response.ok) {
       rootState?.setLoading(true);
@@ -127,8 +142,8 @@ export const BusinessServices = ({
   };
 
   useEffect(() => {
-    if (!initialServicesData?.res.Error) {
-      const servicesCopy = initialServicesData?.res;
+    if (initialServicesData?.res?.services?.length > 0) {
+      const servicesCopy = initialServicesData?.res?.services;
 
       setServices(servicesCopy);
     }

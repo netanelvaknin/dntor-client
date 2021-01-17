@@ -24,6 +24,16 @@ export default createMuiTheme({
     }
   },
   overrides: {
+    MuiDialogActions: {
+      root: {
+        margin: '0 auto'
+      }
+    },
+    MuiDialog: {
+      paperScrollPaper: {
+        maxHeight: 'calc(100% - 31px)'
+      }
+    },
     MuiToolbar: {
       root: {
         '& .MuiPickersTimePickerToolbar-ampmSelection .MuiPickersToolbarText-toolbarBtnSelected': {
