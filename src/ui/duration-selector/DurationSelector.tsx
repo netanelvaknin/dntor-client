@@ -43,6 +43,7 @@ export const DurationSelector = ({ onChange }: DurationSelectorProps) => {
       <DurationPicker
         onChange={onDuartionChange}
         initialDuration={{ hours: 0, minutes: 0, seconds: 0 }}
+        maxHours={23}
       />
     </DurationSelectorContainer>
   );

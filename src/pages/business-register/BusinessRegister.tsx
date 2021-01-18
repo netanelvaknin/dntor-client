@@ -38,7 +38,7 @@ export interface CurrentStep {
 export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
   const businessRegisterState = useContext(businessRegisterContext);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(2);
   const [, setState] = useState({});
   const [showMobileView, setShowMobileView] = useState(false);
   const [open, setOpen] = useState(false);
