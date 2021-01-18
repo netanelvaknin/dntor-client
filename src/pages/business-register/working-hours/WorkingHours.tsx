@@ -325,7 +325,9 @@ export const WorkingHours = ({
       >
         <Grid item container justify="center">
           <Grid item>
-            <Typography variant="h2">הפסקה מספר 1</Typography>
+            <Typography variant="h2" style={{ marginBottom: "0.5rem" }}>
+              מהן שעות ההפסקה הראשונה?
+            </Typography>
           </Grid>
         </Grid>
         <Grid
@@ -365,7 +367,7 @@ export const WorkingHours = ({
         </Grid>
         <BreakButton variant="text" onClick={() => removeBreak(0)}>
           <Grid container justify="center" alignItems="center">
-            <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה מספר 1
+            <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה
           </Grid>
         </BreakButton>
       </Grid>
@@ -389,7 +391,9 @@ export const WorkingHours = ({
       >
         <Grid item container justify="center">
           <Grid item>
-            <Typography variant="h2">הפסקה מספר 2</Typography>
+            <Typography variant="h2" style={{ marginBottom: "0.5rem" }}>
+              מהן שעות ההפסקה השניה?
+            </Typography>
           </Grid>
         </Grid>
         <Grid
@@ -429,7 +433,7 @@ export const WorkingHours = ({
         </Grid>
         <BreakButton variant="text" onClick={() => removeBreak(1)}>
           <Grid container justify="center" alignItems="center">
-            <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה מספר 2
+            <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה
           </Grid>
         </BreakButton>
       </Grid>
@@ -453,7 +457,9 @@ export const WorkingHours = ({
       >
         <Grid item container justify="center">
           <Grid item>
-            <Typography variant="h2">הפסקה מספר 3</Typography>
+            <Typography variant="h2" style={{ marginBottom: "0.5rem" }}>
+              מהן שעות ההפסקה השלישית?
+            </Typography>
           </Grid>
         </Grid>
         <Grid
@@ -493,7 +499,7 @@ export const WorkingHours = ({
         </Grid>
         <BreakButton variant="text" onClick={() => removeBreak(2)}>
           <Grid container justify="center" alignItems="center">
-            <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה מספר 3
+            <Delete style={{ marginLeft: "1rem" }} /> הסרת הפסקה
           </Grid>
         </BreakButton>
       </Grid>
@@ -700,7 +706,7 @@ export const WorkingHours = ({
             <Grid item container justify="center">
               <Grid item>
                 <Typography variant="h2" style={{ marginBottom: "2rem" }}>
-                  שעות עבודה
+                  מהן שעות העבודה של העסק?
                 </Typography>
               </Grid>
             </Grid>
