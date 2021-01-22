@@ -28,7 +28,7 @@ interface WorkingHoursProps extends CurrentStep {
   showMobileView?: boolean;
   initialWorkTimesData?: any;
   setShowMobileView?: React.Dispatch<React.SetStateAction<boolean>>;
-  currentStep?: 1 | 2 | 3 | 4;
+  currentStep?: 1 | 2 | 3 | 4 | 5;
 }
 
 export const WorkingHours = ({

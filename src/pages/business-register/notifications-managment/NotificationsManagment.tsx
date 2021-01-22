@@ -12,7 +12,7 @@ import { CurrentStep } from "../BusinessRegister";
 import rootContext from "../../../context/root/rootContext";
 import useFetch from "use-http";
 import { Alert } from "@material-ui/lab";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 
 interface NotificationsManagmentProps extends CurrentStep {}
 
@@ -33,7 +33,7 @@ export const NotificationsManagment = ({
   );
   const { get, post, response } = useFetch();
   const rootState = useContext(rootContext);
-  const history = useHistory();
+  // const history = useHistory();
 
   const customersNotifications = watch("customerSmsRemainderActive");
 
@@ -108,8 +108,7 @@ export const NotificationsManagment = ({
     }
 
     if (response.ok && everyStepsAreAlreadyFilled) {
-      setCurrentStep(1);
-      history.push("/admin-panel");
+      // setCurrentStep(5);
     } else {
       rootState?.setError("אירעה שגיאה. אנא נסה שנית מאוחר יותר");
     }
@@ -204,7 +203,7 @@ export const NotificationsManagment = ({
 
       <Grid container justify="center" style={{ paddingBottom: "5rem" }}>
         <ContinueButtonStyle type="submit" disabled={!!rootState?.error}>
-          בואו נעבור ליומן !
+          המשך לשלב הבא
         </ContinueButtonStyle>
       </Grid>
     </form>

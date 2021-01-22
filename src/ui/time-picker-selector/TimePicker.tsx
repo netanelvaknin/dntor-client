@@ -1,12 +1,12 @@
-import { useState } from "react";
 import { TimePicker as MuiTimePicker } from "@material-ui/pickers";
-import { useTimePickerStyles, TimePickerStyle } from "./TimePickerStyle";
-import { useForm, Controller } from "react-hook-form";
-import TimePickerToolbar from "./time-picker-toolbar/TimePickerToolbar";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 // @ts-ignore
 import TimePicker from "react-times";
 import "react-times/css/classic/default.css";
 import "react-times/css/material/default.css";
+import TimePickerToolbar from "./time-picker-toolbar/TimePickerToolbar";
+import { TimePickerStyle, useTimePickerStyles } from "./TimePickerStyle";
 
 interface TimePickerProps {
   variant?: "dropdown" | "modal";

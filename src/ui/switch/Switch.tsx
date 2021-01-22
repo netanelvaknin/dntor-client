@@ -8,14 +8,17 @@ interface SwitchProps {
     | React.RefObject<any>
     | null
     | undefined;
+  value?: boolean;
+  onChange?: any;
 }
-export const Switch = ({ name, register }: SwitchProps) => {
+export const Switch = ({ name, register, value, onChange }: SwitchProps) => {
   const classes = useSwitchStyles();
 
   return (
     <MuiSwitch
       inputRef={register}
       name={name}
+      value={value}
       classes={{
         root: classes.root,
         switchBase: classes.switchBase,
@@ -23,6 +26,7 @@ export const Switch = ({ name, register }: SwitchProps) => {
         track: classes.track,
         checked: classes.checked,
       }}
+      onChange={onChange}
     />
   );
 };

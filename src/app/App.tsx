@@ -1,10 +1,9 @@
 import React, { lazy, useContext } from "react";
-
-import { Switch, Route } from "react-router-dom";
-import ProtectedRoute from "../framework/ProtectedRoute";
-import rootContext from "../context/root/rootContext";
 import "react-block-ui/style.css";
-import { Navbar, BlockUI } from "../ui/index";
+import { Route, Switch } from "react-router-dom";
+import rootContext from "../context/root/rootContext";
+import ProtectedRoute from "../framework/ProtectedRoute";
+import { BlockUI, Navbar } from "../ui/index";
 
 const Login = lazy(() => import("../pages/login/Login"));
 const LandingPage = lazy(() => import("../pages/landing-page/LandingPage"));

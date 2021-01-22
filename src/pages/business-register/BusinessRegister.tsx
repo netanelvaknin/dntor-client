@@ -1,23 +1,23 @@
-import { lazy, useState, useContext, useEffect } from "react";
+import { Dialog } from "@material-ui/core";
+import { lazy, useContext, useEffect, useState } from "react";
+// import { useHistory } from "react-router-dom";
+import { useLastLocation } from "react-router-last-location";
+import useFetch from "use-http";
+import arrowRight from "../../assets/icons/arrow-right.svg";
+import { GradientButton } from "../../components/index";
+import businessRegisterContext from "../../context/business-register/businessRegisterContext";
+import rootContext from "../../context/root/rootContext";
+import { useSmallScreen } from "../../hooks/index";
 import {
-  BusinessRegisterPageStyle,
-  BusinessRegisterCard,
-  CardLabel,
   ArrowRightButton,
-  useDialogStyles,
+  BusinessRegisterCard,
+  BusinessRegisterPageStyle,
+  CardLabel,
   DialogHeading,
   DialogText,
+  useDialogStyles,
 } from "./BusinessRegisterStyle";
 import Stepper from "./stepper/Stepper";
-import { useSmallScreen } from "../../hooks/index";
-import arrowRight from "../../assets/icons/arrow-right.svg";
-import rootContext from "../../context/root/rootContext";
-import useFetch from "use-http";
-import { useHistory } from "react-router-dom";
-import businessRegisterContext from "../../context/business-register/businessRegisterContext";
-import { Dialog } from "@material-ui/core";
-import { useLastLocation } from "react-router-last-location";
-import { GradientButton } from "../../components/index";
 
 // Steps components
 const BusinessProfile = lazy(() =>
@@ -31,19 +31,23 @@ const NotificationsManagment = lazy(() =>
   import("./notifications-managment/NotificationsManagment")
 );
 
+const ServiceProviders = lazy(() =>
+  import("./service-providers/ServiceProviders")
+);
+
 export interface CurrentStep {
-  setCurrentStep: React.Dispatch<React.SetStateAction<1 | 2 | 3 | 4>>;
+  setCurrentStep: React.Dispatch<React.SetStateAction<1 | 2 | 3 | 4 | 5>>;
 }
 
 export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
   const businessRegisterState = useContext(businessRegisterContext);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(2);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(4);
   const [, setState] = useState({});
   const [showMobileView, setShowMobileView] = useState(false);
   const [open, setOpen] = useState(false);
   const { get, response } = useFetch();
-  const history = useHistory();
+  // const history = useHistory();
   const lastLocation = useLastLocation();
   const classes = useDialogStyles();
 
@@ -98,6 +102,8 @@ export const BusinessRegister = () => {
       getWorkTimesData();
     } else if (currentStep === 3) {
       getServicesData();
+    } else if (currentStep === 4) {
+      getServicesData();
     }
   };
 
@@ -117,7 +123,7 @@ export const BusinessRegister = () => {
       businessRegisterState?.workTimesData?.res?.days?.length > 0 &&
       !businessRegisterState.fetchedOnce
     ) {
-      history.push("/admin-panel");
+      // history.push("/admin-panel");
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,6 +182,17 @@ export const BusinessRegister = () => {
     },
     {
       stepNumber: 4,
+      stepName: "נותני שירות",
+      component: (
+        <ServiceProviders
+          initialServicesData={
+            businessRegisterState && businessRegisterState.servicesData
+          }
+        />
+      ),
+    },
+    {
+      stepNumber: 5,
       stepName: "ניהול התראות",
       component: <NotificationsManagment setCurrentStep={setCurrentStep} />,
     },
