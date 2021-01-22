@@ -1,6 +1,6 @@
 import styled from 'styled-components/macro';
 import {makeStyles, Grid} from '@material-ui/core';
-import { Button, Card } from "../../../ui/index";
+import { Button, Card, Checkbox} from "../../../ui/index";
 
 export const useDialogStyles = makeStyles({
     paper: {
@@ -25,6 +25,21 @@ export const ContinueButton = styled(Button)`
     height: 3rem;
 `;
 
+export const ServiceCheckboxStyle = styled(Checkbox)`
+    border: 1px solid black;
+    border-radius: 2rem;
+    padding-left: 1rem;
+    min-height: 4rem;
+    margin-right: .1rem;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+    background: ${props => props.value && props.theme.palette.primary.light};
+
+    .MuiTypography-body1 {
+        font-size: 1.6rem;
+    }
+`;
+
 export const Heading = styled.span`
     font-size: 2rem;
 `;
@@ -44,7 +59,9 @@ export const ServiceProvidersContainer = styled(Grid)`
 `;
 
 export const ServiceProviderCard = styled(Card)`
+    position: relative;
     width: 28rem;
-    height: 8.6rem;
+    min-height: 8.6rem;
     margin: 1rem 0;
+    padding: 1.5rem;
 `;

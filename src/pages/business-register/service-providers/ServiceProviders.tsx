@@ -6,20 +6,26 @@ import { TextField, Checkbox } from "../../../ui/index";
 import { useForm } from "react-hook-form";
 import { Grid, IconButton } from "@material-ui/core";
 import AddIcon from "../../../assets/icons/plus_icon.svg";
+import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import {
   ContinueButton,
   Heading,
   Divider,
   ServiceProviderCard,
   ServiceProvidersContainer,
+  ServiceCheckboxStyle,
 } from "./ServiceProvidersStyle";
 
 interface ServiceProvidersProps {
   initialServicesData?: any;
+  showMobileView: boolean;
+  setShowMobileView: (showMobileView: boolean) => void;
 }
 
 export const ServiceProviders = ({
   initialServicesData,
+  showMobileView,
+  setShowMobileView,
 }: ServiceProvidersProps) => {
   const [currentProviderData, setCurrentProviderData] = useState<any>([]);
   const [services, setServices] = useState<any>([]);
@@ -120,16 +126,6 @@ export const ServiceProviders = ({
 
   const handleSaveDaysAndHours = () => {
     // Extract the selected days
-    const selectedDays = {
-      sunday,
-      monday,
-      tuesday,
-      wednesday,
-      thursday,
-      friday,
-      saturday,
-    };
-
     const currentProviderDataCopy = JSON.stringify(currentProviderData);
 
     // Include only the days that selected and unique for each card
@@ -187,23 +183,10 @@ export const ServiceProviders = ({
       },
     ]);
 
-    // setServiceProviders([
-    //   ...serviceProviders,
-    //   {
-    //     fullName: providerName,
-    //     workTimes: [
-    //       {
-    //         days: selectedDaysNames,
-    //         workingHours: {
-    //           from: startWorking,
-    //           to: endWorking,
-    //         },
-    //         breaks,
-    //       },
-    //     ],
-    //   },
-    // ]);
-
+    // Reset and close
+    setShowBreakOne(false);
+    setShowBreakTwo(false);
+    setShowBreakThree(false);
     setAdditionalHoursOpen(false);
   };
 
@@ -228,11 +211,82 @@ export const ServiceProviders = ({
     setSaturday({ selected: false, disabled: false });
   };
 
+  const removeWorkTimesCard = (index: number) => {
+    const currentServiceProviderCopy = [...currentProviderData];
+    const daysToEnable = currentServiceProviderCopy[index].workTimes[0].days;
+    daysToEnable.includes("sunday") &&
+      setSunday({ selected: false, disabled: false });
+    daysToEnable.includes("monday") &&
+      setMonday({ selected: false, disabled: false });
+    daysToEnable.includes("tuesday") &&
+      setTuesday({ selected: false, disabled: false });
+    daysToEnable.includes("wednesday") &&
+      setWednesday({ selected: false, disabled: false });
+    daysToEnable.includes("thursday") &&
+      setThursday({ selected: false, disabled: false });
+    daysToEnable.includes("friday") &&
+      setFriday({ selected: false, disabled: false });
+    daysToEnable.includes("saturday") &&
+      setSaturday({ selected: false, disabled: false });
+    currentServiceProviderCopy.splice(index, 1);
+    setCurrentProviderData(currentServiceProviderCopy);
+  };
+
+  const handleAddProvider = () => {
+    const currentSelectedServices = services.filter((service: any) => {
+      if (service.selected) {
+        return service;
+      }
+
+      return null;
+    });
+
+    const providerData = {
+      providerName,
+      currentSelectedServices,
+      currentProviderData,
+    };
+
+    setServiceProviders([...serviceProviders, providerData]);
+
+    // Reset and move to providers view
+    resetDays();
+    reset({ provider_name: "" });
+    resetSelectedServices();
+    setCurrentProviderData([]);
+    setShowMobileView(true);
+  };
+
+  const resetSelectedServices = () => {
+    const servicesCopy = [...services];
+    servicesCopy.map((service: any) => {
+      return (service.selected = false);
+    });
+  };
+
   useEffect(() => {
     if (!showBreakOne || !showBreakTwo || !showBreakThree) {
       setShowAddBreakButton(true);
     }
   }, [showBreakOne, showBreakTwo, showBreakThree]);
+
+  const translateDaysToHebrew = (daysArr: string[]) => {
+    const daysNames: any = {
+      sunday: "א",
+      monday: "ב",
+      tuesday: "ג",
+      wednesday: "ד",
+      thursday: "ה",
+      friday: "ו",
+      saturday: "ש",
+    };
+
+    const translatedArr = daysArr.map((day: string) => {
+      return daysNames[day];
+    });
+
+    return translatedArr;
+  };
 
   useEffect(() => {
     if (sameHours && currentProviderData.length > 0) {
@@ -287,153 +341,224 @@ export const ServiceProviders = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <div style={{ maxWidth: "30rem", margin: "0 auto" }}>
-        <Grid
-          container
-          justify="flex-start"
-          alignItems="flex-start"
-          style={{ paddingTop: "2.5rem" }}
-        >
-          <Grid item>
-            <TextField
-              name="provider_name"
-              register={register}
-              control={control}
-              type="text"
-              label="מה שם נותנ/ת השירות"
-            />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          justify="flex-start"
-          alignItems="flex-start"
-          style={{ marginTop: "2rem" }}
-        >
-          <Grid item style={{ marginBottom: "1rem" }}>
-            <Heading>
-              {providerName
-                ? `מהם השירותים ש${providerName} נותנ/ת ?`
-                : " מהם השירותים של נותנ/ת השירות ?"}
-            </Heading>
-          </Grid>
-          <Grid
-            item
-            container
-            style={{ maxHeight: "12rem", overflowY: "auto", padding: "1rem" }}
-          >
-            {services?.map((service: any, index: number) => {
-              return (
-                <Grid item md={6} key={service._id}>
-                  <Checkbox
-                    name={service._id}
-                    value={service.selected}
-                    label={service.serviceName}
-                    onChange={() => handleServiceChange(index)}
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
-        </Grid>
-
-        <Divider />
-
-        <Grid
-          container
-          justify="flex-start"
-          alignItems="flex-start"
-          style={{ marginTop: "2rem" }}
-        >
-          <Grid item>
-            <Heading>
-              {providerName
-                ? `מהן שעות הפעילות של ${providerName} ?`
-                : "מהן שעות הפעילות של נותנ/ת השירות ?"}
-            </Heading>
-          </Grid>
-
-          <Grid
-            item
-            container
-            justify="space-between"
-            style={{ margin: "1.5rem 0" }}
-          >
-            <Grid item container justify="space-between" alignItems="center">
-              <Checkbox
-                label="שימוש באותן שעות שהוגדרו לעסק"
-                name="same_hours"
-                value={sameHours}
-                onChange={() => setSameHours(!sameHours)}
-              />
-            </Grid>
-
-            {!sameHours && (
-              <Grid item style={{ marginTop: "2rem" }}>
-                <IconButton
-                  style={{ marginRight: "-1.2rem" }}
-                  onClick={() => setAdditionalHoursOpen(true)}
-                >
-                  <img src={AddIcon} alt="הוספת זמנים לנותן שירות" />{" "}
-                </IconButton>
-                <span
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setAdditionalHoursOpen(true)}
-                >
-                  הוסף שעות
-                </span>
-              </Grid>
-            )}
-          </Grid>
-
-          {/* Service provider working hours & breaks times */}
-          <ServiceProvidersContainer item container>
-            {currentProviderData?.map((sprovider: any, index: number) => {
+      <div style={{ maxWidth: "32rem", margin: "0 auto" }}>
+        {showMobileView ? (
+          <div>
+            {serviceProviders.map((sprovider: any, index: number) => {
               return (
                 <ServiceProviderCard key={index}>
-                  <p>
-                    {sprovider.workTimes[0].days.includes("sunday") && "א' "}
-                    {sprovider.workTimes[0].days.includes("monday") && "ב' "}
-                    {sprovider.workTimes[0].days.includes("tuesday") && "ג' "}
-                    {sprovider.workTimes[0].days.includes("wednesday") && "ד' "}
-                    {sprovider.workTimes[0].days.includes("thursday") && "ה' "}
-                    {sprovider.workTimes[0].days.includes("friday") && "ו' "}
-                    {sprovider.workTimes[0].days.includes("saturday") && "ש' "}
-                  </p>
-                  <p>
-                    {sprovider.workTimes[0].workingHours.from} -{" "}
-                    {sprovider.workTimes[0].workingHours.to}
-                  </p>
-                  <p>
-                    {sprovider.workTimes[0].breaks[0] &&
-                      `${sprovider.workTimes[0].breaks[0].from} - ${sprovider.workTimes[0].breaks[0].to}`}
-                  </p>
-                  <p>
-                    {sprovider.workTimes[0].breaks[1] &&
-                      `${sprovider.workTimes[0].breaks[1].from} - ${sprovider.workTimes[0].breaks[1].to}`}
-                  </p>
+                  <p>{sprovider.providerName}</p>
 
-                  <p>
-                    {sprovider.workTimes[0].breaks[2] &&
-                      `${sprovider.workTimes[0].breaks[2].from} - ${sprovider.workTimes[0].breaks[2].to}`}
-                  </p>
+                  {sprovider.currentSelectedServices.map(
+                    (service: any, index: number) => {
+                      return <p key={index}>{service.serviceName}</p>;
+                    }
+                  )}
+
+                  {sprovider?.currentProviderData[0]?.workTimes[0]?.days
+                    .length > 0 &&
+                    translateDaysToHebrew(
+                      sprovider.currentProviderData[0].workTimes[0].days
+                    ).map((day: any) => {
+                      return `${day} `;
+                    })}
                 </ServiceProviderCard>
               );
             })}
-            {/* <ServiceProviderCard />
-            <ServiceProviderCard />
-            <ServiceProviderCard /> */}
-          </ServiceProvidersContainer>
-        </Grid>
+          </div>
+        ) : (
+          <>
+            <Grid
+              container
+              justify="flex-start"
+              alignItems="flex-start"
+              style={{ paddingTop: "2.5rem" }}
+            >
+              <Grid item>
+                <TextField
+                  name="provider_name"
+                  register={register}
+                  control={control}
+                  type="text"
+                  label="מה שם נותנ/ת השירות"
+                />
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              justify="flex-start"
+              alignItems="flex-start"
+              style={{ marginTop: "2rem" }}
+            >
+              <Grid item style={{ marginBottom: "1rem" }}>
+                <Heading>
+                  {providerName
+                    ? `מהם השירותים ש${providerName} נותנ/ת `
+                    : " מהם השירותים של נותנ/ת השירות "}
+                </Heading>
+              </Grid>
+              <Grid
+                item
+                container
+                style={{
+                  maxHeight: "12rem",
+                  overflowY: "auto",
+                  padding: "1rem",
+                }}
+              >
+                {services?.map((service: any, index: number) => {
+                  return (
+                    <Grid item key={service._id}>
+                      <ServiceCheckboxStyle
+                        name={service._id}
+                        value={service.selected}
+                        label={service.serviceName}
+                        onChange={() => handleServiceChange(index)}
+                      />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Grid>
 
-        <Grid
-          container
-          justify="center"
-          alignItems="center"
-          style={{ marginTop: "2rem", paddingBottom: "4rem" }}
-        >
-          <ContinueButton variant="outlined">אישור</ContinueButton>
-        </Grid>
+            <Divider />
+
+            <Grid
+              container
+              justify="flex-start"
+              alignItems="flex-start"
+              style={{ marginTop: "2rem" }}
+            >
+              <Grid item>
+                <Heading>
+                  {providerName
+                    ? `מהן שעות הפעילות של ${providerName}`
+                    : "מהן שעות הפעילות של נותנ/ת השירות "}
+                </Heading>
+              </Grid>
+
+              <Grid
+                item
+                container
+                justify="space-between"
+                style={{ margin: "1.5rem 0" }}
+              >
+                <Grid
+                  item
+                  container
+                  justify="space-between"
+                  alignItems="center"
+                >
+                  <Checkbox
+                    label="שימוש באותן השעות שהוגדרו לעסק"
+                    name="same_hours"
+                    value={sameHours}
+                    onChange={() => setSameHours(!sameHours)}
+                  />
+                </Grid>
+
+                {!sameHours && (
+                  <Grid
+                    item
+                    container
+                    alignItems="center"
+                    justify="flex-start"
+                    style={{ marginTop: "1rem" }}
+                  >
+                    <IconButton
+                      style={{ marginRight: "-1.2rem" }}
+                      onClick={() => setAdditionalHoursOpen(true)}
+                    >
+                      <img src={AddIcon} alt="הוספת זמנים לנותן שירות" />{" "}
+                    </IconButton>
+                    <span
+                      style={{ cursor: "pointer", fontSize: "1.8rem" }}
+                      onClick={() => setAdditionalHoursOpen(true)}
+                    >
+                      הוסף שעות
+                    </span>
+                  </Grid>
+                )}
+              </Grid>
+
+              {/* Service provider working hours & breaks times */}
+              <ServiceProvidersContainer item container>
+                {currentProviderData?.map((sprovider: any, index: number) => {
+                  return (
+                    <ServiceProviderCard key={index}>
+                      <strong>ימי פעילות:</strong>
+                      <p>
+                        {sprovider.workTimes[0].days.includes("sunday") &&
+                          "א' "}
+                        {sprovider.workTimes[0].days.includes("monday") &&
+                          "ב' "}
+                        {sprovider.workTimes[0].days.includes("tuesday") &&
+                          "ג' "}
+                        {sprovider.workTimes[0].days.includes("wednesday") &&
+                          "ד' "}
+                        {sprovider.workTimes[0].days.includes("thursday") &&
+                          "ה' "}
+                        {sprovider.workTimes[0].days.includes("friday") &&
+                          "ו' "}
+                        {sprovider.workTimes[0].days.includes("saturday") &&
+                          "ש' "}
+                      </p>
+
+                      <strong>שעת התחלה וסיום:</strong>
+                      <p>
+                        {sprovider.workTimes[0].workingHours.from} -{" "}
+                        {sprovider.workTimes[0].workingHours.to}
+                      </p>
+
+                      {sprovider.workTimes[0].breaks[0] && (
+                        <strong>הפסקות:</strong>
+                      )}
+                      <p>
+                        {sprovider.workTimes[0].breaks[0] &&
+                          `${sprovider.workTimes[0].breaks[0].from} - ${sprovider.workTimes[0].breaks[0].to}`}
+                      </p>
+                      <p>
+                        {sprovider.workTimes[0].breaks[1] &&
+                          `${sprovider.workTimes[0].breaks[1].from} - ${sprovider.workTimes[0].breaks[1].to}`}
+                      </p>
+
+                      <p>
+                        {sprovider.workTimes[0].breaks[2] &&
+                          `${sprovider.workTimes[0].breaks[2].from} - ${sprovider.workTimes[0].breaks[2].to}`}
+                      </p>
+
+                      <IconButton
+                        onClick={() => removeWorkTimesCard(index)}
+                        style={{
+                          position: "absolute",
+                          left: "1rem",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        <img src={TrashIcon} alt="מחיקה" />
+                      </IconButton>
+                    </ServiceProviderCard>
+                  );
+                })}
+                {/* <ServiceProviderCard />
+  <ServiceProviderCard />
+  <ServiceProviderCard /> */}
+              </ServiceProvidersContainer>
+            </Grid>
+
+            <Grid
+              container
+              justify="center"
+              alignItems="center"
+              style={{ marginTop: "2rem", paddingBottom: "4rem" }}
+            >
+              <ContinueButton variant="outlined" onClick={handleAddProvider}>
+                אישור
+              </ContinueButton>
+            </Grid>
+          </>
+        )}
       </div>
 
       <ServiceProvidersInfoDialog

@@ -185,6 +185,8 @@ export const BusinessRegister = () => {
       stepName: "נותני שירות",
       component: (
         <ServiceProviders
+          showMobileView={showMobileView}
+          setShowMobileView={setShowMobileView}
           initialServicesData={
             businessRegisterState && businessRegisterState.servicesData
           }
