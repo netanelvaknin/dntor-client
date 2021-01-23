@@ -13,6 +13,7 @@ import { Delete } from "@material-ui/icons";
 import { DayCheckbox } from "../../working-hours/WorkingHoursStyle";
 import { AdditionalHoursModalProps } from "./AdditionalHoursModalInterface";
 import { useSmallScreen } from "../../../../hooks/index";
+import { Transition } from "../ServiceProviders";
 
 const useDialogStyles = makeStyles({
   paper: {
@@ -77,6 +78,7 @@ export const AdditionalHoursModal = ({
       open={open}
       classes={{ paper: classes.paper }}
       fullScreen={isSmallScreen}
+      TransitionComponent={Transition}
     >
       <IconButton
         onClick={() => setOpen(false)}

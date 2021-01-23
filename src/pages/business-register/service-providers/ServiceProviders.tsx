@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import { Dialog } from "@material-ui/core";
 import ServiceProvidersInfoDialog from "./service-providers-info-dialog/ServiceProvidersInfoDialog";
 import AdditionalHoursModal from "./additional-hours-modal/AdditionalHoursModal";
 import { TextField, Checkbox } from "../../../ui/index";
 import { useForm } from "react-hook-form";
-import { Grid, IconButton } from "@material-ui/core";
+import { Grid, IconButton, Slide } from "@material-ui/core";
+import { TransitionProps } from "@material-ui/core/transitions";
 import AddIcon from "../../../assets/icons/plus_icon.svg";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import {
@@ -14,22 +15,36 @@ import {
   ServiceProviderCard,
   ServiceProvidersContainer,
   ServiceCheckboxStyle,
+  ConfirmationDialogHeading,
+  ConfirmationDialogSecondaryHeading,
+  ConfirmationActionButton,
+  useConfirmationDialogStyles,
 } from "./ServiceProvidersStyle";
+
+export const Transition = forwardRef(function Transition(
+  props: TransitionProps & { children?: React.ReactElement<any, any> },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 interface ServiceProvidersProps {
   initialServicesData?: any;
+  businessWorkingHours?: any;
   showMobileView: boolean;
   setShowMobileView: (showMobileView: boolean) => void;
 }
 
 export const ServiceProviders = ({
   initialServicesData,
+  businessWorkingHours,
   showMobileView,
   setShowMobileView,
 }: ServiceProvidersProps) => {
   const [currentProviderData, setCurrentProviderData] = useState<any>([]);
   const [services, setServices] = useState<any>([]);
   const [serviceProviders, setServiceProviders] = useState<any>([]);
+  const [initialWorkingHours, setInitialWorkingHours] = useState([]);
   const [sameHours, setSameHours] = useState(true);
   const { control, handleSubmit, register, watch, reset } = useForm({
     defaultValues: {
@@ -75,6 +90,7 @@ export const ServiceProviders = ({
   const [endBreakThree, setEndBreakThree] = useState("18:00");
 
   const providerName = watch("provider_name");
+  const confirmationClasses = useConfirmationDialogStyles();
 
   const onSubmit = async (formData: any) => {
     console.log(formData);
@@ -296,6 +312,10 @@ export const ServiceProviders = ({
     }
   }, [sameHours, currentProviderData.length]);
 
+  useEffect(() => {
+    setInitialWorkingHours(businessWorkingHours?.res?.days);
+  }, [businessWorkingHours?.res?.days]);
+
   const additionalHoursModalProps = {
     open: additionalHoursOpen,
     setOpen: setAdditionalHoursOpen,
@@ -457,6 +477,54 @@ export const ServiceProviders = ({
                   />
                 </Grid>
 
+                {sameHours && initialWorkingHours?.length > 0 && (
+                  <ServiceProvidersContainer>
+                    {initialWorkingHours?.map((w: any, index: number) => {
+                      const translatedDays = translateDaysToHebrew(w.days);
+
+                      return (
+                        <ServiceProviderCard key={index}>
+                          <strong>ימי פעילות:</strong>
+                          <p>
+                            {translatedDays.map((day: string) => {
+                              return day + "' ";
+                            })}
+                          </p>
+
+                          <strong>שעת התחלה וסיום:</strong>
+                          <p>
+                            {w.workingHours.from} - {w.workingHours.to}
+                          </p>
+
+                          {w.breaks.length !== 0 && (
+                            <>
+                              <strong>הפסקות:</strong>
+
+                              {w.breaks[0] && (
+                                <p>
+                                  {w.breaks[0].from} - {w.breaks[0].to}
+                                </p>
+                              )}
+
+                              {w.breaks[1] && (
+                                <p>
+                                  {w.breaks[1].from} - {w.breaks[1].to}
+                                </p>
+                              )}
+
+                              {w.breaks[2] && (
+                                <p>
+                                  {w.breaks[2].from} - {w.breaks[2].to}
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </ServiceProviderCard>
+                      );
+                    })}
+                  </ServiceProvidersContainer>
+                )}
+
                 {!sameHours && (
                   <Grid
                     item
@@ -541,9 +609,6 @@ export const ServiceProviders = ({
                     </ServiceProviderCard>
                   );
                 })}
-                {/* <ServiceProviderCard />
-  <ServiceProviderCard />
-  <ServiceProviderCard /> */}
               </ServiceProvidersContainer>
             </Grid>
 
@@ -568,15 +633,35 @@ export const ServiceProviders = ({
 
       <AdditionalHoursModal {...additionalHoursModalProps} />
 
-      <Dialog open={confirmationDialogOpen}>
-        <h1>בחרת להשתמש באותן שעות שבהן העסק משתמש.</h1>
-        <h1>פעולה זאת תוביל למחיקת הימים והשעות שכבר בחרת. בטוח ?</h1>
-        <button onClick={() => handleConfirmationDialogActions(1)}>
-          כן, בטוח
-        </button>
-        <button onClick={() => handleConfirmationDialogActions(2)}>
-          לא, בוא נשאיר את מה שבחרתי
-        </button>
+      <Dialog
+        TransitionComponent={Transition}
+        open={confirmationDialogOpen}
+        classes={{ paper: confirmationClasses.paper }}
+      >
+        <ConfirmationDialogHeading>
+          בחרת להשתמש באותן שעות שבהן העסק משתמש.
+        </ConfirmationDialogHeading>
+        <ConfirmationDialogSecondaryHeading>
+          פעולה זאת תוביל למחיקת הימים והשעות שכבר בחרת בשלב זה. בטוח ?
+        </ConfirmationDialogSecondaryHeading>
+
+        <Grid container justify="center" alignItems="center" spacing={2}>
+          <Grid item md={6} container justify="center" alignItems="center">
+            <ConfirmationActionButton
+              onClick={() => handleConfirmationDialogActions(1)}
+            >
+              כן, אפשר למחוק
+            </ConfirmationActionButton>
+          </Grid>
+          <Grid item md={6} container justify="center" alignItems="center">
+            <ConfirmationActionButton
+              variant="contained"
+              onClick={() => handleConfirmationDialogActions(2)}
+            >
+              התחרטתי, בואו נשאיר
+            </ConfirmationActionButton>
+          </Grid>
+        </Grid>
       </Dialog>
     </form>
   );

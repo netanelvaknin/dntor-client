@@ -5,6 +5,7 @@ import {
   DialogContinueButton,
   DialogContentText,
 } from "../ServiceProvidersStyle";
+import { Transition } from "../ServiceProviders";
 
 export const ServiceProvidersInfoDialog = ({
   open,
@@ -16,7 +17,11 @@ export const ServiceProvidersInfoDialog = ({
   const classes = useDialogStyles();
 
   return (
-    <Dialog open={open} classes={{ paper: classes.paper }}>
+    <Dialog
+      open={open}
+      classes={{ paper: classes.paper }}
+      TransitionComponent={Transition}
+    >
       <Grid container justify="center" alignItems="center">
         <Grid item>
           <img src={InformationIcon} alt="מידע נוסף" />

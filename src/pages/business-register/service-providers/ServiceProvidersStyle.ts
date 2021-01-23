@@ -65,3 +65,26 @@ export const ServiceProviderCard = styled(Card)`
     margin: 1rem 0;
     padding: 1.5rem;
 `;
+
+export const ConfirmationDialogHeading = styled.h1`
+    font-size: 2.5rem;
+    margin: 0 auto 2rem;
+    max-width: 37rem;
+    text-align: center;
+`;
+
+export const ConfirmationDialogSecondaryHeading = styled(ConfirmationDialogHeading)`
+    font-size: 2rem;
+    max-width: 42rem;
+`;
+
+export const ConfirmationActionButton = styled(Button)`
+    width: 24rem;
+    height: 3rem;
+`;
+
+export const useConfirmationDialogStyles = makeStyles({
+    paper: {
+        padding: '3rem'
+    }
+})
