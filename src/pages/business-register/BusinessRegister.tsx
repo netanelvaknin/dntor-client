@@ -42,7 +42,7 @@ export interface CurrentStep {
 export const BusinessRegister = () => {
   const rootState = useContext(rootContext);
   const businessRegisterState = useContext(businessRegisterContext);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(4);
   const [, setState] = useState({});
   const [showMobileView, setShowMobileView] = useState(false);
   const [open, setOpen] = useState(false);
@@ -103,6 +103,7 @@ export const BusinessRegister = () => {
     } else if (currentStep === 3) {
       getServicesData();
     } else if (currentStep === 4) {
+      getWorkTimesData();
       getServicesData();
     }
   };

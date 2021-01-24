@@ -25,7 +25,11 @@ export const Card = ({
   return (
     <>
       {expandable ? (
-        <Accordion classes={{ root: classes.root }} disabled={disabled}>
+        <Accordion
+          className={className}
+          classes={{ root: classes.root }}
+          disabled={disabled}
+        >
           <AccordionSummary
             aria-controls="panel1a-content"
             id="panel1a-header"

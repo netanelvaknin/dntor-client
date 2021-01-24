@@ -19,6 +19,7 @@ import {
   ConfirmationDialogSecondaryHeading,
   ConfirmationActionButton,
   useConfirmationDialogStyles,
+  SummaryProviderCard,
 } from "./ServiceProvidersStyle";
 
 export const Transition = forwardRef(function Transition(
@@ -44,7 +45,7 @@ export const ServiceProviders = ({
   const [currentProviderData, setCurrentProviderData] = useState<any>([]);
   const [services, setServices] = useState<any>([]);
   const [serviceProviders, setServiceProviders] = useState<any>([]);
-  const [initialWorkingHours, setInitialWorkingHours] = useState([]);
+  const [initialWorkingHours, setInitialWorkingHours] = useState<any>([]);
   const [sameHours, setSameHours] = useState(true);
   const { control, handleSubmit, register, watch, reset } = useForm({
     defaultValues: {
@@ -186,16 +187,12 @@ export const ServiceProviders = ({
     setCurrentProviderData([
       ...currentProviderData,
       {
-        workTimes: [
-          {
-            days: selectedDaysNames,
-            workingHours: {
-              from: startWorking,
-              to: endWorking,
-            },
-            breaks,
-          },
-        ],
+        days: selectedDaysNames,
+        workingHours: {
+          from: startWorking,
+          to: endWorking,
+        },
+        breaks,
       },
     ]);
 
@@ -229,7 +226,7 @@ export const ServiceProviders = ({
 
   const removeWorkTimesCard = (index: number) => {
     const currentServiceProviderCopy = [...currentProviderData];
-    const daysToEnable = currentServiceProviderCopy[index].workTimes[0].days;
+    const daysToEnable = currentServiceProviderCopy[index].days;
     daysToEnable.includes("sunday") &&
       setSunday({ selected: false, disabled: false });
     daysToEnable.includes("monday") &&
@@ -249,6 +246,8 @@ export const ServiceProviders = ({
   };
 
   const handleAddProvider = () => {
+    let providerData: any = {};
+
     const currentSelectedServices = services.filter((service: any) => {
       if (service.selected) {
         return service;
@@ -257,11 +256,25 @@ export const ServiceProviders = ({
       return null;
     });
 
-    const providerData = {
-      providerName,
-      currentSelectedServices,
-      currentProviderData,
-    };
+    const initialWorkingHoursCopy = [...initialWorkingHours];
+    const currentProviderDataCopy: any = [...currentProviderData];
+
+    initialWorkingHoursCopy.map((w: any) => {
+      return (w.days = translateDaysToHebrew(w.days));
+    });
+
+    currentProviderDataCopy.map((c: any) => {
+      return (c.days = translateDaysToHebrew(c.days));
+    });
+
+    providerData.providerName = providerName;
+    providerData.currentSelectedServices = currentSelectedServices;
+
+    if (sameHours) {
+      providerData.currentProviderData = initialWorkingHoursCopy;
+    } else {
+      providerData.currentProviderData = currentProviderDataCopy;
+    }
 
     setServiceProviders([...serviceProviders, providerData]);
 
@@ -272,6 +285,8 @@ export const ServiceProviders = ({
     setCurrentProviderData([]);
     setShowMobileView(true);
   };
+
+  console.log(serviceProviders);
 
   const resetSelectedServices = () => {
     const servicesCopy = [...services];
@@ -287,6 +302,18 @@ export const ServiceProviders = ({
   }, [showBreakOne, showBreakTwo, showBreakThree]);
 
   const translateDaysToHebrew = (daysArr: string[]) => {
+    if (
+      daysArr.includes("א") ||
+      daysArr.includes("ב") ||
+      daysArr.includes("ג") ||
+      daysArr.includes("ד") ||
+      daysArr.includes("ה") ||
+      daysArr.includes("ו") ||
+      daysArr.includes("ש")
+    ) {
+      return daysArr;
+    }
+
     const daysNames: any = {
       sunday: "א",
       monday: "ב",
@@ -361,28 +388,67 @@ export const ServiceProviders = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <div style={{ maxWidth: "32rem", margin: "0 auto" }}>
+      <div
+        style={{
+          maxWidth: showMobileView ? "40rem" : "32rem",
+          margin: "0 auto",
+          paddingTop: showMobileView ? "2rem" : "0",
+        }}
+      >
         {showMobileView ? (
-          <div>
+          <div
+            style={{
+              paddingTop: "2rem",
+              maxHeight: "44rem",
+              overflowY: "auto",
+              padding: "1rem 1rem 3rem",
+            }}
+          >
             {serviceProviders.map((sprovider: any, index: number) => {
               return (
-                <ServiceProviderCard key={index}>
-                  <p>{sprovider.providerName}</p>
+                <SummaryProviderCard
+                  cardTitle={<strong>{sprovider.providerName}</strong>}
+                  expandable
+                  key={index}
+                >
+                  <div>
+                    <strong>שירותים ש{sprovider.providerName} נותנ/ת:</strong>
+                    {sprovider.currentSelectedServices.map(
+                      (service: any, index: number) => {
+                        return <p key={index}>{service.serviceName}</p>;
+                      }
+                    )}
 
-                  {sprovider.currentSelectedServices.map(
-                    (service: any, index: number) => {
-                      return <p key={index}>{service.serviceName}</p>;
-                    }
-                  )}
-
-                  {sprovider?.currentProviderData[0]?.workTimes[0]?.days
-                    .length > 0 &&
-                    translateDaysToHebrew(
-                      sprovider.currentProviderData[0].workTimes[0].days
-                    ).map((day: any) => {
-                      return `${day} `;
+                    {sprovider?.currentProviderData.map((w: any, i: number) => {
+                      return (
+                        <div key={i} style={{ margin: "2rem 0" }}>
+                          <strong>שעות עבודה:</strong>
+                          <p>
+                            {w.workingHours?.from} - {w.workingHours?.to}
+                          </p>
+                          <strong>ימי עבודה</strong>
+                          <p>{w.days}</p>
+                          {w.breaks[0] && <strong>הפסקות</strong>}
+                          {w.breaks[0] && (
+                            <p>
+                              {w.breaks[0].from} - {w.breaks[0].to}
+                            </p>
+                          )}
+                          {w.breaks[1] && (
+                            <p>
+                              {w.breaks[1].from} - {w.breaks[1].to}
+                            </p>
+                          )}
+                          {w.breaks[2] && (
+                            <p>
+                              {w.breaks[2].from} - {w.breaks[2].to}
+                            </p>
+                          )}
+                        </div>
+                      );
                     })}
-                </ServiceProviderCard>
+                  </div>
+                </SummaryProviderCard>
               );
             })}
           </div>
@@ -481,12 +547,11 @@ export const ServiceProviders = ({
                   <ServiceProvidersContainer>
                     {initialWorkingHours?.map((w: any, index: number) => {
                       const translatedDays = translateDaysToHebrew(w.days);
-
                       return (
                         <ServiceProviderCard key={index}>
                           <strong>ימי פעילות:</strong>
                           <p>
-                            {translatedDays.map((day: string) => {
+                            {translatedDays?.map((day: string) => {
                               return day + "' ";
                             })}
                           </p>
@@ -556,43 +621,34 @@ export const ServiceProviders = ({
                     <ServiceProviderCard key={index}>
                       <strong>ימי פעילות:</strong>
                       <p>
-                        {sprovider.workTimes[0].days.includes("sunday") &&
-                          "א' "}
-                        {sprovider.workTimes[0].days.includes("monday") &&
-                          "ב' "}
-                        {sprovider.workTimes[0].days.includes("tuesday") &&
-                          "ג' "}
-                        {sprovider.workTimes[0].days.includes("wednesday") &&
-                          "ד' "}
-                        {sprovider.workTimes[0].days.includes("thursday") &&
-                          "ה' "}
-                        {sprovider.workTimes[0].days.includes("friday") &&
-                          "ו' "}
-                        {sprovider.workTimes[0].days.includes("saturday") &&
-                          "ש' "}
+                        {sprovider.days.includes("sunday") && "א' "}
+                        {sprovider.days.includes("monday") && "ב' "}
+                        {sprovider.days.includes("tuesday") && "ג' "}
+                        {sprovider.days.includes("wednesday") && "ד' "}
+                        {sprovider.days.includes("thursday") && "ה' "}
+                        {sprovider.days.includes("friday") && "ו' "}
+                        {sprovider.days.includes("saturday") && "ש' "}
                       </p>
 
                       <strong>שעת התחלה וסיום:</strong>
                       <p>
-                        {sprovider.workTimes[0].workingHours.from} -{" "}
-                        {sprovider.workTimes[0].workingHours.to}
+                        {sprovider.workingHours.from} -{" "}
+                        {sprovider.workingHours.to}
                       </p>
 
-                      {sprovider.workTimes[0].breaks[0] && (
-                        <strong>הפסקות:</strong>
-                      )}
+                      {sprovider.breaks[0] && <strong>הפסקות:</strong>}
                       <p>
-                        {sprovider.workTimes[0].breaks[0] &&
-                          `${sprovider.workTimes[0].breaks[0].from} - ${sprovider.workTimes[0].breaks[0].to}`}
+                        {sprovider.breaks[0] &&
+                          `${sprovider.breaks[0].from} - ${sprovider.breaks[0].to}`}
                       </p>
                       <p>
-                        {sprovider.workTimes[0].breaks[1] &&
-                          `${sprovider.workTimes[0].breaks[1].from} - ${sprovider.workTimes[0].breaks[1].to}`}
+                        {sprovider.breaks[1] &&
+                          `${sprovider.breaks[1].from} - ${sprovider.breaks[1].to}`}
                       </p>
 
                       <p>
-                        {sprovider.workTimes[0].breaks[2] &&
-                          `${sprovider.workTimes[0].breaks[2].from} - ${sprovider.workTimes[0].breaks[2].to}`}
+                        {sprovider.breaks[2] &&
+                          `${sprovider.breaks[2].from} - ${sprovider.breaks[2].to}`}
                       </p>
 
                       <IconButton

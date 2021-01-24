@@ -76,6 +76,7 @@ export const ConfirmationDialogHeading = styled.h1`
 export const ConfirmationDialogSecondaryHeading = styled(ConfirmationDialogHeading)`
     font-size: 2rem;
     max-width: 42rem;
+    font-weight: normal;
 `;
 
 export const ConfirmationActionButton = styled(Button)`
@@ -87,4 +88,12 @@ export const useConfirmationDialogStyles = makeStyles({
     paper: {
         padding: '3rem'
     }
-})
+});
+
+export const SummaryProviderCard = styled(Card)`
+    margin: 1rem 0 2.5rem;
+
+    & .MuiAccordionSummary-root {
+        background: #9090900d;
+    }
+`;
