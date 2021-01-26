@@ -107,3 +107,7 @@ export const ButtonStyle = styled(Button)`
     width: 26rem;
     margin: 1rem;
 `;
+
+export const ServicesList = styled.ul`
+  list-style-position: inside;
+`;

@@ -138,7 +138,7 @@ export const BusinessProfile = ({
 
                 <Grid container justify="center" style={{margin: "2rem 0"}}>
                     <Grid item>
-                        <ContinueButtonStyle type="submit">המשך</ContinueButtonStyle>
+                        <ContinueButtonStyle type="submit" variant="contained">המשך</ContinueButtonStyle>
                     </Grid>
                 </Grid>
             </Grid>

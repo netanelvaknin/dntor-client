@@ -4,7 +4,7 @@ export const LandingPage = () => {
   return (
     <LandingPageContainer>
       <ComingSoonHeading variant="h1">בקרוב!</ComingSoonHeading>
-      <span>מערכת זימון התורים המתקדמת בישראל</span>
+      <span>מערכת זימון התורים והפגישות המתקדמת בישראל</span>
     </LandingPageContainer>
   );
 };

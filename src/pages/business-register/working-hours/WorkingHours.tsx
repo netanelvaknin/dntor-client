@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Grid, IconButton, Typography} from "@material-ui/core";
 import {Button, TimePickerSelector} from "../../../ui/index";
 import {ContinueButtonStyle} from "../BusinessRegisterStyle";
@@ -121,7 +121,7 @@ export const WorkingHours = ({
         const hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
         const translatedDays = Object.entries(checkedDay).map(
             ([key, value], index) => {
-                if (value && value !== undefined) {
+                if (value) {
                     return hebrewDays[index];
                 } else {
                     return null;
@@ -269,7 +269,7 @@ export const WorkingHours = ({
         const daysBeforeRemove = workingHours[index].days;
         const newDays = {};
 
-        Object.entries(translatedDays).forEach(([key, value], index) => {
+        Object.entries(translatedDays).forEach(([key, value]) => {
             if (daysBeforeRemove.includes(value)) {
                 Object.assign(newDays, {[key]: false});
             }
@@ -331,7 +331,7 @@ export const WorkingHours = ({
                 </Grid>
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={5}
@@ -344,7 +344,7 @@ export const WorkingHours = ({
 
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={2}
@@ -354,7 +354,7 @@ export const WorkingHours = ({
 
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={5}
@@ -397,7 +397,7 @@ export const WorkingHours = ({
                 </Grid>
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={5}
@@ -410,7 +410,7 @@ export const WorkingHours = ({
 
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={2}
@@ -420,7 +420,7 @@ export const WorkingHours = ({
 
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={5}
@@ -463,7 +463,7 @@ export const WorkingHours = ({
                 </Grid>
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={5}
@@ -476,7 +476,7 @@ export const WorkingHours = ({
 
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={2}
@@ -486,7 +486,7 @@ export const WorkingHours = ({
 
                 <Grid
                     item
-                    container={isSmallScreen ? false : true}
+                    container={!isSmallScreen}
                     justify={!isSmallScreen ? "center" : undefined}
                     alignItems={!isSmallScreen ? "center" : undefined}
                     md={5}
