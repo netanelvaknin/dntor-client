@@ -1,66 +1,67 @@
-import { useContext, useState, useEffect } from "react";
+import {useContext, useEffect, useState} from "react";
 import rootContext from "../context/root/rootContext";
-import { Provider } from "use-http";
-import { useCookies, withCookies } from "react-cookie";
-import { useLocation } from "react-router-dom";
+import {Provider} from "use-http";
+import {useCookies, withCookies} from "react-cookie";
+import {useLocation} from "react-router-dom";
+
 interface HttpProviderProps {
-  children?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
-export const HttpProvider = ({ children }: HttpProviderProps) => {
-  const [cookies] = useCookies();
-  const rootState = useContext(rootContext);
-  const [token, setToken] = useState("");
+export const HttpProvider = ({children}: HttpProviderProps) => {
+    const [cookies] = useCookies();
+    const rootState = useContext(rootContext);
+    const [token, setToken] = useState("");
 
-  const location = useLocation();
+    const location = useLocation();
 
-  useEffect(() => {
-    // Clean the error state every route change
-    rootState?.setError("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
-
-  useEffect(() => {
-    setToken(cookies.token);
-  }, [cookies]);
-
-  const options = {
-    cachePolicy: "no-cache",
-    timeout: 10000,
-    onTimeout: () => {
-      console.log("REQUEST TIMEOUT");
-    },
-    onError: (e: any) => {
-      console.log(e);
-    },
-    interceptors: {
-      request: async ({ options }: any) => {
-        rootState?.setLoading(true);
+    useEffect(() => {
+        // Clean the error state every route change
         rootState?.setError("");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location]);
 
-        // Set headers
-        options.headers.Accept = "application/json";
-        // options.headers.Authorization = `Bearer ${token}`;
-        options.headers["access-token"] = `${token || ""}`;
-        return options;
-      },
-      response: async ({ response }: any) => {
-        setTimeout(() => {
-          rootState?.setLoading(false);
-        }, 2000);
+    useEffect(() => {
+        setToken(cookies.token);
+    }, [cookies]);
 
-        const res = response;
-        return res;
-      },
-    },
-  };
+    const options = {
+        cachePolicy: "no-cache",
+        timeout: 10000,
+        onTimeout: () => {
+            console.log("REQUEST TIMEOUT");
+        },
+        onError: (e: any) => {
+            console.log(e);
+        },
+        interceptors: {
+            request: async ({options}: any) => {
+                rootState?.setLoading(true);
+                rootState?.setError("");
 
-  return (
-    // @ts-ignore
-    <Provider url="https://dev.dntor.com" options={options}>
-      {children}
-    </Provider>
-  );
+                // Set headers
+                options.headers.Accept = "application/json";
+                // options.headers.Authorization = `Bearer ${token}`;
+                options.headers["access-token"] = `${token || ""}`;
+                return options;
+            },
+            response: async ({response}: any) => {
+                setTimeout(() => {
+                    rootState?.setLoading(false);
+                }, 2000);
+
+                const res = response;
+                return res;
+            },
+        },
+    };
+
+    return (
+        // @ts-ignore
+        <Provider url="https://dev.dntor.com" options={options}>
+            {children}
+        </Provider>
+    );
 };
 
 export default withCookies(HttpProvider);

@@ -1,22 +1,22 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {
-  BusinessServicesHeading,
-  DurationText,
-  RightGrid,
-  LeftGrid,
-  ServiceCard,
-  ServiceText,
-  MobileAddButton,
+    BusinessServicesHeading,
+    DurationText,
+    LeftGrid,
+    MobileAddButton,
+    RightGrid,
+    ServiceCard,
+    ServiceText,
 } from "./BusinessServicesStyle";
-import { Grid, IconButton } from "@material-ui/core";
-import { TextField, DurationSelector } from "../../../ui/index";
-import { ContinueButtonStyle } from "../BusinessRegisterStyle";
-import { useSmallScreen } from "../../../hooks/index";
+import {Grid, IconButton} from "@material-ui/core";
+import {DurationSelector, TextField} from "../../../ui/index";
+import {ContinueButtonStyle} from "../BusinessRegisterStyle";
+import {useSmallScreen} from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
-import { useForm } from "react-hook-form";
-import { CurrentStep } from "../BusinessRegister";
+import {useForm} from "react-hook-form";
+import {CurrentStep} from "../BusinessRegister";
 import useFetch from "use-http";
-import { Alert } from "@material-ui/lab";
+import {Alert} from "@material-ui/lab";
 
 import rootContext from "../../../context/root/rootContext";
 
