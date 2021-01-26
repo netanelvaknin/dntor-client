@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
   Dialog,
   makeStyles,
@@ -14,11 +15,13 @@ import { DayCheckbox } from "../../working-hours/WorkingHoursStyle";
 import { AdditionalHoursModalProps } from "./AdditionalHoursModalInterface";
 import { useSmallScreen } from "../../../../hooks/index";
 import { Transition } from "../ServiceProviders";
+import rootContext from "../../../../context/root/rootContext";
+import { Alert } from "@material-ui/lab";
 
 const useDialogStyles = makeStyles({
   paper: {
     width: "55rem",
-    height: "55rem",
+    height: "70rem",
     position: "relative",
     padding: "4rem 2rem 2rem",
     "@media (max-width: 767px)": {
@@ -72,6 +75,7 @@ export const AdditionalHoursModal = ({
 }: AdditionalHoursModalProps) => {
   const classes = useDialogStyles();
   const isSmallScreen = useSmallScreen();
+  const rootState = useContext(rootContext);
 
   return (
     <Dialog
@@ -378,6 +382,19 @@ export const AdditionalHoursModal = ({
           </Grid>
         </Grid>
       )}
+
+      <Grid container style={{ margin: "0rem 0 2rem" }}>
+        <Grid item md={12} xs={12}>
+          {rootState?.error && (
+            <Alert
+              style={{ maxWidth: "28rem", margin: "0 auto" }}
+              severity="error"
+            >
+              {rootState?.error}
+            </Alert>
+          )}
+        </Grid>
+      </Grid>
 
       <Grid
         container

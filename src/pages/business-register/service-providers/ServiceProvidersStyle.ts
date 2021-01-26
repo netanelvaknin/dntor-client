@@ -55,7 +55,7 @@ export const ServiceProvidersContainer = styled(Grid)`
     overflow-y: auto;
     max-height: 24rem;
     padding-left: 2rem;
-    padding-right: 1rem;
+    padding-right: .5rem;
 `;
 
 export const ServiceProviderCard = styled(Card)`
@@ -91,9 +91,19 @@ export const useConfirmationDialogStyles = makeStyles({
 });
 
 export const SummaryProviderCard = styled(Card)`
-    margin: 1rem 0 2.5rem;
+    &,
+    &.MuiAccordion-root.Mui-expanded {
+        margin: 1rem auto 2.5rem;
+
+    }
 
     & .MuiAccordionSummary-root {
         background: #9090900d;
     }
+`;
+
+export const ButtonStyle = styled(Button)`
+    height: 3rem;
+    width: 26rem;
+    margin: 1rem;
 `;
