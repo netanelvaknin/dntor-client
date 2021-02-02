@@ -33,7 +33,10 @@ const App = () => {
 
     return (
         <>
-            <BlockUI blocking={rootState?.loading}/>
+            <BlockUI
+                blocking={rootState?.loading}
+                loader={rootState?.loader}
+                title={rootState?.loaderTitle}/>
             <Navbar/>
 
             <Switch>

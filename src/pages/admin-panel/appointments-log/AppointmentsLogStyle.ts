@@ -1,6 +1,6 @@
 import {makeStyles} from '@material-ui/core/styles';
 import styled from 'styled-components/macro';
-import {mobile} from '../../../utils/screen-sizes';
+import {mobile} from "../../../utils/screen-sizes";
 
 export const AppointmentsLogContainer = styled.div`
     position: relative;
@@ -15,6 +15,7 @@ export const SubMenu = styled.div`
         background: transparent;
     }
 `;
+
 
 export const useDatepickerStyles = makeStyles({
     staticWrapperRoot: {

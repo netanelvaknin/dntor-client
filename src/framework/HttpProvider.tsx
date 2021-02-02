@@ -48,7 +48,7 @@ export const HttpProvider = ({children}: HttpProviderProps) => {
             response: async ({response}: any) => {
                 setTimeout(() => {
                     rootState?.setLoading(false);
-                }, 2000);
+                }, 3000);
 
                 const res = response;
                 return res;

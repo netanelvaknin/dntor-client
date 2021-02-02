@@ -5,7 +5,7 @@ import { Button, Card, Checkbox} from "../../../ui/index";
 export const useDialogStyles = makeStyles({
     paper: {
         width: '28rem',
-        height: '31rem',
+        height: '32rem',
         padding: '2rem'
     }
 });
@@ -48,7 +48,7 @@ export const Divider = styled.div`
     border-bottom: 2px solid #E2E2E2;
     height: 1px;
     width: 28rem;
-    margin: 3rem 0 2rem;
+    margin: 0 0 2rem;
 `;
 
 export const ServiceProvidersContainer = styled(Grid)`
@@ -93,8 +93,8 @@ export const useConfirmationDialogStyles = makeStyles({
 export const SummaryProviderCard = styled(Card)`
     &,
     &.MuiAccordion-root.Mui-expanded {
-        margin: 1rem auto 2.5rem;
-
+        width: 100%;
+        margin: 1rem auto;
     }
 
     & .MuiAccordionSummary-root {

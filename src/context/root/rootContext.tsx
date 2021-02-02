@@ -8,6 +8,8 @@ type rootContextType =
       setError: (error: string) => void;
       setLoading: (isLoading: boolean) => void;
       setLoader: (loader: any) => void;
+      loaderTitle: string;
+      setLoaderTitle: (title: string) => void;
     }
   | undefined;
 

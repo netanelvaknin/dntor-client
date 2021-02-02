@@ -9,6 +9,8 @@ type businessRegisterContextType =
       setBusinessData: any;
       setWorkTimesData: any;
       setServicesData: any;
+      serviceProvidersData: any;
+      setServiceProvidersData: any;
       setFechedOnce: any;
     }
   | undefined;

@@ -1,13 +1,13 @@
 import { BlockUIContainer, Overlay, MessageContainer } from "./BlockUIStyle";
-import { Loader } from "../../animations/index";
 
 interface BlockUIProps {
   blocking: boolean | undefined;
+  loader?: React.ReactNode;
   title?: string;
   children?: React.ReactNode;
 }
 
-export const BlockUI = ({ blocking, title = "", children }: BlockUIProps) => {
+export const BlockUI = ({ blocking, title = "", children, loader }: BlockUIProps) => {
   if (!blocking) {
     return <></>;
   } else {
@@ -16,7 +16,8 @@ export const BlockUI = ({ blocking, title = "", children }: BlockUIProps) => {
         <Overlay />
         <MessageContainer>
           <div className="block-ui-message">
-            <Loader />
+            <h1>{title}</h1>
+            {loader}
             {children}
           </div>
         </MessageContainer>

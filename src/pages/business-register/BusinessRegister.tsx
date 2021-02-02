@@ -1,10 +1,10 @@
 import {Dialog} from "@material-ui/core";
-import {lazy, useContext, useEffect, useState} from "react";
+import React, {lazy, useContext, useEffect, useState} from "react";
 // import { useHistory } from "react-router-dom";
 import {useLastLocation} from "react-router-last-location";
 import useFetch from "use-http";
 import arrowRight from "../../assets/icons/arrow-right.svg";
-import {GradientButton} from "../../components/index";
+import {GradientButton} from "../../components";
 import businessRegisterContext from "../../context/business-register/businessRegisterContext";
 import rootContext from "../../context/root/rootContext";
 import {useSmallScreen} from "../../hooks/index";
@@ -89,10 +89,17 @@ export const BusinessRegister = () => {
             businessRegisterState && businessRegisterState.setServicesData(data);
     }
 
+    async function getServicesProviderData() {
+        const data = await get("/serviceProvider/getAll");
+        if (response.ok)
+            businessRegisterState && businessRegisterState.setServiceProvidersData(data);
+    }
+
     const getAllData = () => {
         getBusinessData();
         getWorkTimesData();
         getServicesData();
+        getServicesProviderData();
     };
 
     const getDataByStep = () => {
@@ -105,6 +112,7 @@ export const BusinessRegister = () => {
         } else if (currentStep === 4) {
             getWorkTimesData();
             getServicesData();
+            getServicesProviderData();
         }
     };
 
@@ -188,12 +196,10 @@ export const BusinessRegister = () => {
                 <ServiceProviders
                     showMobileView={showMobileView}
                     setShowMobileView={setShowMobileView}
-                    initialServicesData={
-                        businessRegisterState && businessRegisterState.servicesData
-                    }
-                    businessWorkingHours={
-                        businessRegisterState && businessRegisterState.workTimesData
-                    }
+                    setCurrentStep={setCurrentStep}
+                    initialServiceProvidersData={businessRegisterState && businessRegisterState.serviceProvidersData}
+                    initialServicesData={businessRegisterState && businessRegisterState.servicesData}
+                    businessWorkingHours={businessRegisterState && businessRegisterState.workTimesData}
                 />
             ),
         },

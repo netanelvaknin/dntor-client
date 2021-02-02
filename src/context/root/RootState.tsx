@@ -1,38 +1,41 @@
-import { useState, ReactNode, useEffect } from "react";
+import {useState, ReactNode, useEffect} from "react";
 import RootContext from "./rootContext";
-// import { Loader } from "../../animations/index";
+import {Loader} from "../../animations/index";
 
 interface RootStateProps {
-  children?: ReactNode;
+    children?: ReactNode;
 }
 
-export const RootState = ({ children }: RootStateProps) => {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [loader, setLoader] = useState();
+export const RootState = ({children}: RootStateProps) => {
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [loader, setLoader] = useState(<Loader/>);
+    const [loaderTitle, setLoaderTitle] = useState('');
 
-  useEffect(() => {
-    if (loading) {
-      setTimeout(() => {
-        setLoading(!loading);
-      }, 2000);
-    }
-  }, [loading]);
+    useEffect(() => {
+        if (loading) {
+            setTimeout(() => {
+                setLoading(!loading);
+            }, 2000);
+        }
+    }, [loading]);
 
-  return (
-    <RootContext.Provider
-      value={{
-        error,
-        setError,
-        loading,
-        setLoading,
-        loader,
-        setLoader,
-      }}
-    >
-      {children}
-    </RootContext.Provider>
-  );
+    return (
+        <RootContext.Provider
+            value={{
+                error,
+                setError,
+                loading,
+                setLoading,
+                loader,
+                setLoader,
+                loaderTitle,
+                setLoaderTitle
+            }}
+        >
+            {children}
+        </RootContext.Provider>
+    );
 };
 
 export default RootState;

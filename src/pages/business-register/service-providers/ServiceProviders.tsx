@@ -1,34 +1,33 @@
-import React, {useEffect, useState, forwardRef, useContext} from "react";
-import {Dialog} from "@material-ui/core";
+import React, {forwardRef, useContext, useEffect, useState} from "react";
+import {Dialog, Grid, IconButton, Slide, Typography} from "@material-ui/core";
 import ServiceProvidersInfoDialog from "./service-providers-info-dialog/ServiceProvidersInfoDialog";
 import AdditionalHoursModal from "./additional-hours-modal/AdditionalHoursModal";
-import {TextField, Checkbox} from "../../../ui/index";
+import {Button, Checkbox, TextField} from "../../../ui/index";
 import {useForm} from "react-hook-form";
-import {Grid, IconButton, Slide, Typography} from "@material-ui/core";
 import {TransitionProps} from "@material-ui/core/transitions";
 import AddIcon from "../../../assets/icons/plus_icon.svg";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import {
-    ContinueButton,
-    Heading,
-    Divider,
-    ServiceProviderCard,
-    ServiceProvidersContainer,
-    ServiceCheckboxStyle,
+    ButtonStyle,
+    ConfirmationActionButton,
     ConfirmationDialogHeading,
     ConfirmationDialogSecondaryHeading,
-    ConfirmationActionButton,
-    useConfirmationDialogStyles,
+    ContinueButton,
+    Divider,
+    Heading,
+    ServiceCheckboxStyle,
+    ServiceProviderCard,
+    ServiceProvidersContainer,
+    ServicesList,
     SummaryProviderCard,
-    ButtonStyle,
-    ServicesList
+    useConfirmationDialogStyles
 } from "./ServiceProvidersStyle";
 import {useSmallScreen} from "../../../hooks/index";
 import rootContext from "../../../context/root/rootContext";
 import {Alert} from "@material-ui/lab";
 import moment from "moment";
-import {Button} from "../../../ui/index";
 import useFetch from "use-http";
+import {Delete, Loader} from '../../../animations';
 
 export const Transition = forwardRef(function Transition(
     props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -38,20 +37,23 @@ export const Transition = forwardRef(function Transition(
 });
 
 interface ServiceProvidersProps {
+    initialServiceProvidersData?: any;
     initialServicesData?: any;
     businessWorkingHours?: any;
     showMobileView: boolean;
     setShowMobileView: (showMobileView: boolean) => void;
+    setCurrentStep: (currentStep: 1 | 2 | 3 | 4 | 5) => void;
 }
 
 export const ServiceProviders = ({
+                                     initialServiceProvidersData,
                                      initialServicesData,
                                      businessWorkingHours,
                                      showMobileView,
                                      setShowMobileView,
+                                     setCurrentStep
                                  }: ServiceProvidersProps) => {
     const rootState = useContext(rootContext);
-
     const [currentProviderData, setCurrentProviderData] = useState<any>([]);
     const [services, setServices] = useState<any>([]);
     const [serviceProviders, setServiceProviders] = useState<any>([]);
@@ -63,7 +65,7 @@ export const ServiceProviders = ({
         },
     });
     const {post, response} = useFetch();
-
+    const [mountedOnce, setMountedOnce] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [additionalHoursOpen, setAdditionalHoursOpen] = useState(false);
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
@@ -108,44 +110,92 @@ export const ServiceProviders = ({
     const isSmallScreen = useSmallScreen();
 
     const onSubmit = async () => {
+        rootState?.setLoader(<Loader />);
         const finalServiceProviders: any = [];
         const serviceProvidersCopy = [...serviceProviders];
 
         serviceProvidersCopy.forEach((serviceProvider: any) => {
             const finalResult: any = {};
 
-            finalResult.fullname = serviceProvider.providerName;
+            if (serviceProvider._id) {
+                finalResult._id = serviceProvider._id;
+            }
 
-            finalResult.services = serviceProvider.currentSelectedServices.map(
-                (selectedService: any) => {
-                    return {serviceId: selectedService._id};
-                }
-            );
-            finalResult.workTimes = serviceProvider.currentProviderData;
+            finalResult.fullname = serviceProvider.providerName;
+            finalResult.services = serviceProvider.services.map((selectedService: any) => {
+                return {serviceId: selectedService._id};
+            });
+
+            const formattedWorkTimes = serviceProvider.workTimes.map((providerWorkTimes: any) => {
+                return providerWorkTimes.days.map((dayObj: any) => {
+                    dayObj.days = translateDaysToEnglish(dayObj.days);
+                    return dayObj;
+                });
+            });
+
+            finalResult.workTimes = formattedWorkTimes[0];
+
             finalServiceProviders.push(finalResult);
         });
 
-        console.log(finalServiceProviders);
+        const uniqueProviders = finalServiceProviders.filter((provider: any) => {
+            if (!provider._id) {
+                return provider;
+            }
 
-        await post("/serviceProvider/insert", finalServiceProviders);
+            return null;
+        });
+
+        if (uniqueProviders.length > 0) {
+            await post("/serviceProvider/insert", uniqueProviders);
+        } else if (uniqueProviders.length < 1 && finalServiceProviders.length > 0) {
+            setCurrentStep(5);
+            setShowMobileView(false);
+        }
 
         if (response.ok) {
-            console.log("WORK!!");
-            // setCurrentStep(3);
-            // setShowMobileView && setShowMobileView(false);
+            setCurrentStep(5);
+            setShowMobileView(false);
         }
     };
 
     useEffect(() => {
-        if (!rootState?.loading) {
-            setDialogOpen(true);
+        if (initialServiceProvidersData) {
+            const data: any = [];
+            const initialServiceProvidersCopy = [...initialServiceProvidersData.res];
+            initialServiceProvidersCopy.forEach((provider: any) => {
+                const finalResult: any = {};
+                finalResult._id = provider._id;
+                finalResult.providerName = provider.fullName;
+                finalResult.services = provider.services;
+                provider.workTimes.map((workTime: any) => {
+                    return workTime.days.map((dayObj: any) => {
+                        return dayObj.days = translateDaysToHebrew(dayObj.days);
+                    })
+                });
+                finalResult.workTimes = provider.workTimes;
+                data.push(finalResult);
+            });
+            setServiceProviders(data);
         }
-    }, [rootState?.loading]);
+    }, [initialServiceProvidersData])
+
+    useEffect(() => {
+        if (!rootState?.loading && !mountedOnce) {
+            setDialogOpen(true);
+            setMountedOnce(true);
+        }
+    }, [rootState?.loading, mountedOnce]);
 
     useEffect(() => {
         const initialServices = initialServicesData?.res?.services;
         initialServices?.map((service: any) => {
-            return (service.selected = false);
+            if (service) {
+                service.selected = false;
+                service.name = service.serviceName;
+            }
+
+            return null;
         });
 
         setServices(initialServices);
@@ -250,27 +300,13 @@ export const ServiceProviders = ({
 
             // Include only the days that selected and unique for each card
             const selectedDaysNames = [];
-            sunday.selected &&
-            !currentProviderDataCopy.includes("sunday") &&
-            selectedDaysNames.push("sunday");
-            monday.selected &&
-            !currentProviderDataCopy.includes("monday") &&
-            selectedDaysNames.push("monday");
-            tuesday.selected &&
-            !currentProviderDataCopy.includes("tuesday") &&
-            selectedDaysNames.push("tuesday");
-            wednesday.selected &&
-            !currentProviderDataCopy.includes("wednesday") &&
-            selectedDaysNames.push("wednesday");
-            thursday.selected &&
-            !currentProviderDataCopy.includes("thursday") &&
-            selectedDaysNames.push("thursday");
-            friday.selected &&
-            !currentProviderDataCopy.includes("friday") &&
-            selectedDaysNames.push("friday");
-            saturday.selected &&
-            !currentProviderDataCopy.includes("saturday") &&
-            selectedDaysNames.push("saturday");
+            sunday.selected && !sunday.disabled && !currentProviderDataCopy.includes("sunday") && selectedDaysNames.push("sunday");
+            monday.selected && !currentProviderDataCopy.includes("monday") && selectedDaysNames.push("monday");
+            tuesday.selected && !currentProviderDataCopy.includes("tuesday") && selectedDaysNames.push("tuesday");
+            wednesday.selected && !currentProviderDataCopy.includes("wednesday") && selectedDaysNames.push("wednesday");
+            thursday.selected && !currentProviderDataCopy.includes("thursday") && selectedDaysNames.push("thursday");
+            friday.selected && !currentProviderDataCopy.includes("friday") && selectedDaysNames.push("friday");
+            saturday.selected && !currentProviderDataCopy.includes("saturday") && selectedDaysNames.push("saturday");
 
             // Disabled the selected days
             sunday.selected && setSunday({...sunday, disabled: true});
@@ -281,24 +317,26 @@ export const ServiceProviders = ({
             friday.selected && setFriday({...friday, disabled: true});
             saturday.selected && setSaturday({...saturday, disabled: true});
 
-            setCurrentProviderData([
-                ...currentProviderData,
-                {
-                    days: selectedDaysNames,
-                    workingHours: {
-                        from: startWorking,
-                        to: endWorking,
-                    },
-                    breaks,
-                },
-            ]);
+            if (selectedDaysNames.length > 0) {
+                setCurrentProviderData([
+                    ...currentProviderData, {
+                        days: selectedDaysNames,
+                        workingHours: {
+                            from: startWorking,
+                            to: endWorking,
+                        },
+                        breaks,
+                    }]);
 
-            // Reset and close
-            setShowBreakOne(false);
-            setShowBreakTwo(false);
-            setShowBreakThree(false);
-            setAdditionalHoursOpen(false);
-            rootState?.setError("");
+                // Reset and close
+                setShowBreakOne(false);
+                setShowBreakTwo(false);
+                setShowBreakThree(false);
+                setAdditionalHoursOpen(false);
+                rootState?.setError("");
+            } else {
+                rootState?.setError('נא לוודא שסימנת ימים ושעות פעילות חדשים');
+            }
         } else if (breaksError) {
             rootState?.setError(breaksError);
         } else if (workTimesError) {
@@ -351,13 +389,15 @@ export const ServiceProviders = ({
     const handleAddProvider = () => {
         let providerData: any = {};
 
+
         const currentSelectedServices = services.filter((service: any) => {
             if (service.selected) {
-                return service;
+                return {name: service.serviceName, ...service};
             }
 
             return null;
         });
+
 
         const initialWorkingHoursCopy = [...initialWorkingHours];
         const currentProviderDataCopy: any = [...currentProviderData];
@@ -371,28 +411,34 @@ export const ServiceProviders = ({
         });
 
         providerData.providerName = providerName;
-        providerData.currentSelectedServices = currentSelectedServices;
+        providerData.services = currentSelectedServices;
 
         if (sameHours) {
-            providerData.currentProviderData = initialWorkingHoursCopy;
+            providerData.workTimes = [{days: initialWorkingHoursCopy}];
         } else {
-            providerData.currentProviderData = currentProviderDataCopy;
+            providerData.workTimes = [{days: currentProviderData}];
         }
+
 
         if (providerName !== "") {
             rootState?.setError("");
 
             if (currentSelectedServices.length > 0) {
                 rootState?.setError("");
+                if (providerData.workTimes[0].days.length > 0) {
+                    if (serviceProviders.length < 5) {
+                        setServiceProviders([...serviceProviders, providerData]);
 
-                if (providerData.currentProviderData.length > 0) {
-                    setServiceProviders([...serviceProviders, providerData]);
-                    // Reset and move to providers view
-                    resetDays();
-                    reset({provider_name: ""});
-                    resetSelectedServices();
-                    setCurrentProviderData([]);
-                    setShowMobileView(true);
+                        // Reset and move to providers view
+                        resetDays();
+                        reset({provider_name: ""});
+                        resetSelectedServices();
+                        setCurrentProviderData([]);
+                        setSameHours(true);
+                        setShowMobileView(true);
+                    } else {
+                        rootState?.setError('לא ניתן להוסיף יותר מ-5 נותני שירות לעסק אחד')
+                    }
                 } else {
                     rootState?.setError(`נא להוסיף שעות פעילות עבור ${providerName}`);
                 }
@@ -403,6 +449,7 @@ export const ServiceProviders = ({
             rootState?.setError("נא לבדוק ששם נותן השירות תקין");
         }
     };
+
 
     const resetSelectedServices = () => {
         const servicesCopy = [...services];
@@ -418,37 +465,79 @@ export const ServiceProviders = ({
     }, [showBreakOne, showBreakTwo, showBreakThree]);
 
     const translateDaysToHebrew = (daysArr: string[]) => {
+        if (daysArr) {
+            if (
+                daysArr.includes("א") ||
+                daysArr.includes("ב") ||
+                daysArr.includes("ג") ||
+                daysArr.includes("ד") ||
+                daysArr.includes("ה") ||
+                daysArr.includes("ו") ||
+                daysArr.includes("ש")
+            ) {
+                return daysArr;
+            }
+
+            const daysNames: any = {
+                sunday: "א",
+                monday: "ב",
+                tuesday: "ג",
+                wednesday: "ד",
+                thursday: "ה",
+                friday: "ו",
+                saturday: "ש",
+            };
+
+            return daysArr.map((day: string) => {
+                return daysNames[day];
+            });
+        }
+
+    };
+
+    const translateDaysToEnglish = (daysArr: string[]) => {
         if (
-            daysArr.includes("א") ||
-            daysArr.includes("ב") ||
-            daysArr.includes("ג") ||
-            daysArr.includes("ד") ||
-            daysArr.includes("ה") ||
-            daysArr.includes("ו") ||
-            daysArr.includes("ש")
+            daysArr.includes("sunday") ||
+            daysArr.includes("monday") ||
+            daysArr.includes("tuesday") ||
+            daysArr.includes("wednesday") ||
+            daysArr.includes("thursday") ||
+            daysArr.includes("friday") ||
+            daysArr.includes("saturday")
         ) {
             return daysArr;
         }
 
-        const daysNames: any = {
-            sunday: "א",
-            monday: "ב",
-            tuesday: "ג",
-            wednesday: "ד",
-            thursday: "ה",
-            friday: "ו",
-            saturday: "ש",
-        };
-
         return daysArr.map((day: string) => {
-            return daysNames[day];
+            if (day === 'א') {
+                return 'sunday';
+            } else if (day === 'ב') {
+                return 'monday';
+            } else if (day === 'ג') {
+                return 'tuesday';
+            } else if (day === 'ד') {
+                return 'wednesday';
+            } else if (day === 'ה') {
+                return 'thursday';
+            } else if (day === 'ו') {
+                return 'friday';
+            } else if (day === 'ש') {
+                return 'saturday';
+            } else {
+                return null;
+            }
         });
     };
 
-    const removeServiceProvider = (index: number) => {
+    const removeServiceProvider = (index: number, spId: string) => {
         const serviceProvidersCopy = [...serviceProviders];
         serviceProvidersCopy.splice(index, 1);
         setServiceProviders(serviceProvidersCopy);
+
+        if (spId) {
+            rootState?.setLoader(<Delete />);
+            post("/serviceProvider/remove", {spId})
+        }
     }
 
     useEffect(() => {
@@ -458,6 +547,7 @@ export const ServiceProviders = ({
             setConfirmationDialogOpen(false);
         }
     }, [sameHours, currentProviderData.length]);
+
 
     useEffect(() => {
         setInitialWorkingHours(businessWorkingHours?.res?.days);
@@ -510,7 +600,7 @@ export const ServiceProviders = ({
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
             <div
                 style={{
-                    maxWidth: showMobileView ? "40rem" : "32rem",
+                    maxWidth: showMobileView ? isSmallScreen ? '30rem' : "40rem" : isSmallScreen ? '30rem' : "32rem",
                     margin: "0 auto",
                     paddingTop: showMobileView ? "2rem" : "0",
                 }}
@@ -530,63 +620,62 @@ export const ServiceProviders = ({
                         >
                             {serviceProviders.map((serviceProvider: any, index: number) => {
                                 return (
-                                    <Grid container alignItems="center" justify="space-between" spacing={1} key={index}>
-                                        <Grid item md={10}>
-                                            <SummaryProviderCard
-                                                cardTitle={<strong>{serviceProvider.providerName} </strong>}
-                                                expandable
-
-                                            >
-                                                <div>
-                                                    <strong>שירותים ש{serviceProvider.providerName} נותנ/ת:</strong>
-                                                    <ServicesList>
-                                                        {serviceProvider.currentSelectedServices.map(
-                                                            (service: any, index: number) => {
-                                                                return <li key={index}>{service.serviceName}</li>;
-                                                            }
-                                                        )}
-                                                    </ServicesList>
-
-                                                    {serviceProvider?.currentProviderData.map(
-                                                        (w: any, i: number) => {
-                                                            return (
-                                                                <div key={i} style={{margin: "2rem 0"}}>
-                                                                    <strong>שעות עבודה:</strong>
-                                                                    <p>
-                                                                        {w.workingHours?.from} - {w.workingHours?.to}
-                                                                    </p>
-                                                                    <strong>ימי עבודה</strong>
-                                                                    <p>{w.days.map((day: string) => day + ' ')}</p>
-                                                                    {w.breaks[0] && <strong>הפסקות</strong>}
-                                                                    {w.breaks[0] && (
-                                                                        <p>
-                                                                            {w.breaks[0].from} - {w.breaks[0].to}
-                                                                        </p>
-                                                                    )}
-                                                                    {w.breaks[1] && (
-                                                                        <p>
-                                                                            {w.breaks[1].from} - {w.breaks[1].to}
-                                                                        </p>
-                                                                    )}
-                                                                    {w.breaks[2] && (
-                                                                        <p>
-                                                                            {w.breaks[2].from} - {w.breaks[2].to}
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )}
-                                                </div>
-                                            </SummaryProviderCard>
-                                        </Grid>
-
-                                        <Grid item md={2} container justify="center">
-                                            <IconButton type="button" onClick={() => removeServiceProvider(index)}>
+                                    <Grid container alignItems="center" justify="center" spacing={1} key={index}>
+                                        <Grid item md={2} xs={1} container justify="center">
+                                            <IconButton type="button"
+                                                        onClick={() => removeServiceProvider(index, serviceProvider.services[0].spId)}>
                                                 <img src={TrashIcon} alt="מחיקה"/>
                                             </IconButton>
                                         </Grid>
 
+                                        <Grid item md={10} xs={11} container alignItems="center">
+                                            <SummaryProviderCard
+                                                cardTitle={<strong>{serviceProvider.providerName}</strong>}
+                                                expandable
+                                            >
+                                                <Grid container direction="column">
+                                                    <div>
+                                                        <strong>שירותים ש{serviceProvider.providerName} נותנ/ת:</strong>
+                                                        <ServicesList>
+                                                            {serviceProvider.services.map(
+                                                                (service: any, index: number) => {
+                                                                    return <li key={index}>{service.name}</li>;
+                                                                }
+                                                            )}
+                                                        </ServicesList>
+                                                    </div>
+
+                                                    <div style={{marginTop: '1.5rem'}}>
+                                                        <strong>ימי עבודה</strong>
+                                                        <p>{serviceProvider.workTimes.map((workTime: any) => {
+                                                            return workTime.days.map((day: any, dayIndex: number) => {
+                                                                return <span
+                                                                    key={dayIndex}>{day.days.map((day: string) => day + ' ')}</span>
+                                                            })
+                                                        })}</p>
+                                                    </div>
+
+                                                    <div style={{marginTop: '1.5rem'}}>
+                                                        {serviceProvider.workTimes.map((workTime: any) => {
+                                                            return workTime.days.map((daysObj: any, daysObjIndex: number) => {
+                                                                return (
+                                                                    <div key={daysObjIndex}>
+                                                                        {daysObj.breaks[0] &&
+                                                                        <strong>הפסקות:</strong>}
+                                                                        {daysObj.breaks[0] &&
+                                                                        <p>{daysObj.breaks[0].from} - {daysObj.breaks[0].to}</p>}
+                                                                        {daysObj.breaks[1] &&
+                                                                        <p>{daysObj.breaks[1].from} - {daysObj.breaks[1].to}</p>}
+                                                                        {daysObj.breaks[2] &&
+                                                                        <p>{daysObj.breaks[2].from} - {daysObj.breaks[2].to}</p>}
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        })}
+                                                    </div>
+                                                </Grid>
+                                            </SummaryProviderCard>
+                                        </Grid>
                                     </Grid>
                                 );
                             })}
@@ -608,7 +697,7 @@ export const ServiceProviders = ({
                                 </ButtonStyle>
                             </Grid>
                             <Grid item>
-                                <ButtonStyle variant="contained" type="submit">
+                                <ButtonStyle variant="contained" type="submit" disabled={serviceProviders.length < 1}>
                                     סיימתי, בוא נמשיך לשלב הבא
                                 </ButtonStyle>
                             </Grid>
@@ -762,7 +851,10 @@ export const ServiceProviders = ({
                                     >
                                         <IconButton
                                             style={{marginRight: "-1.2rem"}}
-                                            onClick={() => setAdditionalHoursOpen(true)}
+                                            onClick={() => {
+                                                rootState?.setError("");
+                                                setAdditionalHoursOpen(true)
+                                            }}
                                         >
                                             <img src={AddIcon} alt="הוספת זמנים לנותן שירות"/>{" "}
                                         </IconButton>
@@ -851,7 +943,10 @@ export const ServiceProviders = ({
                                 <Grid item>
                                     <Button
                                         variant="text"
-                                        onClick={() => setShowMobileView(true)}
+                                        onClick={() => {
+                                            setShowMobileView(true);
+                                            rootState?.setError('');
+                                        }}
                                     >
                                         לצפיה בנותני שירות שכבר הוספת
                                     </Button>
@@ -865,7 +960,9 @@ export const ServiceProviders = ({
                             alignItems="center"
                             style={{marginTop: "2rem", paddingBottom: "4rem"}}
                         >
-                            <ContinueButton variant="contained" onClick={handleAddProvider}>
+                            <ContinueButton
+                                variant="contained"
+                                onClick={handleAddProvider}>
                                 הוספה
                             </ContinueButton>
                         </Grid>

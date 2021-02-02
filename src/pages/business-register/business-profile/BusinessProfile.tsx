@@ -8,6 +8,7 @@ import useFetch from "use-http";
 import {emailPattern, phoneNumberPattern} from "../../../utils/patterns";
 import rootContext from "../../../context/root/rootContext";
 import {Alert} from "@material-ui/lab";
+import {Loader} from '../../../animations';
 
 interface BusinessProfileProps extends CurrentStep {
     initialBusinessProfileData?: any;
@@ -29,6 +30,9 @@ export const BusinessProfile = ({
     const rootState = useContext(rootContext);
 
     const onSubmit = async (formData: any) => {
+        rootState?.setLoader(<Loader />);
+        rootState?.setLoaderTitle('');
+
         await post("/business/upsert", {
             email: formData.business_email.trim(),
             phone: formData.business_phone.trim(),

@@ -81,7 +81,9 @@ export const AdminPanel = () => {
     }
   };
 
-  return <AdminPanelContainer>{renderScreen()}</AdminPanelContainer>;
+  return <AdminPanelContainer>
+    {renderScreen()}
+  </AdminPanelContainer>;
 };
 
 export default AdminPanel;
