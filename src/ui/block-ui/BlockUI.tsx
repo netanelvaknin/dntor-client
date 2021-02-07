@@ -1,4 +1,4 @@
-import { BlockUIContainer, Overlay, MessageContainer } from "./BlockUIStyle";
+import { BlockUIContainer, Overlay, MessageContainer, Title } from "./BlockUIStyle";
 
 interface BlockUIProps {
   blocking: boolean | undefined;
@@ -16,7 +16,7 @@ export const BlockUI = ({ blocking, title = "", children, loader }: BlockUIProps
         <Overlay />
         <MessageContainer>
           <div className="block-ui-message">
-            <h1>{title}</h1>
+            <Title>{title}</Title>
             {loader}
             {children}
           </div>

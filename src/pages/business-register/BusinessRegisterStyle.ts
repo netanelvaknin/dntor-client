@@ -80,7 +80,7 @@ export const ArrowRightButton = styled(IconButton)`
 
 export const ContinueButtonStyle = styled(Button)`
     width: 28rem;
-    height: 3rem;
+    height: 3.5rem;
 `;
 
 export const useDialogStyles = makeStyles({

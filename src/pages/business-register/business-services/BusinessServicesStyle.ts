@@ -67,5 +67,5 @@ export const ServiceText = styled.span`
 export const MobileAddButton = styled(Button)`
     padding: 1.5rem;
     width: 28rem;
-    height: 3rem;
+    height: 3.5rem;
 `;

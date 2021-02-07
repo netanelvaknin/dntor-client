@@ -3,5 +3,5 @@ import { Button } from "../.../../../../../ui/index";
 
 export const SaveHoursButton = styled(Button)`
     width: 25rem;
-    height: 3rem;
+    height: 3.5rem;
 `;

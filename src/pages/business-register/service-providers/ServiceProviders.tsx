@@ -110,7 +110,7 @@ export const ServiceProviders = ({
     const isSmallScreen = useSmallScreen();
 
     const onSubmit = async () => {
-        rootState?.setLoader(<Loader />);
+        rootState?.setLoader(<Loader/>);
         const finalServiceProviders: any = [];
         const serviceProvidersCopy = [...serviceProviders];
 
@@ -234,7 +234,7 @@ export const ServiceProviders = ({
 
     const handleSaveDaysAndHours = () => {
         // Setup breaks array
-        const breaks = [];
+        const breaks: any = [];
 
         const workStartTime = moment(startWorking, "hh:mm");
         const workEndTime = moment(endWorking, "hh:mm");
@@ -245,23 +245,31 @@ export const ServiceProviders = ({
             workTimesError = "זמן התחלה גדול מזמן סיום";
         }
 
-        const startBreakOneTime = moment(startBreakOne, "hh:mm"), endBreakOneTime = moment(endBreakOne, "hh:mm"),
-            startBreakTwoTime = moment(startBreakTwo, "hh:mm"), endBreakTwoTime = moment(endBreakTwo, "hh:mm"),
-            startBreakThreeTime = moment(startBreakThree, "hh:mm"), endBreakThreeTime = moment(endBreakThree, "hh:mm"),
-            isStartBreakOneValid =
-                startBreakOneTime.isBetween(workStartTime, workEndTime) &&
-                startBreakOneTime.isAfter(workStartTime) &&
-                startBreakOneTime.isBefore(endBreakOneTime), isEndBreakOneValid =
+        const startBreakOneTime = moment(startBreakOne, "hh:mm");
+        const endBreakOneTime = moment(endBreakOne, "hh:mm");
+        const startBreakTwoTime = moment(startBreakTwo, "hh:mm");
+        const endBreakTwoTime = moment(endBreakTwo, "hh:mm");
+        const startBreakThreeTime = moment(startBreakThree, "hh:mm");
+        const endBreakThreeTime = moment(endBreakThree, "hh:mm");
+        const isStartBreakOneValid =
+            startBreakOneTime.isBetween(workStartTime, workEndTime) &&
+            startBreakOneTime.isAfter(workStartTime) &&
+            startBreakOneTime.isBefore(endBreakOneTime);
+        const isEndBreakOneValid =
             endBreakOneTime.isBetween(workStartTime, workEndTime) &&
-            endBreakOneTime.isBefore(workEndTime), isStartBreakTwoValid =
+            endBreakOneTime.isBefore(workEndTime);
+        const isStartBreakTwoValid =
             startBreakTwoTime.isBetween(workStartTime, workEndTime) &&
             startBreakTwoTime.isAfter(workStartTime) &&
-            startBreakTwoTime.isBefore(endBreakTwoTime), isEndBreakTwoValid =
+            startBreakTwoTime.isBefore(endBreakTwoTime);
+        const isEndBreakTwoValid =
             endBreakTwoTime.isBetween(workStartTime, workEndTime) &&
-            endBreakTwoTime.isBefore(workEndTime), isStartBreakThreeValid =
+            endBreakTwoTime.isBefore(workEndTime);
+        const isStartBreakThreeValid =
             startBreakThreeTime.isBetween(workStartTime, workEndTime) &&
             startBreakThreeTime.isAfter(workStartTime) &&
-            startBreakThreeTime.isBefore(endBreakThreeTime), isEndBreakThreeValid =
+            startBreakThreeTime.isBefore(endBreakThreeTime);
+        const isEndBreakThreeValid =
             endBreakThreeTime.isBetween(workStartTime, workEndTime) &&
             endBreakThreeTime.isBefore(workEndTime);
 
@@ -299,7 +307,7 @@ export const ServiceProviders = ({
             const currentProviderDataCopy = JSON.stringify(currentProviderData);
 
             // Include only the days that selected and unique for each card
-            const selectedDaysNames = [];
+            const selectedDaysNames: any = [];
             sunday.selected && !sunday.disabled && !currentProviderDataCopy.includes("sunday") && selectedDaysNames.push("sunday");
             monday.selected && !currentProviderDataCopy.includes("monday") && selectedDaysNames.push("monday");
             tuesday.selected && !currentProviderDataCopy.includes("tuesday") && selectedDaysNames.push("tuesday");
@@ -308,34 +316,78 @@ export const ServiceProviders = ({
             friday.selected && !currentProviderDataCopy.includes("friday") && selectedDaysNames.push("friday");
             saturday.selected && !currentProviderDataCopy.includes("saturday") && selectedDaysNames.push("saturday");
 
-            // Disabled the selected days
-            sunday.selected && setSunday({...sunday, disabled: true});
-            monday.selected && setMonday({...monday, disabled: true});
-            tuesday.selected && setTuesday({...tuesday, disabled: true});
-            wednesday.selected && setWednesday({...wednesday, disabled: true});
-            thursday.selected && setThursday({...thursday, disabled: true});
-            friday.selected && setFriday({...friday, disabled: true});
-            saturday.selected && setSaturday({...saturday, disabled: true});
+            // collect all initial working days from the current business
+            const days = initialWorkingHours.map((workingHours: any) => {
+                return workingHours.days;
+            });
 
-            if (selectedDaysNames.length > 0) {
-                setCurrentProviderData([
-                    ...currentProviderData, {
-                        days: selectedDaysNames,
-                        workingHours: {
-                            from: startWorking,
-                            to: endWorking,
-                        },
-                        breaks,
-                    }]);
+            const businessDays = days.flat();
 
-                // Reset and close
-                setShowBreakOne(false);
-                setShowBreakTwo(false);
-                setShowBreakThree(false);
-                setAdditionalHoursOpen(false);
-                rootState?.setError("");
+            // Check if one of the selected days inside the checkbox is exist in initial working hours from step 2
+            if (
+                (sunday.selected && !businessDays.includes('sunday')) ||
+                (monday.selected && !businessDays.includes('monday')) ||
+                (tuesday.selected && !businessDays.includes('tuesday')) ||
+                (wednesday.selected && !businessDays.includes('wednesday')) ||
+                (thursday.selected && !businessDays.includes('thursday')) ||
+                (friday.selected && !businessDays.includes('friday')) ||
+                (saturday.selected && !businessDays.includes('saturday'))
+            ) {
+                rootState?.setError('בחרת בימים שבהם העסק סגור. אם אחד מנותני השירות עובד בשעות אחרות יש לחזור לשלב "שעות פעילות" ולשנות שם את ימי הפעילות.')
             } else {
-                rootState?.setError('נא לוודא שסימנת ימים ושעות פעילות חדשים');
+                rootState?.setError('');
+
+                const isValidWorkTimes = initialWorkingHours.every((workingHours: any) => {
+                    const hours = workingHours.workingHours;
+
+                    return workingHours.days.every((day: string) => {
+                        const dayIncluded = selectedDaysNames.includes(day);
+
+                        if (dayIncluded) {
+                            const initialWorkStart = moment(hours.from, "hh:mm");
+                            const initialWorkEnd = moment(hours.to, "hh:mm");
+                            const startTimeValid = workStartTime.isBetween(initialWorkStart, initialWorkEnd) || workStartTime.isSame(initialWorkStart);
+                            const endTimeValid = workEndTime.isBetween(initialWorkStart, initialWorkEnd) || workEndTime.isSame(initialWorkEnd);
+                            return startTimeValid && endTimeValid;
+                        }
+
+                        return true;
+                    });
+                });
+
+                if (isValidWorkTimes) {
+                    // Disabled the selected days
+                    sunday.selected && setSunday({...sunday, disabled: true});
+                    monday.selected && setMonday({...monday, disabled: true});
+                    tuesday.selected && setTuesday({...tuesday, disabled: true});
+                    wednesday.selected && setWednesday({...wednesday, disabled: true});
+                    thursday.selected && setThursday({...thursday, disabled: true});
+                    friday.selected && setFriday({...friday, disabled: true});
+                    saturday.selected && setSaturday({...saturday, disabled: true});
+
+                    if (selectedDaysNames.length > 0) {
+                        setCurrentProviderData([
+                            ...currentProviderData, {
+                                days: selectedDaysNames,
+                                workingHours: {
+                                    from: startWorking,
+                                    to: endWorking,
+                                },
+                                breaks,
+                            }]);
+
+                        // Reset and close
+                        setShowBreakOne(false);
+                        setShowBreakTwo(false);
+                        setShowBreakThree(false);
+                        setAdditionalHoursOpen(false);
+                        rootState?.setError("");
+                    }
+                } else {
+                    rootState?.setError('רק רגע ! בחרת ימים ושעות שלא תואמות לשעות העסק. נא לוודא שהשעות שבחרת מתאימות עבור כל אחד מהימים.')
+                }
+
+
             }
         } else if (breaksError) {
             rootState?.setError(breaksError);
@@ -535,7 +587,7 @@ export const ServiceProviders = ({
         setServiceProviders(serviceProvidersCopy);
 
         if (spId) {
-            rootState?.setLoader(<Delete />);
+            rootState?.setLoader(<Delete/>);
             post("/serviceProvider/remove", {spId})
         }
     }
@@ -653,6 +705,17 @@ export const ServiceProviders = ({
                                                                     key={dayIndex}>{day.days.map((day: string) => day + ' ')}</span>
                                                             })
                                                         })}</p>
+                                                    </div>
+
+                                                    <div style={{marginTop: '1.5rem'}}>
+                                                        <strong>שעות עבודה</strong>
+                                                        <ul style={{listStylePosition: 'inside'}}>{serviceProvider.workTimes.map((workTime: any) => {
+                                                            return workTime.days.map((day: any, dayIndex: number) => {
+                                                                return <li key={dayIndex}>
+                                                                    {day.workingHours.from} - {day.workingHours.to}
+                                                                </li>
+                                                            });
+                                                        })}</ul>
                                                     </div>
 
                                                     <div style={{marginTop: '1.5rem'}}>

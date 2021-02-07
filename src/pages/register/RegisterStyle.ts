@@ -42,7 +42,7 @@ export const RegisterButton = styled(Button)`
     &.MuiButtonBase-root {
         margin-top: 3rem;
         width: 28rem;
-        height: 3rem;
+        height: 3.5rem;
 
         &.MuiButtonBase-root {
             @media ${mobile} {

@@ -1,6 +1,6 @@
 import {Dialog} from "@material-ui/core";
 import React, {lazy, useContext, useEffect, useState} from "react";
-// import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import {useLastLocation} from "react-router-last-location";
 import useFetch from "use-http";
 import arrowRight from "../../assets/icons/arrow-right.svg";
@@ -42,12 +42,12 @@ export interface CurrentStep {
 export const BusinessRegister = () => {
     const rootState = useContext(rootContext);
     const businessRegisterState = useContext(businessRegisterContext);
-    const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+    const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(4);
     const [, setState] = useState({});
     const [showMobileView, setShowMobileView] = useState(false);
     const [open, setOpen] = useState(false);
     const {get, response} = useFetch();
-    // const history = useHistory();
+    const history = useHistory();
     const lastLocation = useLastLocation();
     const classes = useDialogStyles();
 
@@ -130,9 +130,10 @@ export const BusinessRegister = () => {
             businessRegisterState?.businessData?.res?.name &&
             businessRegisterState?.servicesData?.res?.services?.length > 0 &&
             businessRegisterState?.workTimesData?.res?.days?.length > 0 &&
+            businessRegisterState?.serviceProvidersData?.res.length > 0 &&
             !businessRegisterState.fetchedOnce
         ) {
-            // history.push("/admin-panel");
+            history.push("/admin-panel");
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

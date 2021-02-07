@@ -13,19 +13,15 @@ import { ToText, BreakButton } from "../../working-hours/WorkingHoursStyle";
 import { Delete } from "@material-ui/icons";
 import { DayCheckbox } from "../../working-hours/WorkingHoursStyle";
 import { AdditionalHoursModalProps } from "./AdditionalHoursModalInterface";
-import { useSmallScreen } from "../../../../hooks/index";
 import { Transition } from "../ServiceProviders";
 import rootContext from "../../../../context/root/rootContext";
 import { Alert } from "@material-ui/lab";
 
 const useDialogStyles = makeStyles({
   paper: {
-    width: "55rem",
-    height: "70rem",
     position: "relative",
     padding: "4rem 2rem 2rem",
     "@media (max-width: 767px)": {
-      height: "100%",
       padding: "6rem 1rem 2rem",
     },
   },
@@ -74,14 +70,13 @@ export const AdditionalHoursModal = ({
   handleSaveDaysAndHours,
 }: AdditionalHoursModalProps) => {
   const classes = useDialogStyles();
-  const isSmallScreen = useSmallScreen();
   const rootState = useContext(rootContext);
 
   return (
     <Dialog
       open={open}
       classes={{ paper: classes.paper }}
-      fullScreen={isSmallScreen}
+      fullScreen
       TransitionComponent={Transition}
     >
       <IconButton

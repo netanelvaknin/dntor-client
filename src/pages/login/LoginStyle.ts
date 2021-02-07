@@ -67,7 +67,7 @@ export const TextFieldStyle = styled(TextField)`
 
 export const ConnectButton = styled(Button)`
     width: 28rem;
-    height: 3rem;
+    height: 3.5rem;
 
     &.MuiButtonBase-root {
         @media ${mobile} {

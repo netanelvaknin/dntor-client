@@ -35,3 +35,9 @@ export const MessageContainer = styled.div`
   transform: translateY(-50%);
   z-index: 10001;
 `;
+
+export const Title = styled.h1`
+  font-size: 4rem;
+  margin-bottom: 4rem;
+  color: ${props => props.theme.palette.primary.main};
+`

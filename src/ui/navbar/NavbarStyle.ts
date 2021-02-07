@@ -27,7 +27,7 @@ export const NavbarStyle = styled.nav<NavbarStyleProps>`
 `;
 
 export const ConnectAndRegisterButton = styled(Button)`
-    height: 4rem;
+    height: 3.5rem;
     min-width: 12rem;
 
     @media ${mobile} {

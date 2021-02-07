@@ -38,9 +38,9 @@ export const Register = () => {
     const passwordsMatch = password === validatePassword;
 
     useEffect(() => {
-        rootState?.setLoaderTitle('מתחילים להטיס לך את העסק !')
+        rootState?.setLoaderTitle('בוא נטיס לך את העסק !')
         rootState?.setLoader(<Rocket />);
-    }, [rootState]);
+    }, []);
 
     const onSubmit = async (formData: any) => {
         await post("/user/signup", {

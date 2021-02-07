@@ -12,7 +12,7 @@ export const useDialogStyles = makeStyles({
 
 export const DialogContinueButton = styled(Button)`
     width: 20rem;
-    height: 5rem;   
+    height: 3.5rem;   
 `;
 
 export const DialogContentText = styled.p`
@@ -22,7 +22,7 @@ export const DialogContentText = styled.p`
 
 export const ContinueButton = styled(Button)`
     width: 28rem;
-    height: 3rem;
+    height: 3.5rem;
 `;
 
 export const ServiceCheckboxStyle = styled(Checkbox)`
@@ -81,7 +81,7 @@ export const ConfirmationDialogSecondaryHeading = styled(ConfirmationDialogHeadi
 
 export const ConfirmationActionButton = styled(Button)`
     width: 24rem;
-    height: 3rem;
+    height: 3.5rem;
 `;
 
 export const useConfirmationDialogStyles = makeStyles({
@@ -103,7 +103,7 @@ export const SummaryProviderCard = styled(Card)`
 `;
 
 export const ButtonStyle = styled(Button)`
-    height: 3rem;
+    height: 3.5rem;
     width: 26rem;
     margin: 1rem;
 `;
