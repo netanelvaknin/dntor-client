@@ -29,6 +29,7 @@ export const HoursSetupHeading = styled(Typography)`
 `;
 
 export const ToText = styled.span`
+  font-weight: bold;
   @media ${tablet} {
     margin: 0 1rem;
   }

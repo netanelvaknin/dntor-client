@@ -5,23 +5,18 @@ import rootContext from "../context/root/rootContext";
 import ProtectedRoute from "../framework/ProtectedRoute";
 import {BlockUI, Navbar} from "../ui/index";
 
+// pages
+import LandingPage from "../pages/landing-page/LandingPage";
 const Login = lazy(() => import("../pages/login/Login"));
-const LandingPage = lazy(() => import("../pages/landing-page/LandingPage"));
-
 const Register = lazy(() => import("../pages/register/Register"));
-const BusinessRegister = lazy(() =>
-    import("../pages/business-register/BusinessRegister")
-);
+const BusinessRegister = lazy(() => import("../pages/business-register/BusinessRegister"));
 const AdminPanel = lazy(() => import("../pages/admin-panel/AdminPanel"));
 
 const App = () => {
     const rootState = useContext(rootContext);
 
     const publicRoutes = [
-        {
-            path: "/",
-            component: <LandingPage/>,
-        },
+        {path: "/", component: <LandingPage/>},
         {path: "/login", component: <Login/>},
         {path: "/register", component: <Register/>},
     ];

@@ -44,8 +44,7 @@ export const AppointmentsLog = () => {
                                         <HourText>08:00-09:00</HourText>
                                         <span>דור כהן</span>
                                     </div>
-                                }
-                            >
+                                }>
                                 <div style={{display: "flex", flexDirection: "column"}}>
                                     <span>052-4835373</span>
                                     <div>
@@ -55,14 +54,33 @@ export const AppointmentsLog = () => {
 
                                     <div>
                                         <span style={{fontWeight: "bold"}}>הערות: </span>
-                                        <span>
-                      יש לי עור מאוד רגיש אשמח אם לא תשתמשו בככה וככה וככה
-                    </span>
+                                        <span>יש לי עור מאוד רגיש אשמח אם לא תשתמשו בככה וככה וככה</span>
                                     </div>
                                 </div>
                             </Card>
 
                             <br/>
+                            <Card
+                                expandable
+                                cardTitle={
+                                    <div style={{display: "flex", flexDirection: "column"}}>
+                                        <HourText>08:00-09:00</HourText>
+                                        <span>דור כהן</span>
+                                    </div>
+                                }>
+                                <div style={{display: "flex", flexDirection: "column"}}>
+                                    <span>052-4835373</span>
+                                    <div>
+                                        <span style={{fontWeight: "bold"}}>שירות: </span>
+                                        <span>תספורת גברים מיוחדת מאוד מאוד מאוד</span>
+                                    </div>
+
+                                    <div>
+                                        <span style={{fontWeight: "bold"}}>הערות: </span>
+                                        <span>יש לי עור מאוד רגיש אשמח אם לא תשתמשו בככה וככה וככה</span>
+                                    </div>
+                                </div>
+                            </Card>
                         </DayColumn>
                     </DaysContainer>
                 )}

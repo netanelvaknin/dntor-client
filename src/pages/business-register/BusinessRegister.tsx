@@ -1,6 +1,6 @@
 import {Dialog} from "@material-ui/core";
 import React, {lazy, useContext, useEffect, useState} from "react";
-import { useHistory } from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import {useLastLocation} from "react-router-last-location";
 import useFetch from "use-http";
 import arrowRight from "../../assets/icons/arrow-right.svg";
@@ -41,8 +41,8 @@ export interface CurrentStep {
 
 export const BusinessRegister = () => {
     const rootState = useContext(rootContext);
-    const businessRegisterState = useContext(businessRegisterContext);
-    const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(4);
+    const businessRegisterState: any = useContext(businessRegisterContext);
+    const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
     const [, setState] = useState({});
     const [showMobileView, setShowMobileView] = useState(false);
     const [open, setOpen] = useState(false);
@@ -74,25 +74,25 @@ export const BusinessRegister = () => {
     async function getBusinessData() {
         const data = await get("/business");
         if (response.ok)
-            businessRegisterState && businessRegisterState.setBusinessData(data);
+            businessRegisterState?.setBusinessData(data);
     }
 
     async function getWorkTimesData() {
         const data = await get("business/businessWorkTimes");
         if (response.ok)
-            businessRegisterState && businessRegisterState.setWorkTimesData(data);
+            businessRegisterState?.setWorkTimesData(data);
     }
 
     async function getServicesData() {
         const data = await get("/business/services");
         if (response.ok)
-            businessRegisterState && businessRegisterState.setServicesData(data);
+            businessRegisterState?.setServicesData(data);
     }
 
     async function getServicesProviderData() {
         const data = await get("/serviceProvider/getAll");
         if (response.ok)
-            businessRegisterState && businessRegisterState.setServiceProvidersData(data);
+            businessRegisterState?.setServiceProvidersData(data);
     }
 
     const getAllData = () => {
@@ -154,9 +154,7 @@ export const BusinessRegister = () => {
             stepName: "פרופיל העסק",
             component: (
                 <BusinessProfile
-                    initialBusinessProfileData={
-                        businessRegisterState && businessRegisterState.businessData
-                    }
+                    initialBusinessProfileData={businessRegisterState?.businessData}
                     setCurrentStep={setCurrentStep}
                 />
             ),
@@ -166,9 +164,7 @@ export const BusinessRegister = () => {
             stepName: "שעות פעילות",
             component: (
                 <WorkingHours
-                    initialWorkTimesData={
-                        businessRegisterState && businessRegisterState.workTimesData
-                    }
+                    initialWorkTimesData={businessRegisterState?.workTimesData}
                     setCurrentStep={setCurrentStep}
                     showMobileView={showMobileView}
                     setShowMobileView={setShowMobileView}
@@ -181,9 +177,7 @@ export const BusinessRegister = () => {
             stepName: "הגדרת שירות",
             component: (
                 <BusinessServices
-                    initialServicesData={
-                        businessRegisterState && businessRegisterState.servicesData
-                    }
+                    initialServicesData={businessRegisterState?.servicesData}
                     setCurrentStep={setCurrentStep}
                     showMobileView={showMobileView}
                     setShowMobileView={setShowMobileView}
@@ -198,9 +192,9 @@ export const BusinessRegister = () => {
                     showMobileView={showMobileView}
                     setShowMobileView={setShowMobileView}
                     setCurrentStep={setCurrentStep}
-                    initialServiceProvidersData={businessRegisterState && businessRegisterState.serviceProvidersData}
-                    initialServicesData={businessRegisterState && businessRegisterState.servicesData}
-                    businessWorkingHours={businessRegisterState && businessRegisterState.workTimesData}
+                    initialServiceProvidersData={businessRegisterState?.serviceProvidersData}
+                    initialServicesData={businessRegisterState?.servicesData}
+                    businessWorkingHours={businessRegisterState?.workTimesData}
                 />
             ),
         },
@@ -216,7 +210,7 @@ export const BusinessRegister = () => {
         if (showMobileView) {
             setShowMobileView(false);
         } else if (currentStep >= 2) {
-            businessRegisterState && businessRegisterState.setFechedOnce(true);
+            businessRegisterState?.setFechedOnce(true);
             getDataByStep();
 
             // @ts-ignore

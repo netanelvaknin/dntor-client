@@ -57,10 +57,6 @@ export const TextField = ({
           inputRef={inputRef}
           placeholder={placeholder}
           className={className}
-          // do not change the 'new-password' below
-          // Will prevent autofilling on inputs with type text according to:
-          // https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion
-          autoComplete="new-password"
           classes={{ root: classes.root }}
           InputProps={{
             startAdornment: startAdornment,

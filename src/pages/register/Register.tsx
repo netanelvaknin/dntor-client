@@ -40,6 +40,7 @@ export const Register = () => {
     useEffect(() => {
         rootState?.setLoaderTitle('בוא נטיס לך את העסק !')
         rootState?.setLoader(<Rocket />);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onSubmit = async (formData: any) => {
