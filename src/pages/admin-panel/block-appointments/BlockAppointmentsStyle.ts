@@ -1,7 +1,7 @@
 import styled from 'styled-components/macro';
 import {Button, TextField, Card} from '../../../ui';
 import {mobile} from '../../../utils/screen-sizes';
-import {makeStyles} from '@material-ui/core';
+import {makeStyles, Fab} from '@material-ui/core';
 
 export const ScreenWrapper = styled.div`
   max-width: 80%;
@@ -37,7 +37,10 @@ export const BlockedAppointmentsCard = styled(Card)`
 
 export const useDatepickerStyles = makeStyles({
     input: {
-        width: '18rem'
+        width: '26rem',
+        '@media (max-width: 767px)': {
+            width: '18rem'
+        }
     },
     paper: {
         '& .MuiPickersSlideTransition-transitionContainer, & .MuiPickersCalendarHeader-switchHeader': {
@@ -47,3 +50,20 @@ export const useDatepickerStyles = makeStyles({
         }
     }
 });
+
+export const FabStyle = styled(Fab)`
+  &,
+  &:hover,
+  &:active {
+    position: fixed;
+    bottom: 7rem;
+    left: 9rem;
+    background: #fff;
+
+    @media ${mobile} {
+      left: 50%;
+      bottom: 4rem;
+      transform: translateX(-50%);
+    }
+  }
+`;

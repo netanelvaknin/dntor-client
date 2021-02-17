@@ -15,6 +15,7 @@ export const AdminPanel = () => {
 
     useEffect(function resetActiveNavItem() {
         adminPanelState?.setActiveNavItem('יומן תורים');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {

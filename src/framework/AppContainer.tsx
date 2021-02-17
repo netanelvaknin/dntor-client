@@ -16,8 +16,10 @@ import HttpProvider from "./HttpProvider";
 import {CookiesProvider} from "react-cookie";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {LastLocationProvider} from "react-router-last-location";
+import 'moment-timezone';
 
 moment.locale("he");
+moment.tz('Asia/Jerusalem');
 
 const AppContainer = (props: any) => {
     // Configure JSS

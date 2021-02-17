@@ -1,15 +1,17 @@
-import {useState, useEffect, Fragment} from "react";
+import React, {useState, useEffect, Fragment, useContext} from "react";
 import {
     BlockAppointmentsContainer,
     BlockButton,
     CauseField,
     BlockedAppointmentsCard,
     ScreenWrapper,
-    useDatepickerStyles
+    useDatepickerStyles,
+    FabStyle
 } from './BlockAppointmentsStyle';
-import {TimePickerSelector} from '../../../ui';
+import {TimePickerSelector, Checkbox} from '../../../ui';
+import rootContext from "../../../context/root/rootContext";
 import {Controller, useForm} from 'react-hook-form';
-import {Checkbox, FormControlLabel, Grid, IconButton} from "@material-ui/core";
+import {Checkbox as MatCheckbox, FormControlLabel, Grid, IconButton} from "@material-ui/core";
 import {DatePicker} from "@material-ui/pickers";
 import {ToText} from "../../business-register/working-hours/WorkingHoursStyle";
 import {ReactComponent as CheckboxCircle} from "../../../assets/icons/checkbox_circle.svg";
@@ -18,18 +20,22 @@ import {useCheckboxStyles} from "../../../ui/checkbox/CheckboxStyle";
 import useFetch from 'use-http';
 import moment from 'moment';
 import cancelBlockingIcon from '../../../assets/icons/cancel_blocking.svg';
-import {useSmallScreen} from "../../../hooks";
+import arrowIcon from '../../../assets/icons/arrow_up.svg';
+import {useScroll, useSmallScreen} from "../../../hooks";
+import {Alert} from "@material-ui/lab";
 
 interface BlockAppointmentsProps {
     serviceProviderData?: any;
 }
 
 export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps) => {
+    const rootState = useContext(rootContext);
+    const [providers, setProviders] = useState<any>([]);
     const [businessBlockedAppointments, setBusinessBlockedAppointments] = useState<any>([]);
-    const [providersBlockedAppointments, setProvidersBlockedAppointments] = useState<any>([]);
+    const [providersBlockedAppointments, setProvidersBlockedAppointments] = useState<any>([...serviceProviderData]);
     const [startBlockHour, setStartBlockHour] = useState(moment().format('08:00'));
     const [endBlockHour, setEndBlockHour] = useState('18:00');
-    const {post, get, response} = useFetch();
+    const {post, get, request, response} = useFetch();
     const {handleSubmit, register, control, reset, errors} = useForm({
         defaultValues: {
             all_providers: false,
@@ -43,9 +49,19 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
     const isSmallScreen = useSmallScreen();
     const datepickerClasses = useDatepickerStyles();
     const classes = useCheckboxStyles();
+    const scrollPosition = useScroll();
+    const scrolledToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
 
+    const handleProvidersChange = (index: number) => {
+        const providersCopy = [...providers];
+        providersCopy[index].selected = !providersCopy[index].selected;
+
+        setProviders(providersCopy);
+    };
 
     const obSubmit = async (values: any) => {
+        const now = moment();
+
         // Append hours to the start & end date
         const fromDate = moment(values.fromDate);
         const toDate = moment(values.toDate);
@@ -56,181 +72,262 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
         const hoursEndBlock = endBlockHour.split(':')[0];
         const minutesEndBlock = endBlockHour.split(':')[1];
 
-        fromDate.set('hour', Number(hoursStartBlock));
-        fromDate.set('minute', Number(minutesStartBlock));
-
-        toDate.set('hour', Number(hoursEndBlock));
-        toDate.set('minute', Number(minutesEndBlock));
-
-        const now = moment();
-
+        fromDate.set({h: Number(hoursStartBlock), m: Number(minutesStartBlock)})
+        toDate.set({h: Number(hoursEndBlock), m: Number(minutesEndBlock)});
+        const duration = moment.duration(toDate.diff(fromDate)).asMinutes();
         if (fromDate.isAfter(now) && toDate.isAfter(now) && toDate.isAfter(fromDate)) {
-            const providersIds = serviceProviderData.map((serviceProvider: any) => {
-                return serviceProvider._id;
-            });
+            if (duration > 20) {
+                // Check if at least one provider selected
+                const selectedProviders = providers.filter((provider: any) => {
+                    if (provider.selected) {
+                        return provider;
+                    }
 
-            // Check if at least one provider selected
-            const selectedProviders: object[] = [];
-            Object.entries(values).forEach(([key, value]) => {
-                if ((providersIds.includes(key) && value) || (key === 'all_providers' && value)) {
-                    selectedProviders.push({id: key, value});
-                }
-            });
-
-            const allProvidersSelected = selectedProviders.find((provider: any) => {
-                return provider.id === 'all_providers';
-            })
-
-            // Group data and send
-            const data = {
-                fromDate,
-                toDate,
-                cause: values.cause
-            }
-
-            if (selectedProviders.length > 0) {
-                if (allProvidersSelected) {
-                    await post('/business/insertBlockWorkTime', data);
-                    setBusinessBlockedAppointments([...businessBlockedAppointments, data]);
-                } else {
-                    const providersIds: any = [];
-                    selectedProviders.forEach((provider: any) => {
-                        providersIds.push(provider.id);
-                    })
-
-                    const updatedData: any = [];
-                    providersIds.forEach((id: string) => {
-
-                        const providerAlreadyHasBlockedApp = providersBlockedAppointments.find((providerBlocked: any) => {
-                            return providerBlocked._id === id;
-                        });
-
-                        if (providerAlreadyHasBlockedApp) {
-                            return providersBlockedAppointments.forEach((provider: any) => {
-                                if (provider._id === id) {
-                                    // Format the data that I get from the server because
-                                    // The keys is different from the keys that I should send
-                                    const blockedWt = provider.blockedWt.map((blockedWt: any) => {
-                                        return {
-                                            cause: blockedWt.cause,
-                                            from: blockedWt.fromDate,
-                                            to: blockedWt.toDate
-                                        }
-                                    });
-
-                                    updatedData.push({
-                                        spId: id,
-                                        blockedWt: [...blockedWt, {
-                                            from: fromDate,
-                                            to: toDate,
-                                            cause: values.cause
-                                        }]
-                                    });
-                                }
-                            })
-                        } else {
-                            updatedData.push({
-                                spId: id,
-                                blockedWt: [{
-                                    from: fromDate,
-                                    to: toDate,
-                                    cause: values.cause
-                                }]
-                            });
-                        }
-
-                    });
-
-                    const formattedCurrentData: any = [];
-                    providersBlockedAppointments.forEach((provider: any) => {
-                        provider.blockedWt.map((blockedWt: any) => {
-                            formattedCurrentData.push({
-                                spId: provider._id,
-                                blockedWt: [{
-                                    cause: blockedWt.cause,
-                                    from: blockedWt.fromDate,
-                                    to: blockedWt.toDate
-                                }]
-                            })
-                        });
-                    });
-
-                    await post('/serviceProvider/update', [...formattedCurrentData, ...updatedData]);
-
-                    const formattedUpdatedData: any = [];
-                    updatedData.forEach((obj: any) => {
-                        obj.blockedWt.map((blockedWt: any) => {
-                            formattedUpdatedData.push({
-                                _id: obj.spId,
-                                blockedWt: [{
-                                    fromDate: blockedWt.from,
-                                    toDate: blockedWt.to,
-                                    cause: blockedWt.cause
-                                }]
-                            })
-                        });
-                    });
-
-                    const finalProviders: any = [];
-                    formattedUpdatedData.forEach((obj: any) => {
-                        providersBlockedAppointments.map((provider: any) => {
-                            if (provider._id === obj._id) {
-                                finalProviders.push({
-                                    fullName: provider.fullName,
-                                    ...obj
-                                })
-                            }
-                        })
-                    });
-
-                    setProvidersBlockedAppointments([...providersBlockedAppointments, ...finalProviders]);
-                }
-
-                if (response.ok) {
-                    console.log('great!');
-                }
-
-                reset({
-                    cause: '',
-                    fromDate: new Date(),
-                    toDate: new Date()
+                    return null;
                 });
 
+                // Group data and send
+                const data = {
+                    fromDate,
+                    toDate,
+                    cause: values.cause
+                }
 
-                setAllProviders(false);
-                setStartBlockHour('00:00');
-                setEndBlockHour('00:00');
+                if (selectedProviders.length > 0 || allProviders) {
+                    if (allProviders) {
+                        await post('/business/insertBlockWorkTime', data);
+                        setBusinessBlockedAppointments([...businessBlockedAppointments, data]);
+                    } else {
+                        const providersIds: any = [];
+                        selectedProviders.forEach((provider: any) => {
+                            providersIds.push(provider._id);
+                        });
+
+                        const updatedData: any = [];
+                        providersIds.forEach((id: string) => {
+
+                            const providerAlreadyHasBlockedApp = providersBlockedAppointments.find((providerBlocked: any) => {
+                                return providerBlocked._id === id;
+                            });
+
+                            if (providerAlreadyHasBlockedApp) {
+                                return providersBlockedAppointments.forEach((provider: any) => {
+                                    if (provider._id === id) {
+                                        // Format the data that I get from the server because
+                                        // The keys is different from the keys that I should send
+                                        const blockedWt = provider.blockedWt.map((blockedWt: any) => {
+                                            return {
+                                                cause: blockedWt.cause,
+                                                from: blockedWt.fromDate,
+                                                to: blockedWt.toDate
+                                            }
+                                        });
+
+                                        updatedData.push({
+                                            spId: id,
+                                            blockedWt: [...blockedWt, {
+                                                from: fromDate,
+                                                to: toDate,
+                                                cause: values.cause
+                                            }]
+                                        });
+                                    }
+                                })
+                            } else {
+                                updatedData.push({
+                                    spId: id,
+                                    blockedWt: [{
+                                        from: fromDate,
+                                        to: toDate,
+                                        cause: values.cause
+                                    }]
+                                });
+                            }
+
+                        });
+
+                        const formattedCurrentData: any = [];
+                        providersBlockedAppointments.forEach((provider: any) => {
+                            provider.blockedWt.forEach((blockedWt: any) => {
+                                formattedCurrentData.push({
+                                    spId: provider._id,
+                                    blockedWt: [{
+                                        cause: blockedWt.cause,
+                                        from: blockedWt.fromDate,
+                                        to: blockedWt.toDate
+                                    }]
+                                })
+                            });
+                        });
+
+                        await post('/serviceProvider/update', [...formattedCurrentData, ...updatedData]);
+
+                        const formattedUpdatedData: any = [];
+                        updatedData.forEach((obj: any) => {
+                            obj.blockedWt.forEach((blockedWt: any) => {
+                                formattedUpdatedData.push({
+                                    _id: obj.spId,
+                                    blockedWt: [{
+                                        fromDate: blockedWt.from,
+                                        toDate: blockedWt.to,
+                                        cause: blockedWt.cause
+                                    }]
+                                })
+                            });
+                        });
+
+                        const finalProviders: any = [];
+                        formattedUpdatedData.forEach((obj: any) => {
+                            providersBlockedAppointments.forEach((provider: any) => {
+                                if (provider._id === obj._id) {
+                                    finalProviders.push({
+                                        fullName: provider.fullName,
+                                        ...obj
+                                    })
+                                }
+                            })
+                        });
+
+                        setProvidersBlockedAppointments([...providersBlockedAppointments, ...finalProviders]);
+                    }
+
+                    if (response.ok) {
+                        console.log('great!');
+                    }
+
+                    reset({
+                        cause: '',
+                        fromDate: new Date(),
+                        toDate: new Date()
+                    });
+
+                    const providersCopy = [...providers];
+                    providersCopy.map((provider: any) => {
+                        return (provider.selected = false);
+                    });
+
+                    setAllProviders(false);
+                    setStartBlockHour('08:00');
+                    setEndBlockHour('18:00');
+                    window.scrollTo(0, document.body.scrollHeight);
+                    rootState?.setError('');
+                } else {
+                    rootState?.setError('יש לבחור לפחות נותן שירות שירות אחד')
+                }
             } else {
-                console.log('יש לבחור לפחות נותן שירות שירות אחד')
+                rootState?.setError('נא להזין חסימה שהיא מעל 20 דק');
             }
         } else {
-            console.log('יש לוודא שהשעות והתאריכים שנבחרו הם הגיוניים. אין לבחור תאריכים ושעות שעברו כבר.')
+            rootState?.setError('יש לוודא שהשעות והתאריכים שנבחרו הם הגיוניים. אין לבחור תאריכים ושעות שעברו כבר.');
         }
     };
 
-    const removeBlockedServiceProvider = (blockedWdIdToRemove: any) => {
-        // console.log(id);
-        // const formattedData: any = [];
-        // providersBlockedAppointments.forEach((provider: any) => {
-        //     provider.blockedWt.map((blockedWt: any) => {
-        //         formattedData.push({
-        //             spId: provider._id,
-        //             fullName: provider.fullName,
-        //             blockedWt: [{
-        //                 from: blockedWt.fromDate,
-        //                 to: blockedWt.toDate,
-        //                 cause: blockedWt.cause
-        //             }]
-        //         });
-        //     });
-        // });
+    const removeBlockedServiceProvider = async (providerIdToRemove: string, providerWtId: string) => {
+        const updatedBlockedAppointments: any = [];
 
-        // console.log(formattedData);
+        const providerToRemove = providersBlockedAppointments.find((provider: any) => {
+            return provider._id === providerIdToRemove;
+        });
+
+
+        const WtIdToRemove = providerToRemove.blockedWt.find((blockedWt: any) => {
+            return blockedWt._id === providerWtId && providerToRemove?.hasOwnProperty('services');
+        });
+
+
+        if (WtIdToRemove) {
+            const index = providerToRemove.blockedWt.findIndex((provider: any) => {
+                return provider._id === providerIdToRemove;
+            })
+            providerToRemove.blockedWt.splice(index, 1);
+
+            providersBlockedAppointments.forEach((provider: any) => {
+                if (provider.blockedWt.length > 0) {
+                    provider.blockedWt.forEach((blocked: any) => {
+                        updatedBlockedAppointments.push({
+                            spId: provider._id,
+                            fullname: provider.fullName,
+                            blockedWt: [{
+                                from: blocked.fromDate,
+                                to: blocked.toDate,
+                                cause: blocked.cause
+                            }]
+                        });
+                    });
+                } else {
+                    updatedBlockedAppointments.push({
+                        spId: provider._id,
+                        fullname: provider.fullName,
+                        blockedWt: []
+                    });
+                }
+            });
+
+            await post('/serviceProvider/update', updatedBlockedAppointments);
+
+            if (response.ok) {
+                console.log('removed');
+            }
+        } else {
+            const providersBlockedAppointmentsCopy = [...providersBlockedAppointments];
+            const providerWithoutWtId = providersBlockedAppointmentsCopy.findIndex((provider) => {
+                return provider._id === providerIdToRemove && !provider?.hasOwnProperty('services');
+            });
+
+            providersBlockedAppointmentsCopy.splice(Number(providerWithoutWtId), 1);
+            setProvidersBlockedAppointments(providersBlockedAppointmentsCopy);
+
+            providersBlockedAppointmentsCopy.forEach((provider: any) => {
+                if (provider.blockedWt.length > 0) {
+                    provider.blockedWt.forEach((blocked: any) => {
+                        updatedBlockedAppointments.push({
+                            spId: provider._id,
+                            fullname: provider.fullName,
+                            blockedWt: [{
+                                from: blocked.fromDate,
+                                to: blocked.toDate,
+                                cause: blocked.cause
+                            }]
+                        });
+                    });
+                } else {
+                    updatedBlockedAppointments.push({
+                        spId: provider._id,
+                        fullname: provider.fullName,
+                        blockedWt: []
+                    });
+                }
+            });
+
+            await post('/serviceProvider/update', updatedBlockedAppointments);
+
+            if (response.ok) {
+                console.log('removed');
+            }
+        }
 
     }
 
+    const removeBusinessBlockedHours = async (businessId: string, blockWorkTimeId: string) => {
+        const businessBlockedAppointmentsCopy = [...businessBlockedAppointments];
+        const indexToRemove = businessBlockedAppointmentsCopy.findIndex((blockedAppointment: any) => blockedAppointment._id === blockWorkTimeId);
+        businessBlockedAppointmentsCopy.splice(indexToRemove, 1);
+        setBusinessBlockedAppointments(businessBlockedAppointmentsCopy);
+        await request.delete(`/business/removeBlockWorkTime/${blockWorkTimeId}`);
+        if (response.ok) {
+            console.log('deleted!');
+        }
+    }
+
     useEffect(() => {
-        setProvidersBlockedAppointments([...serviceProviderData]);
+        const initialServiceProviders = serviceProviderData
+        if (initialServiceProviders) {
+            serviceProviderData.forEach((provider: any) => {
+                provider.selected = false;
+            })
+
+            setProviders([...initialServiceProviders])
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -250,7 +347,8 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
     return <BlockAppointmentsContainer>
         <ScreenWrapper>
             <form onSubmit={handleSubmit(obSubmit)}>
-                <h1 style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: '5rem'}}>חסימת תורים</h1>
+                <h1 style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: isSmallScreen ? '2rem' : '5rem'}}>חסימת
+                    תורים</h1>
                 <p>ברצוני לחסום את התורים עבור כל נותני השירות הבאים:</p>
 
                 <Grid container style={{maxWidth: isSmallScreen ? '100%' : '50%', marginTop: '2rem'}}>
@@ -259,7 +357,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                             <FormControlLabel
                                 label="כל נותני השירות"
                                 control={
-                                    <Checkbox
+                                    <MatCheckbox
                                         checked={allProviders}
                                         name="all_providers"
                                         inputRef={register}
@@ -272,22 +370,15 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                         </Grid>
                     )}
 
-
-                    {serviceProviderData.map((serviceProvider: any, ind: number) => {
+                    {providers.map((serviceProvider: any, ind: number) => {
                         return (
                             <Grid item key={ind}>
-                                <FormControlLabel
-                                    label={serviceProvider.fullName}
+                                <Checkbox
                                     name={serviceProvider._id}
-                                    inputRef={register}
-                                    classes={{disabled: classes.disabled}}
                                     disabled={allProviders}
-                                    control={
-                                        <Checkbox
-                                            icon={<CheckboxCircle/>}
-                                            checkedIcon={<CheckboxChecked/>}
-                                        />
-                                    }
+                                    value={serviceProvider.selected}
+                                    label={serviceProvider.fullName}
+                                    onChange={() => handleProvidersChange(ind)}
                                 />
                             </Grid>
                         )
@@ -300,10 +391,11 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                             name="cause"
                             register={register}
                             required
-                            minLength={3}
+                            minLength={6}
                             control={control}
                             error={!!errors.cause}
-                            helperText={errors.cause ? "יש למלא סיבה כלשהי" : <strong>הסיבה לא תוצג ללקוחות</strong>}
+                            helperText={errors.cause ? "יש להזין לפחות 6 תווים" :
+                                <strong>הסיבה לא תוצג ללקוחות</strong>}
                             label="סיבת החסימה (לדוגמא: אירוע, חג וכו')"/>
                     </Grid>
                 </Grid>
@@ -416,7 +508,10 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
 
 
                     <Grid container justify="center"
-                          style={{marginTop: isSmallScreen ? '3.5rem' : '6rem', maxWidth: isSmallScreen ? '100%' : '50%'}}>
+                          style={{
+                              marginTop: isSmallScreen ? '3.5rem' : '6rem',
+                              maxWidth: isSmallScreen ? '100%' : '50%'
+                          }}>
                         <Grid item>
                             <BlockButton variant="contained" type="submit">הוסף חסימה</BlockButton>
                         </Grid>
@@ -424,9 +519,21 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                 </div>
             </form>
 
+            <Grid container justify="center" style={{maxWidth: isSmallScreen ? '100%' : '50%', marginTop: '2rem'}}>
+                <Grid item md={12} xs={12}>
+                    {rootState?.error && (
+                        <Alert
+                            style={{maxWidth: "28rem", margin: "0 auto"}}
+                            severity="error"
+                        >
+                            {rootState?.error}
+                        </Alert>
+                    )}
+                </Grid>
+            </Grid>
+
 
             <div style={{marginBottom: '5rem'}}>
-                <h1 style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: '4rem'}}>תורים חסומים:</h1>
                 {providersBlockedAppointments.map((serviceProvider: any, index: number) => {
                     return (
                         <Fragment key={index}>
@@ -437,7 +544,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                                             container
                                             justify="space-between"
                                             alignItems="center"
-                                            direction={isSmallScreen ? 'column' : 'row'}
+                                            direction="row"
                                             style={{
                                                 minHeight: '10rem',
                                                 padding: '2rem 3rem'
@@ -450,18 +557,22 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                                                 <p style={{marginBottom: '1rem'}}>{blockedWt.cause}</p>
 
                                                 <strong>תורים חסומים החל מ-</strong>
-                                                <p style={{marginBottom: '1rem'}}>{moment(blockedWt.fromDate).format('L')}</p>
+                                                <p>{moment(blockedWt.fromDate).format('L')}</p>
+                                                <p style={{marginBottom: '1rem'}}> בשעה{' '}{moment(blockedWt.fromDate).format('LT')}</p>
 
                                                 <strong>ועד: </strong>
                                                 <p>{moment(blockedWt.toDate).format('L')}</p>
+                                                <p> בשעה{' '}{moment(blockedWt.toDate).format('LT')}</p>
                                             </Grid>
+
 
                                             <Grid item>
                                                 <Grid container direction="column">
-                                                    <IconButton onClick={() => removeBlockedServiceProvider(blockedWt._id)}>
+                                                    <IconButton
+                                                        onClick={() => removeBlockedServiceProvider(serviceProvider._id, blockedWt._id)}>
                                                         <img src={cancelBlockingIcon} alt="ביטול חסימה"/>
                                                     </IconButton>
-                                                    <span style={{maxWidth: '12rem', textAlign: 'center'}}>ביטול חסימה עבור {serviceProvider.fullName}</span>
+                                                    <span>ביטול חסימה</span>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -479,6 +590,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                                 container
                                 justify="space-between"
                                 alignItems="center"
+                                direction="row"
                                 style={{
                                     minHeight: '10rem',
                                     padding: '2rem 3rem'
@@ -489,14 +601,18 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                                     <strong>סיבת החסימה:</strong>
                                     <p style={{marginBottom: '1rem'}}>{businessBlockedAppointment.cause}</p>
                                     <strong>חסום החל מ:</strong>
-                                    <p style={{marginBottom: '1rem'}}>{moment(businessBlockedAppointment.fromDate).format('L')}</p>
+                                    <p>{moment(businessBlockedAppointment.fromDate).format('L')}</p>
+                                    <p style={{marginBottom: '1rem'}}> בשעה{' '}{moment(businessBlockedAppointment.fromDate).format('LT')}</p>
+
                                     <strong>ועד: </strong>
                                     <p>{moment(businessBlockedAppointment.toDate).format('L')}</p>
+                                    <p> בשעה{' '}{moment(businessBlockedAppointment.toDate).format('LT')}</p>
                                 </Grid>
 
                                 <Grid item>
                                     <Grid container direction="column">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => removeBusinessBlockedHours(businessBlockedAppointment.businessId, businessBlockedAppointment._id)}>
                                             <img src={cancelBlockingIcon} alt="ביטול חסימה"/>
                                         </IconButton>
                                         <span>ביטול חסימה</span>
@@ -507,6 +623,20 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                     )
                 })}
             </div>
+
+            {document.body.scrollHeight > 1000 && <FabStyle onClick={() => {
+                scrollPosition > 500 || scrolledToBottom ? window.scrollTo(0, 0) : window.scrollTo(0, document.body.scrollHeight)
+            }}>
+                {scrollPosition > 500 || scrolledToBottom ? (<img src={arrowIcon} alt={"אייקון כיוון גלילה"}/>) : (
+                    <img src={arrowIcon} alt="אייקון כיוון גלילה" style={{transform: 'rotate(180deg)'}}/>
+                )}
+            </FabStyle>}
+
+            {!isSmallScreen && document.body.scrollHeight > 1000 && <span style={{
+                position: 'fixed',
+                left: '3rem',
+                bottom: '3rem'
+            }}>{scrollPosition > 500 || scrolledToBottom ? 'גלילה לחלקו העליון של העמוד' : 'גלילה לחלקו התחתון של העמוד'}</span>}
         </ScreenWrapper>
     </BlockAppointmentsContainer>
 };
