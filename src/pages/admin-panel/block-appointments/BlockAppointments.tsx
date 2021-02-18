@@ -28,6 +28,7 @@ interface BlockAppointmentsProps {
     serviceProviderData?: any;
 }
 
+
 export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps) => {
     const rootState = useContext(rootContext);
     const [providers, setProviders] = useState<any>([]);
@@ -75,6 +76,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
         fromDate.set({h: Number(hoursStartBlock), m: Number(minutesStartBlock)})
         toDate.set({h: Number(hoursEndBlock), m: Number(minutesEndBlock)});
         const duration = moment.duration(toDate.diff(fromDate)).asMinutes();
+
         if (fromDate.isAfter(now) && toDate.isAfter(now) && toDate.isAfter(fromDate)) {
             if (duration > 20) {
                 // Check if at least one provider selected
@@ -96,103 +98,63 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                 if (selectedProviders.length > 0 || allProviders) {
                     if (allProviders) {
                         await post('/business/insertBlockWorkTime', data);
-                        setBusinessBlockedAppointments([...businessBlockedAppointments, data]);
+                        const newBusinessBlockHours = await get('/business/getBlockWorkTime');
+                        setBusinessBlockedAppointments([...newBusinessBlockHours?.res]);
                     } else {
-                        const providersIds: any = [];
-                        selectedProviders.forEach((provider: any) => {
-                            providersIds.push(provider._id);
+                        const providersIds = selectedProviders.map((provider: any) => {
+                            return provider._id;
                         });
 
-                        const updatedData: any = [];
+                        const blocks: any = [];
                         providersIds.forEach((id: string) => {
+                            const provider = providersBlockedAppointments.find((providerB: any) => providerB._id === id);
 
-                            const providerAlreadyHasBlockedApp = providersBlockedAppointments.find((providerBlocked: any) => {
-                                return providerBlocked._id === id;
-                            });
+                            const buildProvider = {
+                                _id: id,
+                                fullName: provider.fullName,
+                                blockedWt: [data]
+                            };
 
-                            if (providerAlreadyHasBlockedApp) {
-                                return providersBlockedAppointments.forEach((provider: any) => {
-                                    if (provider._id === id) {
-                                        // Format the data that I get from the server because
-                                        // The keys is different from the keys that I should send
-                                        const blockedWt = provider.blockedWt.map((blockedWt: any) => {
-                                            return {
-                                                cause: blockedWt.cause,
-                                                from: blockedWt.fromDate,
-                                                to: blockedWt.toDate
-                                            }
-                                        });
+                            blocks.push(buildProvider);
+                        });
 
-                                        updatedData.push({
-                                            spId: id,
-                                            blockedWt: [...blockedWt, {
-                                                from: fromDate,
-                                                to: toDate,
-                                                cause: values.cause
-                                            }]
-                                        });
-                                    }
+                        setProvidersBlockedAppointments([...providersBlockedAppointments, ...blocks]);
+
+                        // Format blocked appointments before sending
+                        const formattedExistingBlocks: any = [];
+                        providersBlockedAppointments.forEach((provider: any) => {
+                            if (provider.blockedWt.length > 0) {
+                                provider.blockedWt.forEach((block: any) => {
+                                    formattedExistingBlocks.push({
+                                        spId: provider._id,
+                                        blockedWt: [{
+                                            from: block.fromDate,
+                                            to: block.toDate,
+                                            cause: block.cause
+                                        }]
+                                    })
                                 })
                             } else {
-                                updatedData.push({
-                                    spId: id,
-                                    blockedWt: [{
-                                        from: fromDate,
-                                        to: toDate,
-                                        cause: values.cause
-                                    }]
-                                });
-                            }
-
-                        });
-
-                        const formattedCurrentData: any = [];
-                        providersBlockedAppointments.forEach((provider: any) => {
-                            provider.blockedWt.forEach((blockedWt: any) => {
-                                formattedCurrentData.push({
+                                formattedExistingBlocks.push({
                                     spId: provider._id,
-                                    blockedWt: [{
-                                        cause: blockedWt.cause,
-                                        from: blockedWt.fromDate,
-                                        to: blockedWt.toDate
-                                    }]
+                                    blockedWt: []
                                 })
-                            });
+                            }
                         });
 
-                        await post('/serviceProvider/update', [...formattedCurrentData, ...updatedData]);
-
-                        const formattedUpdatedData: any = [];
-                        updatedData.forEach((obj: any) => {
-                            obj.blockedWt.forEach((blockedWt: any) => {
-                                formattedUpdatedData.push({
-                                    _id: obj.spId,
-                                    blockedWt: [{
-                                        fromDate: blockedWt.from,
-                                        toDate: blockedWt.to,
-                                        cause: blockedWt.cause
-                                    }]
-                                })
-                            });
-                        });
-
-                        const finalProviders: any = [];
-                        formattedUpdatedData.forEach((obj: any) => {
-                            providersBlockedAppointments.forEach((provider: any) => {
-                                if (provider._id === obj._id) {
-                                    finalProviders.push({
-                                        fullName: provider.fullName,
-                                        ...obj
-                                    })
-                                }
+                        const formattedNewBlocks: any = [];
+                        blocks.forEach((block: any) => {
+                            formattedNewBlocks.push({
+                                spId: block._id,
+                                blockedWt: [{
+                                    from: block.blockedWt[0].fromDate,
+                                    to: block.blockedWt[0].toDate,
+                                    cause: block.blockedWt[0].cause
+                                }]
                             })
                         });
 
-                        setProvidersBlockedAppointments([...providersBlockedAppointments, ...finalProviders]);
-                    }
-
-                    if (response.ok) {
-                        console.log('great!');
+                        await post('/serviceProvider/update', [...formattedNewBlocks, ...formattedExistingBlocks]);
                     }
 
                     reset({
@@ -310,12 +272,14 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
 
     const removeBusinessBlockedHours = async (businessId: string, blockWorkTimeId: string) => {
         const businessBlockedAppointmentsCopy = [...businessBlockedAppointments];
-        const indexToRemove = businessBlockedAppointmentsCopy.findIndex((blockedAppointment: any) => blockedAppointment._id === blockWorkTimeId);
-        businessBlockedAppointmentsCopy.splice(indexToRemove, 1);
-        setBusinessBlockedAppointments(businessBlockedAppointmentsCopy);
-        await request.delete(`/business/removeBlockWorkTime/${blockWorkTimeId}`);
-        if (response.ok) {
-            console.log('deleted!');
+
+        if (blockWorkTimeId) {
+            // Remove the blocked hours anyway from local state
+            const indexToRemove = businessBlockedAppointmentsCopy.findIndex((blockedAppointment: any) => blockedAppointment._id === blockWorkTimeId);
+            businessBlockedAppointmentsCopy.splice(indexToRemove, 1);
+            setBusinessBlockedAppointments(businessBlockedAppointmentsCopy);
+
+            await request.delete(`/business/removeBlockWorkTime/${blockWorkTimeId}`);
         }
     }
 
@@ -328,7 +292,6 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
 
             setProviders([...initialServiceProviders])
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -584,6 +547,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                 })}
 
                 {businessBlockedAppointments.map((businessBlockedAppointment: any, index: number) => {
+                    console.log(businessBlockedAppointment);
                     return (
                         <BlockedAppointmentsCard key={index}>
                             <Grid
@@ -612,7 +576,9 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                                 <Grid item>
                                     <Grid container direction="column">
                                         <IconButton
-                                            onClick={() => removeBusinessBlockedHours(businessBlockedAppointment.businessId, businessBlockedAppointment._id)}>
+                                            onClick={() => {
+                                                removeBusinessBlockedHours(businessBlockedAppointment.businessId, businessBlockedAppointment._id);
+                                            }}>
                                             <img src={cancelBlockingIcon} alt="ביטול חסימה"/>
                                         </IconButton>
                                         <span>ביטול חסימה</span>

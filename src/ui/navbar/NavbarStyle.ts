@@ -11,9 +11,9 @@ export const NavbarStyle = styled.nav<NavbarStyleProps>`
     height: 8.5rem;
     width: 100%;
     background: #fff;
-    box-shadow: ${props => !props.isAdminPanel && '0px 4px 4px rgba(0, 0, 0, 0.03)'};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.03);
     padding: 0 4rem;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     display: flex;
