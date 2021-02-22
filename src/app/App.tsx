@@ -11,6 +11,7 @@ const Login = lazy(() => import("../pages/login/Login"));
 const Register = lazy(() => import("../pages/register/Register"));
 const BusinessRegister = lazy(() => import("../pages/business-register/BusinessRegister"));
 const AdminPanel = lazy(() => import("../pages/admin-panel/AdminPanel"));
+const Block = lazy(() => import("../pages/block/Block"));
 
 const App = () => {
     const rootState = useContext(rootContext);
@@ -19,6 +20,7 @@ const App = () => {
         {path: "/", component: <LandingPage/>},
         {path: "/login", component: <Login/>},
         {path: "/register", component: <Register/>},
+        {path: '/block', component: <Block />}
     ];
 
     const protectedRoutes = [

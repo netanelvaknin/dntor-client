@@ -4,11 +4,10 @@ import {TextField} from "../../../ui/index";
 import {ContinueButtonStyle} from "../BusinessRegisterStyle";
 import {useForm} from "react-hook-form";
 import {CurrentStep} from "../BusinessRegister";
-import useFetch from "use-http";
 import {emailPattern, phoneNumberPattern} from "../../../utils/patterns";
 import rootContext from "../../../context/root/rootContext";
 import {Alert} from "@material-ui/lab";
-import {Loader} from '../../../animations';
+import {useRequestBuilder} from "../../../hooks";
 
 interface BusinessProfileProps extends CurrentStep {
     initialBusinessProfileData?: any;
@@ -26,21 +25,22 @@ export const BusinessProfile = ({
             business_address: "",
         },
     });
-    const {post, response} = useFetch();
     const rootState = useContext(rootContext);
+    const requestBuilder = useRequestBuilder();
 
     const onSubmit = async (formData: any) => {
-        rootState?.setLoader(<Loader />);
-        rootState?.setLoaderTitle('');
+        const businessUpsertResponse = await requestBuilder({
+            method: 'post',
+            endpoint: '/business/upsert',
+            payload: {
+                email: formData.business_email.trim(),
+                phone: formData.business_phone.trim(),
+                name: formData.business_name.trim(),
+                address: formData.business_address.trim(),
+            }
+        })
 
-        await post("/business/upsert", {
-            email: formData.business_email.trim(),
-            phone: formData.business_phone.trim(),
-            name: formData.business_name.trim(),
-            address: formData.business_address.trim(),
-        });
-
-        if (response.ok) {
+        if (businessUpsertResponse.ok) {
             setCurrentStep(2);
         } else {
             rootState?.setError("אופס! משהו השתבש... שננסה שוב ?");

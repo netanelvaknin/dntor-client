@@ -2,7 +2,7 @@ import {Dialog} from "@material-ui/core";
 import React, {lazy, useContext, useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {useLastLocation} from "react-router-last-location";
-import useFetch from "use-http";
+import {useRequestBuilder} from '../../hooks';
 import arrowRight from "../../assets/icons/arrow-right.svg";
 import {GradientButton} from "../../components";
 import businessRegisterContext from "../../context/business-register/businessRegisterContext";
@@ -46,7 +46,7 @@ export const BusinessRegister = () => {
     const [, setState] = useState({});
     const [showMobileView, setShowMobileView] = useState(false);
     const [open, setOpen] = useState(false);
-    const {get, response} = useFetch();
+    const requestBuilder = useRequestBuilder();
     const history = useHistory();
     const lastLocation = useLastLocation();
     const classes = useDialogStyles();
@@ -72,27 +72,43 @@ export const BusinessRegister = () => {
     }, [currentStep]);
 
     async function getBusinessData() {
-        const data = await get("/business");
-        if (response.ok)
-            businessRegisterState?.setBusinessData(data);
+        const businessDataResponse = await requestBuilder({
+            endpoint: '/business',
+            method: 'get',
+        })
+
+        if (businessDataResponse.ok)
+            businessRegisterState?.setBusinessData(businessDataResponse.data);
     }
 
     async function getWorkTimesData() {
-        const data = await get("business/businessWorkTimes");
-        if (response.ok)
-            businessRegisterState?.setWorkTimesData(data);
+        const workTimeDataResponse = await requestBuilder({
+            method: 'get',
+            endpoint: '/business/businessWorkTimes'
+        });
+
+        if (workTimeDataResponse.ok)
+            businessRegisterState?.setWorkTimesData(workTimeDataResponse.data);
     }
 
     async function getServicesData() {
-        const data = await get("/business/services");
-        if (response.ok)
-            businessRegisterState?.setServicesData(data);
+        const servicesDataResponse = await requestBuilder({
+            method: 'get',
+            endpoint: '/business/services'
+        });
+
+        if (servicesDataResponse.ok)
+            businessRegisterState?.setServicesData(servicesDataResponse.data);
     }
 
     async function getServicesProviderData() {
-        const data = await get("/serviceProvider/getAll");
-        if (response.ok)
-            businessRegisterState?.setServiceProvidersData(data);
+        const serviceProvidersResponse = await requestBuilder({
+            method: 'get',
+            endpoint: '/serviceProvider/getAll'
+        });
+
+        if (serviceProvidersResponse.ok)
+            businessRegisterState?.setServiceProvidersData(serviceProvidersResponse.data);
     }
 
     const getAllData = () => {

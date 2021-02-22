@@ -22,11 +22,10 @@ import {
     SummaryProviderCard,
     useConfirmationDialogStyles
 } from "./ServiceProvidersStyle";
-import {useSmallScreen} from "../../../hooks/index";
+import {useSmallScreen, useRequestBuilder} from "../../../hooks/index";
 import rootContext from "../../../context/root/rootContext";
 import {Alert} from "@material-ui/lab";
 import moment from "moment";
-import useFetch from "use-http";
 import {Delete, Loader} from '../../../animations';
 
 export const Transition = forwardRef(function Transition(
@@ -64,7 +63,8 @@ export const ServiceProviders = ({
             provider_name: "",
         },
     });
-    const {post, response} = useFetch();
+    const requestBuilder = useRequestBuilder();
+
     const [mountedOnce, setMountedOnce] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [additionalHoursOpen, setAdditionalHoursOpen] = useState(false);
@@ -146,14 +146,19 @@ export const ServiceProviders = ({
             return null;
         });
 
+        let serviceProviderResponse;
         if (uniqueProviders.length > 0) {
-            await post("/serviceProvider/insert", uniqueProviders);
+            serviceProviderResponse = await requestBuilder({
+                method: 'post',
+                endpoint: '/serviceProvider/insert',
+                payload: uniqueProviders
+            });
         } else if (uniqueProviders.length < 1 && finalServiceProviders.length > 0) {
             setCurrentStep(5);
             setShowMobileView(false);
         }
 
-        if (response.ok) {
+        if (serviceProviderResponse?.ok) {
             setCurrentStep(5);
             setShowMobileView(false);
         }
@@ -581,14 +586,18 @@ export const ServiceProviders = ({
         });
     };
 
-    const removeServiceProvider = (index: number, spId: string) => {
+    const removeServiceProvider = async (index: number, spId: string) => {
         const serviceProvidersCopy = [...serviceProviders];
         serviceProvidersCopy.splice(index, 1);
         setServiceProviders(serviceProvidersCopy);
 
         if (spId) {
             rootState?.setLoader(<Delete/>);
-            post("/serviceProvider/remove", {spId})
+            await requestBuilder({
+                method: 'post',
+                endpoint: '/serviceProvider/remove',
+                payload: {spId}
+            });
         }
     }
 

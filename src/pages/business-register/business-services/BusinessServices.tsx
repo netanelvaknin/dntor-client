@@ -11,11 +11,10 @@ import {
 import {Grid, IconButton} from "@material-ui/core";
 import {DurationSelector, TextField} from "../../../ui/index";
 import {ContinueButtonStyle} from "../BusinessRegisterStyle";
-import {useSmallScreen} from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import {useForm} from "react-hook-form";
 import {CurrentStep} from "../BusinessRegister";
-import useFetch from "use-http";
+import {useRequestBuilder, useSmallScreen} from '../../../hooks';
 import {Alert} from "@material-ui/lab";
 
 import rootContext from "../../../context/root/rootContext";
@@ -42,7 +41,7 @@ export const BusinessServices = ({
     },
   });
 
-  const { post, response } = useFetch();
+  const requestBuilder = useRequestBuilder();
   const rootState = useContext(rootContext);
 
   const [duration, setDuration] = useState<any>();
@@ -97,13 +96,17 @@ export const BusinessServices = ({
     }
   };
 
-  const removeService = (index: number, serviceId: string) => {
+  const removeService = async (index: number, serviceId: string) => {
     const servicesCopy = [...services];
     servicesCopy.splice(index, 1);
     setServices(servicesCopy);
 
     if (serviceId) {
-      post("/business/removeService", { serviceId });
+      await requestBuilder({
+        method: 'post',
+        endpoint: '/business/removeService',
+        payload: { serviceId }
+      });
     }
   };
 
@@ -124,20 +127,21 @@ export const BusinessServices = ({
       return null;
     });
 
+    let insertServicesResponse;
     if (servicesCopy.length > 0) {
-      await post("/business/insertServices", servicesCopy);
+      insertServicesResponse = await requestBuilder({
+        method: 'post',
+        endpoint: '/business/insertServices',
+        payload: servicesCopy
+      });
     } else if (servicesCopy.length < 1 && services.length > 0) {
-      rootState?.setLoading(true);
       setCurrentStep(4);
       setShowMobileView && setShowMobileView(false);
-      rootState?.setLoading(false);
     }
 
-    if (response.ok) {
-      rootState?.setLoading(true);
+    if (insertServicesResponse?.ok) {
       setCurrentStep(4);
       setShowMobileView && setShowMobileView(false);
-      rootState?.setLoading(false);
     }
   };
 

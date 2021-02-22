@@ -1,22 +1,15 @@
-import {useContext, useEffect} from "react";
-import {
-    RegisterPageStyle,
-    RegisterCard,
-    RegisterHeading,
-    RegisterButton,
-    RegisterFieldStyle,
-} from "./RegisterStyle";
+import {useContext} from "react";
+import {RegisterButton, RegisterCard, RegisterFieldStyle, RegisterHeading, RegisterPageStyle,} from "./RegisterStyle";
 import {useForm} from "react-hook-form";
 import {Grid} from "@material-ui/core";
 import {emailPattern, phoneNumberPattern} from "../../utils/patterns";
-import useFetch from "use-http";
 import rootContext from "../../context/root/rootContext";
 import {Alert} from "@material-ui/lab";
 import {useHistory} from "react-router-dom";
 import moment from "moment";
 import {useCookies} from "react-cookie";
 import {Button} from '../../ui';
-import {Rocket} from '../../animations'
+import {useRequestBuilder} from '../../hooks';
 
 export const Register = () => {
     const rootState = useContext(rootContext);
@@ -30,37 +23,39 @@ export const Register = () => {
             validate_password: "",
         },
     });
-    const {post, response} = useFetch();
+    const requestBuilder = useRequestBuilder();
     const [, setCookie] = useCookies(["token"]);
 
     const password = watch("password");
     const validatePassword = watch("validate_password");
     const passwordsMatch = password === validatePassword;
 
-    useEffect(() => {
-        rootState?.setLoaderTitle('בוא נטיס לך את העסק !')
-        rootState?.setLoader(<Rocket />);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const onSubmit = async (formData: any) => {
-        await post("/user/signup", {
-            fullname: formData.full_name,
-            email: formData.email,
-            personalPhoneNumber: formData.phone,
-            password: formData.password,
+        const signUpResponse = await requestBuilder({
+            method: 'post',
+            endpoint: '/user/signup',
+            payload: {
+                fullname: formData.full_name,
+                email: formData.email,
+                personalPhoneNumber: formData.phone,
+                password: formData.password,
+            },
         });
 
-        if (response.ok) {
-            const data = await post("/user/signin", {
-                email: formData.email,
-                password: formData.password,
+        if (signUpResponse.ok) {
+            const signInResponse = await requestBuilder({
+                method: 'post',
+                endpoint: '/user/signin',
+                payload: {
+                    email: formData.email,
+                    password: formData.password,
+                },
             });
 
-            if (response.ok) {
+            if (signInResponse.ok) {
                 const sevenDaysFromNow = moment().add(7, "d").format("YYYY-MM-DD");
 
-                setCookie("token", data.res, {path: "/"});
+                setCookie("token", signInResponse.data.res, {path: "/"});
                 setCookie("token-expired-date", sevenDaysFromNow);
                 history.push("/business-register");
             } else {
@@ -177,7 +172,8 @@ export const Register = () => {
                         </Grid>
                     </Grid>
 
-                    <input autoComplete="on" readOnly={true} value="" name="hidden" type="text" style={{display: 'none'}} />
+                    <input autoComplete="on" readOnly={true} value="" name="hidden" type="text"
+                           style={{display: 'none'}}/>
                 </form>
             </RegisterCard>
         </RegisterPageStyle>

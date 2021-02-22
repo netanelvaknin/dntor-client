@@ -13,7 +13,6 @@ import {
   ToText,
   WorkingHourCard,
 } from "./WorkingHoursStyle";
-import {useSmallScreen} from "../../../hooks/index";
 import TrashIcon from "../../../assets/icons/trash_icon.svg";
 import {useForm} from "react-hook-form";
 import {CurrentStep} from "../BusinessRegister";
@@ -21,7 +20,7 @@ import rootContext from "../../../context/root/rootContext";
 import moment from "moment";
 import {Delete} from "@material-ui/icons";
 import {Alert} from "@material-ui/lab";
-import useFetch from "use-http";
+import {useRequestBuilder, useSmallScreen} from '../../../hooks';
 
 interface WorkingHoursProps extends CurrentStep {
     showMobileView?: boolean;
@@ -38,7 +37,7 @@ export const WorkingHours = ({
                                  currentStep,
                              }: WorkingHoursProps) => {
     const rootState = useContext(rootContext);
-    const {post, response} = useFetch();
+    const requestBuilder = useRequestBuilder();
 
     const {register, reset, handleSubmit} = useForm();
 
@@ -550,9 +549,13 @@ export const WorkingHours = ({
             );
         });
 
-        await post("/business/upsertWorkTimes", workingHoursCopy);
+        const upsertWorkTimesResponse = await requestBuilder({
+            method: 'post',
+            endpoint: '/business/upsertWorkTimes',
+            payload: workingHoursCopy
+        })
 
-        if (response.ok) {
+        if (upsertWorkTimesResponse.ok) {
             setCurrentStep(3);
             setShowMobileView && setShowMobileView(false);
         }

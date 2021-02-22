@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from "react";
 import rootContext from "../context/root/rootContext";
 import {Provider} from "use-http";
 import {useCookies, withCookies} from "react-cookie";
-import {useLocation} from "react-router-dom";
+import {useLocation, useHistory} from "react-router-dom";
 
 interface HttpProviderProps {
     children?: React.ReactNode;
@@ -14,6 +14,7 @@ export const HttpProvider = ({children}: HttpProviderProps) => {
     const [token, setToken] = useState("");
 
     const location = useLocation();
+    const history = useHistory();
 
     useEffect(() => {
         // Clean the error state every route change
@@ -29,29 +30,23 @@ export const HttpProvider = ({children}: HttpProviderProps) => {
         cachePolicy: "no-cache",
         timeout: 10000,
         onTimeout: () => {
-            console.log("REQUEST TIMEOUT");
+            history.push('/block');
+            rootState?.setLoading(false);
         },
         onError: (e: any) => {
-            console.log(e);
+            // console.log(e);
         },
         interceptors: {
             request: async ({options}: any) => {
-                rootState?.setLoading(true);
                 rootState?.setError("");
 
                 // Set headers
                 options.headers.Accept = "application/json";
-                // options.headers.Authorization = `Bearer ${token}`;
                 options.headers["access-token"] = `${token || ""}`;
                 return options;
             },
             response: async ({response}: any) => {
-                setTimeout(() => {
-                    rootState?.setLoading(false);
-                }, 3000);
-
-                const res = response;
-                return res;
+                return response;
             },
         },
     };

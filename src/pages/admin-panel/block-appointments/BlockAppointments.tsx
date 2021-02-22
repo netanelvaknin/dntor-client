@@ -292,6 +292,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
 
             setProviders([...initialServiceProviders])
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
