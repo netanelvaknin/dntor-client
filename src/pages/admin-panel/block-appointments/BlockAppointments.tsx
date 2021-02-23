@@ -1,14 +1,14 @@
-import React, {useState, useEffect, Fragment, useContext} from "react";
+import React, {Fragment, useContext, useEffect, useState} from "react";
 import {
     BlockAppointmentsContainer,
     BlockButton,
-    CauseField,
     BlockedAppointmentsCard,
+    CauseField,
+    FabStyle,
     ScreenWrapper,
-    useDatepickerStyles,
-    FabStyle
+    useDatepickerStyles
 } from './BlockAppointmentsStyle';
-import {TimePickerSelector, Checkbox} from '../../../ui';
+import {Checkbox, TimePickerSelector} from '../../../ui';
 import rootContext from "../../../context/root/rootContext";
 import {Controller, useForm} from 'react-hook-form';
 import {Checkbox as MatCheckbox, FormControlLabel, Grid, IconButton} from "@material-ui/core";
@@ -17,11 +17,10 @@ import {ToText} from "../../business-register/working-hours/WorkingHoursStyle";
 import {ReactComponent as CheckboxCircle} from "../../../assets/icons/checkbox_circle.svg";
 import {ReactComponent as CheckboxChecked} from "../../../assets/icons/checkbox_checked.svg";
 import {useCheckboxStyles} from "../../../ui/checkbox/CheckboxStyle";
-import useFetch from 'use-http';
 import moment from 'moment';
 import cancelBlockingIcon from '../../../assets/icons/cancel_blocking.svg';
 import arrowIcon from '../../../assets/icons/arrow_up.svg';
-import {useScroll, useSmallScreen} from "../../../hooks";
+import {useRequestBuilder, useScroll, useSmallScreen} from "../../../hooks";
 import {Alert} from "@material-ui/lab";
 
 interface BlockAppointmentsProps {
@@ -36,7 +35,7 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
     const [providersBlockedAppointments, setProvidersBlockedAppointments] = useState<any>([...serviceProviderData]);
     const [startBlockHour, setStartBlockHour] = useState(moment().format('08:00'));
     const [endBlockHour, setEndBlockHour] = useState('18:00');
-    const {post, get, request, response} = useFetch();
+    const requestBuilder = useRequestBuilder();
     const {handleSubmit, register, control, reset, errors} = useForm({
         defaultValues: {
             all_providers: false,
@@ -95,11 +94,19 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                     cause: values.cause
                 }
 
+                let getBlockWorkTimeResponse;
                 if (selectedProviders.length > 0 || allProviders) {
                     if (allProviders) {
-                        await post('/business/insertBlockWorkTime', data);
-                        const newBusinessBlockHours = await get('/business/getBlockWorkTime');
-                        setBusinessBlockedAppointments([...newBusinessBlockHours?.res]);
+                        await requestBuilder({
+                            method: 'post',
+                            endpoint: '/business/insertBlockWorkTime'
+                        });
+
+                        getBlockWorkTimeResponse = await requestBuilder({
+                            method: 'get',
+                            endpoint: '/business/getBlockWorkTime',
+                        })
+                        setBusinessBlockedAppointments([...getBlockWorkTimeResponse?.data.res]);
                     } else {
                         const providersIds = selectedProviders.map((provider: any) => {
                             return provider._id;
@@ -154,7 +161,11 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                             })
                         });
 
-                        await post('/serviceProvider/update', [...formattedNewBlocks, ...formattedExistingBlocks]);
+                        await requestBuilder({
+                            method: 'post',
+                            endpoint: '/serviceProvider/update',
+                            payload: [...formattedNewBlocks, ...formattedExistingBlocks]
+                        });
                     }
 
                     reset({
@@ -225,11 +236,11 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                 }
             });
 
-            await post('/serviceProvider/update', updatedBlockedAppointments);
-
-            if (response.ok) {
-                console.log('removed');
-            }
+            await requestBuilder({
+                method: 'post',
+                endpoint: '/serviceProvider/update',
+                payload: updatedBlockedAppointments
+            });
         } else {
             const providersBlockedAppointmentsCopy = [...providersBlockedAppointments];
             const providerWithoutWtId = providersBlockedAppointmentsCopy.findIndex((provider) => {
@@ -261,13 +272,15 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                 }
             });
 
-            await post('/serviceProvider/update', updatedBlockedAppointments);
+            const providerUpdateResponse = await requestBuilder({
+                method: 'post',
+                endpoint: '/serviceProvider/update'
+            });
 
-            if (response.ok) {
+            if (providerUpdateResponse.ok) {
                 console.log('removed');
             }
         }
-
     }
 
     const removeBusinessBlockedHours = async (businessId: string, blockWorkTimeId: string) => {
@@ -279,7 +292,10 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
             businessBlockedAppointmentsCopy.splice(indexToRemove, 1);
             setBusinessBlockedAppointments(businessBlockedAppointmentsCopy);
 
-            await request.delete(`/business/removeBlockWorkTime/${blockWorkTimeId}`);
+            await requestBuilder({
+                method: 'delete',
+                endpoint: `/business/removeBlockWorkTime/${blockWorkTimeId}`
+            });
         }
     }
 
@@ -295,24 +311,29 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const getBusinessBlockingHours = async () => {
+        return await requestBuilder({
+            method: 'get',
+            endpoint: '/business/getBlockWorkTime'
+        });
+    };
+
     useEffect(() => {
-        const getBusinessBlockingHours = async () => {
-            const data = await get('/business/getBlockWorkTime');
-
+        getBusinessBlockingHours().then((response: any) => {
             if (response.ok) {
-                setBusinessBlockedAppointments(data.res);
+                setBusinessBlockedAppointments(response?.data?.res);
             }
-        };
-
-        getBusinessBlockingHours();
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return <BlockAppointmentsContainer>
         <ScreenWrapper>
             <form onSubmit={handleSubmit(obSubmit)}>
-                <h1 style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: isSmallScreen ? '2rem' : '5rem'}}>חסימת
-                    תורים</h1>
+                <h1
+                    style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: isSmallScreen ? '2rem' : '5rem'}}>
+                    חסימת תורים
+                </h1>
                 <p>ברצוני לחסום את התורים עבור כל נותני השירות הבאים:</p>
 
                 <Grid container style={{maxWidth: isSmallScreen ? '100%' : '50%', marginTop: '2rem'}}>

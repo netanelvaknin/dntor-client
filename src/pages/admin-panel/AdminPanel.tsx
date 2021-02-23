@@ -37,7 +37,10 @@ export const AdminPanel = () => {
             case "יומן תורים":
                 return <AppointmentsLog/>;
             case "קביעת תור":
-                return <NewAppointments/>;
+                return <NewAppointments
+                    adminPanelState={adminPanelState}
+                    initialServiceProviders={businessRegisterState?.serviceProvidersData?.res}
+                />;
             case "חסימת תור":
                 return <BlockAppointments serviceProviderData={businessRegisterState?.serviceProvidersData?.res}/>;
         }

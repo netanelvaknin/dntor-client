@@ -24,9 +24,9 @@ export const NavbarDropdown = forwardRef((props: NavbarDropdownProps, ref) => {
     remove("token-expired-date", "");
     history.push("/");
 
-    businessRegisterState && businessRegisterState.setServicesData({});
-    businessRegisterState && businessRegisterState.setWorkTimesData({});
-    businessRegisterState && businessRegisterState.setBusinessData({});
+    businessRegisterState?.setServicesData({});
+    businessRegisterState?.setWorkTimesData({});
+    businessRegisterState?.setBusinessData({});
   };
 
   return (

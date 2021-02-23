@@ -10,7 +10,7 @@ interface CheckboxProps {
     | React.RefObject<any>
     | null
     | undefined;
-  label?: string;
+  label?: React.ReactNode;
   value?: boolean;
   labelPlacement?: "start" | "top" | "end";
   disabled?: boolean;

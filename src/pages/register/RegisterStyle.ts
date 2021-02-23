@@ -32,7 +32,7 @@ export const RegisterCard = styled(LoginCard)`
 export const RegisterHeading = styled(Typography)`
     @media ${mobile} {
         &.MuiTypography-root {
-            margin-top: 18rem;
+            margin-top: 15rem;
             margin-bottom: 3rem;
         }
     }
@@ -54,4 +54,12 @@ export const RegisterButton = styled(Button)`
 
 export const RegisterFieldStyle = styled(TextField)`
     width: 28rem;
+`;
+
+export const TermsButtonText = styled(Button)`
+  background: red;
+  .MuiButton-label {
+    font-size: 1.7rem;
+    margin-top: -.2rem;
+  }
 `;

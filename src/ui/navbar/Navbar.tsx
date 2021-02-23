@@ -36,9 +36,9 @@ export const Navbar = () => {
       remove("token-expired-date", "");
       history.push("/");
 
-      businessRegisterState && businessRegisterState.setServicesData({});
-      businessRegisterState && businessRegisterState.setWorkTimesData({});
-      businessRegisterState && businessRegisterState.setBusinessData({});
+      businessRegisterState?.setServicesData({});
+      businessRegisterState?.setWorkTimesData({});
+      businessRegisterState?.setBusinessData({});
     }
   };
 
@@ -81,33 +81,22 @@ export const Navbar = () => {
               <AdminActionsContainer>
                 <AdminPanelActionButton
                   variant="text"
-                  activeNavItem={
-                    adminPanelState?.activeNavItem === "יומן תורים"
-                  }
-                  onClick={() =>
-                    adminPanelState &&
-                    adminPanelState.setActiveNavItem("יומן תורים")
-                  }
+                  activeNavItem={adminPanelState?.activeNavItem === "יומן תורים"}
+                  onClick={() => adminPanelState?.setActiveNavItem("יומן תורים")}
                 >
                   יומן תורים
                 </AdminPanelActionButton>
                 <AdminPanelActionButton
                   variant="text"
                   activeNavItem={adminPanelState?.activeNavItem === "קביעת תור"}
-                  onClick={() =>
-                    adminPanelState &&
-                    adminPanelState.setActiveNavItem("קביעת תור")
-                  }
+                  onClick={() => adminPanelState?.setActiveNavItem("קביעת תור")}
                 >
                   קביעת תור
                 </AdminPanelActionButton>
                 <AdminPanelActionButton
                   variant="text"
                   activeNavItem={adminPanelState?.activeNavItem === "חסימת תור"}
-                  onClick={() =>
-                    adminPanelState &&
-                    adminPanelState.setActiveNavItem("חסימת תור")
-                  }
+                  onClick={() => adminPanelState?.setActiveNavItem("חסימת תור")}
                 >
                   חסימת תור
                 </AdminPanelActionButton>

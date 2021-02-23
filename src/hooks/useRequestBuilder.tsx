@@ -6,7 +6,7 @@ import {Loader} from '../animations/loader/Loader';
 type requestConfig = {
     loader?: ReactNode,
     payload?: object | [],
-    method: 'get' | 'post' | 'del',
+    method: 'get' | 'post' | 'delete',
     endpoint: string,
     useLoader?: boolean
     loaderTimeout?: number;
@@ -18,14 +18,14 @@ export const useRequestBuilder = () => {
     const {get, post, del, response} = useFetch();
 
     const requestBuilder = async ({
-                                   loader = <Loader/>,
-                                   payload,
-                                   method,
-                                   endpoint,
-                                   useLoader = true,
-                                   loaderTimeout = 2000,
-                                   loaderTitle = ''
-                               }: requestConfig) => {
+                                      loader = <Loader/>,
+                                      payload,
+                                      method,
+                                      endpoint,
+                                      useLoader = true,
+                                      loaderTimeout = 2000,
+                                      loaderTitle = ''
+                                  }: requestConfig) => {
         if (!useLoader) {
             rootState?.setLoading(false);
         } else {
@@ -45,7 +45,7 @@ export const useRequestBuilder = () => {
             case 'post':
                 await post(endpoint, payload);
                 break;
-            case 'del':
+            case 'delete':
                 await del(endpoint, payload);
                 break;
         };
