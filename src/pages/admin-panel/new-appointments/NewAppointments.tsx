@@ -1,11 +1,17 @@
-import {useEffect, useState, useContext, ChangeEvent} from "react";
-import {NewAppointmentsContainer} from './NewAppointmentsStyle';
+import {ChangeEvent, useContext, useEffect, useState} from "react";
+import {
+    NewAppointmentsContainer,
+    SubmitNewAppointmentButton,
+    useDatePickerStyles,
+    useSelectStyles,
+    FieldsGridContainer
+} from './NewAppointmentsStyle';
 import {DatePicker} from "@material-ui/pickers";
 import {FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select} from '@material-ui/core';
 import moment, {Moment} from "moment";
 import {TextField} from '../../../ui';
 import {useForm} from 'react-hook-form';
-import {CalculatingHours, NewAppointment as NewAppointmentAnimation, Dollars} from "../../../animations";
+import {CalculatingHours, Dollars, NewAppointment as NewAppointmentAnimation} from "../../../animations";
 import {useRequestBuilder, useSmallScreen} from "../../../hooks";
 import RootContext from '../../../context/root/rootContext';
 import {phoneNumberPattern} from "../../../utils/patterns";
@@ -39,6 +45,8 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
     const rootState = useContext(RootContext);
     const requestBuilder = useRequestBuilder();
     const isSmallScreen = useSmallScreen();
+    const datepickerClasses = useDatePickerStyles();
+    const selectClasses = useSelectStyles();
 
     const handleDateChange = (date: Moment | Date | null) => {
         if (selectedService && selectedProvider) {
@@ -165,16 +173,17 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
     return (
         <NewAppointmentsContainer>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Grid container justify="space-between" alignItems="flex-start" direction="column" style={{
-                    maxWidth: '40rem',
-                    padding: '3rem',
-                    margin: '17rem 5rem 5rem'
-                }}>
-                    <Grid item>
+                <FieldsGridContainer
+                    container
+                    justify="space-between"
+                    alignItems="flex-start"
+                    direction="column"
+                >
+                    <Grid item style={{marginBottom: '1rem'}}>
                         <h1>קביעת תור</h1>
                     </Grid>
 
-                    <Grid item>
+                    <Grid item style={{margin: '.5rem 0'}}>
                         <DatePicker
                             label="תאריך"
                             value={selectedDate}
@@ -184,11 +193,12 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                             autoOk
                             disablePast
                             required
+                            InputProps={{className: datepickerClasses.root}}
                         />
                     </Grid>
 
-                    <Grid item>
-                        <FormControl>
+                    <Grid item style={{margin: '.5rem 0'}}>
+                        <FormControl classes={{root: selectClasses.root}}>
                             <InputLabel shrink id="service">
                                 שירות *
                             </InputLabel>
@@ -196,7 +206,13 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                 required
                                 labelId="service"
                                 value={selectedService}
-                                onChange={handleServiceChange}>
+                                onChange={handleServiceChange}
+                                MenuProps={{
+                                    classes: {
+                                        paper: selectClasses.select
+                                    }
+                                }}
+                            >
                                 {businessServices.map((service: any) => {
                                     return <MenuItem value={service._id}
                                                      key={service._id}>{service.serviceName}</MenuItem>
@@ -205,8 +221,10 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                         </FormControl>
                     </Grid>
 
-                    <Grid item>
-                        <FormControl disabled={!selectedService}>
+                    <Grid item style={{margin: '.5rem 0'}}>
+                        <FormControl
+                            disabled={!selectedService}
+                            classes={{root: selectClasses.root}}>
                             <InputLabel shrink id="service-provider">
                                 נותן שירות *
                             </InputLabel>
@@ -215,6 +233,11 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                 labelId="service-provider"
                                 value={selectedProvider}
                                 onChange={handleProviderChange}
+                                MenuProps={{
+                                    classes: {
+                                        paper: selectClasses.select
+                                    }
+                                }}
                             >
                                 {businessServiceProviders?.map((provider: any) => {
                                     return (
@@ -226,14 +249,14 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                     );
                                 })}
                             </Select>
-                            <FormHelperText>אנחנו מציגים לך רק את נותני השירות המתאימים לשירות שבחרת</FormHelperText>
+                            <FormHelperText>רק נותני השירות המתאימים לשירות הנבחר</FormHelperText>
                         </FormControl>
                     </Grid>
 
                     {selectedDate && selectedService && selectedProvider && availableTimes.length > 0 && (
                         <>
-                            <Grid item style={{marginTop: '2rem'}}>
-                                <FormControl>
+                            <Grid item style={{margin: '.5rem 0'}}>
+                                <FormControl classes={{root: selectClasses.root}}>
                                     <InputLabel shrink id="hour">
                                         שעה *
                                     </InputLabel>
@@ -241,7 +264,13 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                         required
                                         labelId="hour"
                                         value={appointmentTime}
-                                        onChange={handleTimeChange}>
+                                        onChange={handleTimeChange}
+                                        MenuProps={{
+                                            classes: {
+                                                paper: selectClasses.select
+                                            }
+                                        }}
+                                    >
                                         {availableTimes?.map((availableTime: string) => {
                                             return (
                                                 <MenuItem key={availableTime}
@@ -249,13 +278,11 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                             )
                                         })}
                                     </Select>
-                                    <FormHelperText>אנחנו מציגים אך ורק שעות שבהן נותן השירות הנבחר <span
-                                        style={{color: 'blue', fontWeight: 'bold'}}>יכול</span> לעבוד
-                                        בהן</FormHelperText>
+                                    <FormHelperText>כאן יופיעו רק שעות פנויות</FormHelperText>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item>
+                            <Grid item style={{margin: '.5rem 0'}}>
                                 <TextField
                                     required
                                     label="שם הלקוח *"
@@ -267,7 +294,7 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                     control={control}/>
                             </Grid>
 
-                            <Grid item>
+                            <Grid item style={{margin: '.5rem 0'}}>
                                 <TextField
                                     required
                                     type="number"
@@ -280,9 +307,9 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                     control={control}/>
                             </Grid>
 
-                            <Grid item>
+                            <Grid item style={{margin: '.5rem 0'}}>
                                 <TextField
-                                    helperText="מומלץ לשאול את הלקוח האם יש דברים נוספים שצריך לדעת עליו לפני התור כמו למשל דברים רפואיים וכו'"
+                                    helperText="דברים שיש להתחשב בהם לדוגמא"
                                     label="הערות (לא חובה למלא)"
                                     name="additional_notes"
                                     register={register}
@@ -290,7 +317,9 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                             </Grid>
 
                             <Grid item>
-                                <button>קביעת תור</button>
+                                <SubmitNewAppointmentButton
+                                    type="submit"
+                                    variant="contained">קביעת תור</SubmitNewAppointmentButton>
                             </Grid>
                         </>
                     )}
@@ -304,7 +333,7 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                             )}
                         </Grid>
                     </Grid>
-                </Grid>
+                </FieldsGridContainer>
             </form>
 
             {!isSmallScreen && <NewAppointmentAnimation/>}
