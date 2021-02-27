@@ -11,6 +11,7 @@ export const BusinessRegisterState = ({children}: RootStateProps) => {
     const [servicesData, setServicesData] = useState();
     const [serviceProvidersData, setServiceProvidersData] = useState();
     const [fetchedOnce, setFechedOnce] = useState(false);
+    const [editMode, setEditMode] = useState(false);
 
     return (
         <BusinessRegisterContext.Provider
@@ -19,12 +20,14 @@ export const BusinessRegisterState = ({children}: RootStateProps) => {
                 workTimesData,
                 servicesData,
                 fetchedOnce,
+                editMode,
                 setBusinessData,
                 setWorkTimesData,
                 setServicesData,
                 serviceProvidersData,
                 setServiceProvidersData,
                 setFechedOnce,
+                setEditMode,
             }}
         >
             {children}

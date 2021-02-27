@@ -22,6 +22,7 @@ import cancelBlockingIcon from '../../../assets/icons/cancel_blocking.svg';
 import arrowIcon from '../../../assets/icons/arrow_up.svg';
 import {useRequestBuilder, useScroll, useSmallScreen} from "../../../hooks";
 import {Alert} from "@material-ui/lab";
+import {Busy} from '../../../animations';
 
 interface BlockAppointmentsProps {
     serviceProviderData?: any;
@@ -99,8 +100,11 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                     if (allProviders) {
                         await requestBuilder({
                             method: 'post',
-                            endpoint: '/business/insertBlockWorkTime'
+                            endpoint: '/business/insertBlockWorkTime',
+                            payload: data
                         });
+
+                        setBusinessBlockedAppointments([...businessBlockedAppointments, data]);
 
                         getBlockWorkTimeResponse = await requestBuilder({
                             method: 'get',
@@ -329,178 +333,190 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
 
     return <BlockAppointmentsContainer>
         <ScreenWrapper>
-            <form onSubmit={handleSubmit(obSubmit)}>
-                <h1
-                    style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: isSmallScreen ? '2rem' : '5rem'}}>
-                    חסימת תורים
-                </h1>
-                <p>ברצוני לחסום את התורים עבור כל נותני השירות הבאים:</p>
+            <form
+                onSubmit={handleSubmit(obSubmit)}
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}
+            >
+                <div>
+                    <h1
+                        style={{fontWeight: 'normal', fontSize: '2.4rem', marginTop: isSmallScreen ? '2rem' : '5rem'}}>
+                        חסימת תורים
+                    </h1>
+                    <p>ברצוני לחסום את התורים עבור כל נותני השירות הבאים:</p>
 
-                <Grid container style={{maxWidth: isSmallScreen ? '100%' : '50%', marginTop: '2rem'}}>
-                    {serviceProviderData.length !== 1 && (
-                        <Grid item>
-                            <FormControlLabel
-                                label="כל נותני השירות"
-                                control={
-                                    <MatCheckbox
-                                        checked={allProviders}
-                                        name="all_providers"
-                                        inputRef={register}
-                                        classes={{disabled: classes.disabled}}
-                                        icon={<CheckboxCircle/>}
-                                        checkedIcon={<CheckboxChecked/>}
-                                        onChange={() => setAllProviders(!allProviders)}
+                    <Grid container style={{maxWidth: isSmallScreen ? '100%' : '50%', marginTop: '2rem'}}>
+                        {serviceProviderData.length !== 1 && (
+                            <Grid item>
+                                <FormControlLabel
+                                    label="כל נותני השירות"
+                                    control={
+                                        <MatCheckbox
+                                            checked={allProviders}
+                                            name="all_providers"
+                                            inputRef={register}
+                                            classes={{disabled: classes.disabled}}
+                                            icon={<CheckboxCircle/>}
+                                            checkedIcon={<CheckboxChecked/>}
+                                            onChange={() => setAllProviders(!allProviders)}
+                                        />
+                                    }/>
+                            </Grid>
+                        )}
+
+                        {providers.map((serviceProvider: any, ind: number) => {
+                            return (
+                                <Grid item key={ind}>
+                                    <Checkbox
+                                        name={serviceProvider._id}
+                                        disabled={allProviders}
+                                        value={serviceProvider.selected}
+                                        label={serviceProvider.fullName}
+                                        onChange={() => handleProvidersChange(ind)}
                                     />
-                                }/>
-                        </Grid>
-                    )}
+                                </Grid>
+                            )
+                        })}
+                    </Grid>
 
-                    {providers.map((serviceProvider: any, ind: number) => {
-                        return (
-                            <Grid item key={ind}>
-                                <Checkbox
-                                    name={serviceProvider._id}
-                                    disabled={allProviders}
-                                    value={serviceProvider.selected}
-                                    label={serviceProvider.fullName}
-                                    onChange={() => handleProvidersChange(ind)}
+                    <Grid container style={{marginTop: '2rem'}}>
+                        <Grid item md={6} xs={12}>
+                            <CauseField
+                                name="cause"
+                                register={register}
+                                required
+                                minLength={6}
+                                control={control}
+                                error={!!errors.cause}
+                                helperText={errors.cause ? "יש להזין לפחות 6 תווים" :
+                                    <strong>הסיבה לא תוצג ללקוחות</strong>}
+                                label="סיבת החסימה (לדוגמא: אירוע, חג וכו')"/>
+                        </Grid>
+                    </Grid>
+
+                    <div>
+                        <Grid
+                            container
+                            alignItems="center"
+                            justify="flex-start"
+                            style={{marginTop: isSmallScreen ? '2.5rem' : '4rem'}}>
+                            <Grid item container alignItems="center" justify="flex-start" md={1} xs={2}>
+                                <span style={{fontWeight: 'bold'}}>מיום</span>
+                            </Grid>
+
+                            <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
+                                <Controller
+                                    control={control}
+                                    name="fromDate"
+                                    render={({onChange, value}) => (
+                                        <DatePicker
+                                            label="התחלה"
+                                            value={value}
+                                            onChange={onChange}
+                                            animateYearScrolling
+                                            variant="inline"
+                                            autoOk
+                                            disablePast
+                                            inputProps={{className: datepickerClasses.input}}
+                                            PopoverProps={{
+                                                classes: {
+                                                    paper: datepickerClasses.paper
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                />
+
+                            </Grid>
+
+                            <Grid
+                                item
+                                container
+                                alignItems="center"
+                                justify="center"
+                                md={1}
+                                xs={2}>
+                                <ToText style={{margin: isSmallScreen ? '0 1rem' : '0 2rem'}}>עד</ToText>
+                            </Grid>
+
+                            <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
+                                <Controller
+                                    control={control}
+                                    name="toDate"
+                                    render={({onChange, value}) => (
+                                        <DatePicker
+                                            label="סיום"
+                                            value={value}
+                                            onChange={onChange}
+                                            animateYearScrolling
+                                            variant="inline"
+                                            autoOk
+                                            disablePast
+                                            inputProps={{className: datepickerClasses.input}}
+                                            PopoverProps={{
+                                                classes: {
+                                                    paper: datepickerClasses.paper
+                                                }
+                                            }}
+                                        />
+                                    )}
                                 />
                             </Grid>
-                        )
-                    })}
-                </Grid>
+                        </Grid>
 
-                <Grid container style={{marginTop: '2rem'}}>
-                    <Grid item md={6} xs={12}>
-                        <CauseField
-                            name="cause"
-                            register={register}
-                            required
-                            minLength={6}
-                            control={control}
-                            error={!!errors.cause}
-                            helperText={errors.cause ? "יש להזין לפחות 6 תווים" :
-                                <strong>הסיבה לא תוצג ללקוחות</strong>}
-                            label="סיבת החסימה (לדוגמא: אירוע, חג וכו')"/>
-                    </Grid>
-                </Grid>
+                        <Grid
+                            container
+                            alignItems="center"
+                            justify="flex-start"
+                            style={{marginTop: '4rem'}}>
+                            <Grid item container alignItems="center" justify="flex-start" md={1} xs={2}>
+                                <span style={{fontWeight: 'bold'}}>משעה</span>
+                            </Grid>
 
+                            <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
+                                <TimePickerSelector
+                                    time={startBlockHour}
+                                    onTimeChange={(hours: any) =>
+                                        setStartBlockHour(`${hours.hour}:${hours.minute}`)
+                                    }
+                                />
+                            </Grid>
+
+                            <Grid
+                                item
+                                container
+                                alignItems="center"
+                                justify="center"
+                                md={1}
+                                xs={2}>
+                                <ToText>עד</ToText>
+                            </Grid>
+
+                            <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
+                                <TimePickerSelector
+                                    time={endBlockHour}
+                                    onTimeChange={(hours: any) => setEndBlockHour(`${hours.hour}:${hours.minute}`)}
+                                />
+                            </Grid>
+                        </Grid>
+
+
+                        <Grid container justify="center"
+                              style={{
+                                  marginTop: isSmallScreen ? '3.5rem' : '6rem',
+                                  maxWidth: isSmallScreen ? '100%' : '50%'
+                              }}>
+                            <Grid item>
+                                <BlockButton variant="contained" type="submit">הוסף חסימה</BlockButton>
+                            </Grid>
+                        </Grid>
+                    </div>
+                </div>
                 <div>
-                    <Grid
-                        container
-                        alignItems="center"
-                        justify="flex-start"
-                        style={{marginTop: isSmallScreen ? '2.5rem' : '4rem'}}>
-                        <Grid item container alignItems="center" justify="flex-start" md={1} xs={2}>
-                            <span style={{fontWeight: 'bold'}}>מיום</span>
-                        </Grid>
-
-                        <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
-                            <Controller
-                                control={control}
-                                name="fromDate"
-                                render={({onChange, value}) => (
-                                    <DatePicker
-                                        label="התחלה"
-                                        value={value}
-                                        onChange={onChange}
-                                        animateYearScrolling
-                                        variant="inline"
-                                        autoOk
-                                        disablePast
-                                        inputProps={{className: datepickerClasses.input}}
-                                        PopoverProps={{
-                                            classes: {
-                                                paper: datepickerClasses.paper
-                                            }
-                                        }}
-                                    />
-                                )}
-                            />
-
-                        </Grid>
-
-                        <Grid
-                            item
-                            container
-                            alignItems="center"
-                            justify="center"
-                            md={1}
-                            xs={2}>
-                            <ToText style={{margin: isSmallScreen ? '0 1rem' : '0 2rem'}}>עד</ToText>
-                        </Grid>
-
-                        <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
-                            <Controller
-                                control={control}
-                                name="toDate"
-                                render={({onChange, value}) => (
-                                    <DatePicker
-                                        label="סיום"
-                                        value={value}
-                                        onChange={onChange}
-                                        animateYearScrolling
-                                        variant="inline"
-                                        autoOk
-                                        disablePast
-                                        inputProps={{className: datepickerClasses.input}}
-                                        PopoverProps={{
-                                            classes: {
-                                                paper: datepickerClasses.paper
-                                            }
-                                        }}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                    </Grid>
-
-                    <Grid
-                        container
-                        alignItems="center"
-                        justify="flex-start"
-                        style={{marginTop: '4rem'}}>
-                        <Grid item container alignItems="center" justify="flex-start" md={1} xs={2}>
-                            <span style={{fontWeight: 'bold'}}>משעה</span>
-                        </Grid>
-
-                        <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
-                            <TimePickerSelector
-                                time={startBlockHour}
-                                onTimeChange={(hours: any) =>
-                                    setStartBlockHour(`${hours.hour}:${hours.minute}`)
-                                }
-                            />
-                        </Grid>
-
-                        <Grid
-                            item
-                            container
-                            alignItems="center"
-                            justify="center"
-                            md={1}
-                            xs={2}>
-                            <ToText>עד</ToText>
-                        </Grid>
-
-                        <Grid item container alignItems="center" justify="flex-start" md={2} xs={4}>
-                            <TimePickerSelector
-                                time={endBlockHour}
-                                onTimeChange={(hours: any) => setEndBlockHour(`${hours.hour}:${hours.minute}`)}
-                            />
-                        </Grid>
-                    </Grid>
-
-
-                    <Grid container justify="center"
-                          style={{
-                              marginTop: isSmallScreen ? '3.5rem' : '6rem',
-                              maxWidth: isSmallScreen ? '100%' : '50%'
-                          }}>
-                        <Grid item>
-                            <BlockButton variant="contained" type="submit">הוסף חסימה</BlockButton>
-                        </Grid>
-                    </Grid>
+                    <Busy />
                 </div>
             </form>
 

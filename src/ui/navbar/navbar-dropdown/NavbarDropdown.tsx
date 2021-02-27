@@ -63,20 +63,16 @@ export const NavbarDropdown = forwardRef((props: NavbarDropdownProps, ref) => {
         </IconButton>
       </div>
 
-      <MenuItemStyle onClick={() => console.log("yo")}>
-        פרופיל העסק
+      <MenuItemStyle onClick={() => {
+        businessRegisterState?.setEditMode(true);
+        props.onClose(false);
+        history.push('/business-register');
+      }}>
+        עריכת הגדרות העסק
       </MenuItemStyle>
 
-      <MenuItemStyle onClick={() => console.log("yo")}>
-        שעות פעילות
-      </MenuItemStyle>
-
-      <MenuItemStyle onClick={() => console.log("yo")}>
-        יומני תורים
-      </MenuItemStyle>
-
-      <MenuItemStyle onClick={() => console.log("yo")}>
-        ניהול התראות
+      <MenuItemStyle disabled>
+        הצגת הודעה ללקוחות (בקרוב)
       </MenuItemStyle>
     </MenuStyle>
   );

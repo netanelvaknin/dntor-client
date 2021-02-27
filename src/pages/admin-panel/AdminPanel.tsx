@@ -24,6 +24,8 @@ export const AdminPanel = () => {
             businessRegisterState?.servicesData?.res?.services?.length > 0 &&
             businessRegisterState?.workTimesData?.res?.days?.length > 0
         ) {
+            window.scrollTo(0, 0);
+            businessRegisterState?.setEditMode(false);
             return;
         }
 

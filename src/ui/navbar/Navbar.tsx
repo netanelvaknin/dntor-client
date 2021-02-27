@@ -82,7 +82,10 @@ export const Navbar = () => {
                 <AdminPanelActionButton
                   variant="text"
                   activeNavItem={adminPanelState?.activeNavItem === "יומן תורים"}
-                  onClick={() => adminPanelState?.setActiveNavItem("יומן תורים")}
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                    adminPanelState?.setActiveNavItem("יומן תורים")
+                  }}
                 >
                   יומן תורים
                 </AdminPanelActionButton>

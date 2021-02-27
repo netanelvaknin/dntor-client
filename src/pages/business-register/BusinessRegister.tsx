@@ -64,6 +64,7 @@ export const BusinessRegister = () => {
 
     useEffect(() => {
         rootState?.setError("");
+        window.scrollTo(0, 0);
 
         if (currentStep > 1) {
             setOpen(false);
@@ -147,7 +148,8 @@ export const BusinessRegister = () => {
             businessRegisterState?.servicesData?.res?.services?.length > 0 &&
             businessRegisterState?.workTimesData?.res?.days?.length > 0 &&
             businessRegisterState?.serviceProvidersData?.res.length > 0 &&
-            !businessRegisterState.fetchedOnce
+            !businessRegisterState?.fetchedOnce &&
+            !businessRegisterState?.editMode
         ) {
             history.push("/admin-panel");
         }
@@ -251,9 +253,7 @@ export const BusinessRegister = () => {
                     </ArrowRightButton>
                 )}
 
-                {isSmallScreen && (
-                    <CardLabel>{steps[currentStep - 1].stepName}</CardLabel>
-                )}
+                {isSmallScreen && (<CardLabel>{steps[currentStep - 1].stepName}</CardLabel>)}
 
                 {steps[currentStep - 1].component}
 
