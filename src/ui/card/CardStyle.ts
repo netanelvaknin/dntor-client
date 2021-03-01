@@ -22,6 +22,12 @@ export const useAccordionStyle = makeStyles((theme) => ({
         '& .MuiAccordionSummary-content': {
             fontSize: '1.6rem',
             borderRadius: '8px',
+        },
+        '& .MuiAccordionSummary-content.Mui-expanded': {
+            margin: '1rem 0 .5rem 0'
         }
+    },
+    expanded: {
+        margin: '0 0 2rem!important'
     }
 }))

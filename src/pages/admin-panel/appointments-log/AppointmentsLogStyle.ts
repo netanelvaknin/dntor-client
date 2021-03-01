@@ -1,52 +1,64 @@
 import {makeStyles} from '@material-ui/core/styles';
-import styled, {keyframes} from 'styled-components/macro';
+import styled from 'styled-components/macro';
 import {mobile} from "../../../utils/screen-sizes";
-import {Card} from '../../../ui';
+import {Card, Button} from '../../../ui';
+import {IconButton} from '@material-ui/core';
 
-const backInDown = keyframes`
-  0% {
-    -webkit-transform: translateY(-1200px) scale(0.7);
-    transform: translateY(-1200px) scale(0.7);
-    opacity: 0.7;
-  }
-
-  80% {
-    -webkit-transform: translateY(0px) scale(0.7);
-    transform: translateY(0px) scale(0.7);
-    opacity: 0.7;
-  }
-
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    opacity: 1;
-  }
-`;
-
-
-interface AppointmentCardProps {
-    scrollPosition: number;
+interface TableModeProp {
+    isSmallTableMode: boolean;
 }
 
-export const AppointmentCard = styled(Card)<AppointmentCardProps>`
-  animation: ${backInDown} .7s linear;
+export const AppointmentCard = styled(Card)<TableModeProp>`
   margin-bottom: 2rem;
+  max-width: ${props => props.isSmallTableMode && '100%'};
+`;
+
+export const EmptyCard = styled(Card)<TableModeProp>`
+  background: #E2E2E2;
+  min-height: 52rem;
+  height: 100%;
+  font-weight: bold;
+  text-align: center;
+  padding: 2rem;
+  max-width: ${props => props.isSmallTableMode && '100%'};
 `;
 
 export const AppointmentsLogContainer = styled.div`
   position: relative;
 `;
 
-export const SubMenu = styled.div`
+export const SubMenuStyle = styled.div`
   margin-top: 8.5rem;
   background: ${props => props.theme.palette.primary.light};
   height: 8rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 10rem;
 
   @media ${mobile} {
-    background: transparent;
+    padding: 1rem 1rem;
   }
 `;
 
+interface ProviderButtonProps {
+    isActiveProvider: boolean;
+}
+export const ProviderButton = styled(Button)<ProviderButtonProps>`
+    min-width: 12.1rem;
+    height: 3rem;
+    margin: 0 1rem;
+    transition: all .5s;
+  
+    @media ${mobile} {
+      min-width: 9rem;
+    }
+    
+    .MuiButton-label {
+      color: ${props => props.isActiveProvider ? 'white' : 'black'};
+      text-decoration: none;
+    }
+`;
 
 export const useDatepickerStyles = makeStyles({
     staticWrapperRoot: {
@@ -90,7 +102,7 @@ export const LogWrapper = styled.div`
   background: white;
   min-height: 52rem;
   border-radius: 9rem 9rem 0px 0px;
-
+  padding-bottom: 3rem;
 `;
 
 export const DaysContainer = styled.div`
@@ -100,23 +112,38 @@ export const DaysContainer = styled.div`
   max-width: 189rem;
 
   @media (max-width: 1500px) {
-    padding: 7rem 4rem;
+    padding: 3rem 4rem;
   }
 `;
 
-export const DayColumn = styled.div`
-  width: 19rem;
+export const DayColumn = styled.div<TableModeProp>`
+  width: ${props => props.isSmallTableMode ? '100%' : '19rem'};
 
   @media (max-width: 1500px) {
-    width: 17rem;
+    width: ${props => props.isSmallTableMode ? '100%' : '17rem'};
   }
 
   @media (max-width: 1285px) {
-    width: 15rem;
+    width: ${props => props.isSmallTableMode ? '100%' : '15rem'};
   }
 `;
 
 export const HourText = styled.span`
   font-size: 1.6rem;
   font-weight: bold;
+`;
+
+export const PhoneNumber = styled.a`
+  &,
+  &:hover,
+  &:visited,
+  &:active {
+    color: black;
+    text-decoration: none;
+  }
+`;
+
+export const ActionButton = styled(IconButton)`
+  width: 3.5rem;
+  height: 3.5rem;
 `;

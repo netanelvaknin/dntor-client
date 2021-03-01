@@ -27,7 +27,7 @@ export const Card = ({
       {expandable ? (
         <Accordion
           className={className}
-          classes={{ root: classes.root }}
+          classes={{ root: classes.root, expanded: classes.expanded }}
           disabled={disabled}
         >
           <AccordionSummary

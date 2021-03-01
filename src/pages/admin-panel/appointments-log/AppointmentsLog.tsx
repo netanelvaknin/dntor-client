@@ -7,20 +7,27 @@ import {
     LogWrapper,
     DaysContainer,
     DayColumn,
-    HourText,
-    SubMenu,
-    AppointmentCard
+    EmptyCard,
 } from "./AppointmentsLogStyle";
 import {useScreenSize, useScroll} from "../../../hooks/index";
 import {FabStyle} from "../block-appointments/BlockAppointmentsStyle";
 import arrowIcon from "../../../assets/icons/arrow_up.svg";
 import {useRequestBuilder} from '../../../hooks';
+import {LoadingAppointments} from "../../../animations";
+import AppointmentItem from "./AppointmentItem";
+import SubMenu from './SubMenu';
 
-export const AppointmentsLog = () => {
+interface AppointmentsLogProps {
+    initialServiceProviders: any;
+}
+
+export const AppointmentsLog = (props: AppointmentsLogProps) => {
     const [selectedDate, handleDateChange] = useState<Moment | Date | null>(new Date());
-    const [appointments, setAppointments] = useState([]);
+    const [appointments, setAppointments] = useState<any>([]);
+    const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
     const [weekDates, setWeekDates] = useState([]);
-
+    const [loadingAppointments, setLoadingAppointments] = useState(false);
+    console.log(selectedProviderId)
     const scrolledToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
     const hebrewDays = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 
@@ -29,11 +36,13 @@ export const AppointmentsLog = () => {
     const isSmallTableMode = useScreenSize(0, 1175);
     const scrollPosition = useScroll();
 
-    const getAllAppointments = async (fromDate: Moment, toDate: Moment) => {
+    const getAllAppointments = async (fromDate: Moment, toDate: Moment, providerId?: string | null) => {
+        setLoadingAppointments(true);
         const appointments = await requestBuilder({
             method: 'post',
             endpoint: '/appointments/get',
             payload: {
+                spId: providerId || null,
                 fromDate: fromDate.format('YYYY-MM-DD'),
                 toDate: toDate.format('YYYY-MM-DD')
             },
@@ -42,31 +51,46 @@ export const AppointmentsLog = () => {
 
         if (appointments.ok) {
             setAppointments(appointments.data.res);
+            setTimeout(() => {
+                setLoadingAppointments(false);
+            }, 800);
         }
     };
 
+
     // Get list of all dates for displaying them below the day name
     const getWeekDates = (fromDate: Moment, toDate: Moment) => {
-        const dateArray: any = [];
+        const datesArray: any = [];
         let currentDate = moment(fromDate);
         const stopDate = moment(toDate);
         while (currentDate <= stopDate) {
-            dateArray.push(moment(currentDate).format('DD/MM'))
+            datesArray.push(moment(currentDate).format('DD/MM'))
             currentDate = moment(currentDate).add(1, 'days');
         }
-        return dateArray;
+
+        return datesArray;
     }
 
     useEffect(() => {
         const fromDate = moment(selectedDate).startOf('week');
         const toDate = moment(selectedDate).endOf('week');
-        getAllAppointments(fromDate, toDate);
+
+        if (isSmallTableMode) {
+            getAllAppointments(moment(selectedDate), moment(selectedDate));
+        } else {
+            getAllAppointments(fromDate, toDate, selectedProviderId);
+        }
+
         setWeekDates(getWeekDates(fromDate, toDate));
-    }, [selectedDate]);
+    }, [selectedProviderId, selectedDate, isSmallTableMode]);
 
     return (
         <AppointmentsLogContainer>
-            <SubMenu></SubMenu>
+            <SubMenu
+                initialServiceProviders={props.initialServiceProviders}
+                selectedProviderId={selectedProviderId}
+                setSelectedProviderId={setSelectedProviderId}
+            />
             <DatePicker
                 value={selectedDate}
                 onChange={(e) => handleDateChange(moment(e))}
@@ -76,39 +100,24 @@ export const AppointmentsLog = () => {
             />
 
             <LogWrapper>
-                {isSmallTableMode ? (<></>) : (
+                {loadingAppointments ? <LoadingAppointments/> : (
                     <DaysContainer>
                         {appointments.map((dayInWeek: any, index: number) => {
-                            return <DayColumn key={index}>
-                                <strong>{hebrewDays[index]}</strong>
-                                <strong style={{display: 'block'}}>{weekDates[index]}</strong>
+                            return <DayColumn isSmallTableMode={isSmallTableMode} key={index}>
+                                <div style={{textAlign: 'center', marginBottom: '2rem'}}>
+                                    <strong>{isSmallTableMode ? moment(selectedDate).format('ddd') : hebrewDays[index]}</strong>
+                                    <strong
+                                        style={{display: 'block'}}>{isSmallTableMode ? moment(selectedDate).format('DD/MM') : weekDates[index]}</strong>
+                                </div>
+
                                 {dayInWeek.length > 0 ? dayInWeek.map((appointment: any) => {
                                     return (
-                                        <AppointmentCard
+                                        <AppointmentItem
                                             key={appointment._id}
-                                            scrollPosition={scrollPosition}
-                                            expandable
-                                            cardTitle={
-                                                <div style={{display: "flex", flexDirection: "column"}}>
-                                                    <HourText>08:00-09:00</HourText>
-                                                    <span>{appointment.customerName}</span>
-                                                </div>
-                                            }>
-                                            <div style={{display: "flex", flexDirection: "column"}}>
-                                                <span>{appointment.customerPhone}</span>
-                                                <div>
-                                                    <span style={{fontWeight: "bold"}}>שירות: </span>
-                                                    <span>תספורת גברים מיוחדת מאוד מאוד מאוד</span>
-                                                </div>
-
-                                                {appointment.notes && <div>
-                                                    <span style={{fontWeight: "bold"}}>הערות: </span>
-                                                    <span>{appointment.notes}</span>
-                                                </div>}
-                                            </div>
-                                        </AppointmentCard>
+                                            appointment={appointment}
+                                            isSmallTableMode={isSmallTableMode}/>
                                     )
-                                }) : <p>אין תורים ליום זה</p>}
+                                }) : <EmptyCard isSmallTableMode={isSmallTableMode}>לא נמצאו תורים ליום זה</EmptyCard>}
                             </DayColumn>
                         })}
                     </DaysContainer>

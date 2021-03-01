@@ -37,7 +37,7 @@ export const AdminPanel = () => {
     const renderScreen = () => {
         switch (adminPanelState?.activeNavItem) {
             case "יומן תורים":
-                return <AppointmentsLog/>;
+                return <AppointmentsLog initialServiceProviders={businessRegisterState?.serviceProvidersData?.res}/>;
             case "קביעת תור":
                 return <NewAppointments
                     adminPanelState={adminPanelState}
