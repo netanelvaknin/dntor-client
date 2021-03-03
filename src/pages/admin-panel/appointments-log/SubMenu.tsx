@@ -9,7 +9,8 @@ interface SubMenuProps {
 const SubMenu = ({
                      initialServiceProviders,
                      selectedProviderId,
-                     setSelectedProviderId}: SubMenuProps) => {
+                     setSelectedProviderId
+                 }: SubMenuProps) => {
     const handleProviderClick = (id: string | null) => {
         setSelectedProviderId(id);
     };
@@ -23,13 +24,11 @@ const SubMenu = ({
 
             {initialServiceProviders?.map((provider: any) => {
                 return (
-                    <>
                     <ProviderButton
                         isActiveProvider={provider._id === selectedProviderId}
                         onClick={() => handleProviderClick(provider._id)}
                         variant={provider._id === selectedProviderId ? 'contained' : 'text'}
                         key={provider._id}>{provider.fullName}</ProviderButton>
-                    </>
                 )
             })}
         </SubMenuStyle>

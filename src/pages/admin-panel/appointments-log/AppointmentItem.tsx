@@ -6,15 +6,15 @@ import removeIcon from "../../../assets/icons/remove_icon.svg";
 
 interface AppointmentItemProps {
     appointment: any;
-    isSmallTableMode: boolean;
+    viewMode: 'table' | 'column';
 }
 
-const AppointmentItem = ({appointment, isSmallTableMode}: AppointmentItemProps) => {
+const AppointmentItem = ({appointment, viewMode}: AppointmentItemProps) => {
     return (
         <Fade in timeout={1500}>
             <div>
                 <AppointmentCard
-                    isSmallTableMode={isSmallTableMode}
+                    viewMode={viewMode}
                     expandable
                     cardTitle={
                         <div style={{display: "flex", flexDirection: "column"}}>

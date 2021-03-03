@@ -57,7 +57,7 @@ export const FabStyle = styled(Fab)`
   &:active {
     position: fixed;
     bottom: 7rem;
-    left: 9rem;
+    left: 10rem;
     background: #fff;
 
     @media ${mobile} {

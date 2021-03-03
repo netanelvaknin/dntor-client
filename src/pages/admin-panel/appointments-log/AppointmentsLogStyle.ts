@@ -4,23 +4,23 @@ import {mobile} from "../../../utils/screen-sizes";
 import {Card, Button} from '../../../ui';
 import {IconButton} from '@material-ui/core';
 
-interface TableModeProp {
-    isSmallTableMode: boolean;
+interface ViewModeProps {
+    viewMode: 'table' | 'column';
 }
 
-export const AppointmentCard = styled(Card)<TableModeProp>`
+export const AppointmentCard = styled(Card)<ViewModeProps>`
   margin-bottom: 2rem;
-  max-width: ${props => props.isSmallTableMode && '100%'};
+  max-width: ${props => props.viewMode === 'column' && '100%'};
 `;
 
-export const EmptyCard = styled(Card)<TableModeProp>`
+export const EmptyCard = styled(Card)<ViewModeProps>`
   background: #E2E2E2;
   min-height: 52rem;
   height: 100%;
   font-weight: bold;
   text-align: center;
   padding: 2rem;
-  max-width: ${props => props.isSmallTableMode && '100%'};
+  max-width: ${props => props.viewMode === 'column' && '100%'};
 `;
 
 export const AppointmentsLogContainer = styled.div`
@@ -48,7 +48,6 @@ export const ProviderButton = styled(Button)<ProviderButtonProps>`
     min-width: 12.1rem;
     height: 3rem;
     margin: 0 1rem;
-    transition: all .5s;
   
     @media ${mobile} {
       min-width: 9rem;
@@ -116,15 +115,16 @@ export const DaysContainer = styled.div`
   }
 `;
 
-export const DayColumn = styled.div<TableModeProp>`
-  width: ${props => props.isSmallTableMode ? '100%' : '19rem'};
+export const DayColumn = styled.div<ViewModeProps>`
+  transition: all 5s;
+  width: ${props => props.viewMode === 'column' ? '100%' : '19rem'};
 
   @media (max-width: 1500px) {
-    width: ${props => props.isSmallTableMode ? '100%' : '17rem'};
+    width: ${props => props.viewMode === 'column' ? '100%' : '17rem'};
   }
 
   @media (max-width: 1285px) {
-    width: ${props => props.isSmallTableMode ? '100%' : '15rem'};
+    width: ${props => props.viewMode === 'column' ? '100%' : '15rem'};
   }
 `;
 
@@ -146,4 +146,29 @@ export const PhoneNumber = styled.a`
 export const ActionButton = styled(IconButton)`
   width: 3.5rem;
   height: 3.5rem;
+`;
+
+export const ViewButton = styled(IconButton)`
+  width: 55px;
+  height: 55px;
+  margin: 1rem;
+  &,&:hover {
+    background: white;
+  }
+`;
+
+export const TableModesContainer = styled.div`
+  position: absolute;
+  left: 5rem;
+  top: 15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const ViewOption = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
