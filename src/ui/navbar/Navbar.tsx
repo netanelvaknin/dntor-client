@@ -9,7 +9,7 @@ import {
 import { useHistory, useLocation } from "react-router-dom";
 import { useCookies, withCookies } from "react-cookie";
 import businessRegisterContext from "../../context/business-register/businessRegisterContext";
-import { useSmallScreen } from "../../hooks/index";
+import {useScreenSize, useSmallScreen} from "../../hooks/index";
 import DotsIcon from "../../assets/icons/mobile_dots.svg";
 import NotificationsIcon from "../../assets/icons/notifications.svg";
 import ShareIcon from "../../assets/icons/share.svg";
@@ -27,6 +27,7 @@ export const Navbar = () => {
   const [cookies, remove] = useCookies();
   const isSmallScreen = useSmallScreen();
   const useProfileRef = useRef(null);
+  const isSmallerThan1175px = useScreenSize(0, 1175);
 
   const handleButtonClick = () => {
     if (!cookies.token) {
@@ -76,7 +77,7 @@ export const Navbar = () => {
 
       {location.pathname === "/admin-panel" && (
         <>
-          {!isSmallScreen ? (
+          {!isSmallerThan1175px ? (
             <>
               <AdminActionsContainer>
                 <AdminPanelActionButton

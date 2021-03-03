@@ -21,6 +21,11 @@ export const EmptyCard = styled(Card)<ViewModeProps>`
   text-align: center;
   padding: 2rem;
   max-width: ${props => props.viewMode === 'column' && '100%'};
+  
+  @media ${mobile} {
+    min-height: auto;
+    height: 100%;
+  }
 `;
 
 export const AppointmentsLogContainer = styled.div`
@@ -101,7 +106,7 @@ export const LogWrapper = styled.div`
   background: white;
   min-height: 52rem;
   border-radius: 9rem 9rem 0px 0px;
-  padding-bottom: 3rem;
+  padding-bottom: 5%;
 `;
 
 export const DaysContainer = styled.div`

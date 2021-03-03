@@ -40,6 +40,7 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
     const requestBuilder = useRequestBuilder();
     const classes = useDatepickerStyles();
     const isSmallerThan1175px = useScreenSize(0, 1175);
+    console.log({isSmallerThan1175px});
     const viewMode = isSmallerThan1175px ? 'column' : view;
     const isSmallScreen = useSmallScreen();
     const scrollPosition = useScroll();
