@@ -213,7 +213,7 @@ export const NewAppointments = ({initialServiceProviders, adminPanelState}: NewA
                                     }
                                 }}
                             >
-                                {businessServices.map((service: any) => {
+                                {businessServices?.map((service: any) => {
                                     return <MenuItem value={service._id}
                                                      key={service._id}>{service.serviceName}</MenuItem>
                                 })}

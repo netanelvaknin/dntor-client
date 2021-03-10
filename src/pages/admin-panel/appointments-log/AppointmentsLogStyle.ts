@@ -177,3 +177,9 @@ export const ViewOption = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
+export const DecisionButton = styled(Button)`
+  width: 20rem;
+  height: 4rem;
+  margin: 1.5rem;
+`;

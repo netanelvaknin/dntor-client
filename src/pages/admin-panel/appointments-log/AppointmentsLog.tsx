@@ -21,6 +21,7 @@ import {useRequestBuilder} from '../../../hooks';
 import {LoadingAppointments} from "../../../animations";
 import AppointmentItem from "./AppointmentItem";
 import SubMenu from './SubMenu';
+import RemovingConfirmation from "./RemovingConfirmation";
 
 interface AppointmentsLogProps {
     initialServiceProviders: any;
@@ -33,6 +34,8 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
     const [view, setView] = useState<'table' | 'column'>('table');
     const [weekDates, setWeekDates] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(false);
+    const [removingDialogOpen, setRemovingDialogOpen] = useState(false);
+    const [appointmentToRemove, setAppointmentToRemove] = useState('');
 
     const scrolledToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
     const hebrewDays = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
@@ -40,7 +43,6 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
     const requestBuilder = useRequestBuilder();
     const classes = useDatepickerStyles();
     const isSmallerThan1175px = useScreenSize(0, 1175);
-    console.log({isSmallerThan1175px});
     const viewMode = isSmallerThan1175px ? 'column' : view;
     const isSmallScreen = useSmallScreen();
     const scrollPosition = useScroll();
@@ -80,13 +82,23 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
         return datesArray;
     }
 
+    const handleDialogOpen = (id: string) => {
+        setRemovingDialogOpen(true);
+        setAppointmentToRemove(id);
+    }
+
+    const handleRemoveAppointment = (appointmentId: string) => {
+        setRemovingDialogOpen(true);
+        console.log(appointmentId);
+    };
+
     useEffect(() => {
         const fromDate = moment(selectedDate).startOf('week');
         const toDate = moment(selectedDate).endOf('week');
 
         if (viewMode === 'column') {
-            getAllAppointments(moment(selectedDate), moment(selectedDate));
-        } else {
+            getAllAppointments(moment(selectedDate), moment(selectedDate), selectedProviderId);
+        } else if (viewMode === 'table') {
             getAllAppointments(fromDate, toDate, selectedProviderId);
         }
 
@@ -126,7 +138,7 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
                                 src={tableIcon}
                                 alt="תצוגת טבלה"/>
                         </ViewButton>
-                        <span style={{fontSize: '1.4rem'}}>טבלה</span>
+                        <span style={{fontSize: '1.4rem'}}>שבוע</span>
                     </ViewOption>
                 </div>
             </TableModesContainer>}
@@ -137,9 +149,9 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
                         {appointments.map((dayInWeek: any, index: number) => {
                             return <DayColumn viewMode={viewMode} key={index}>
                                 <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-                                    <strong>{viewMode ? moment(selectedDate).format('ddd') : hebrewDays[index]}</strong>
+                                    <strong>{viewMode === 'column' ? moment(selectedDate).format('ddd') : hebrewDays[index]}</strong>
                                     <strong
-                                        style={{display: 'block'}}>{viewMode ? moment(selectedDate).format('DD/MM') : weekDates[index]}</strong>
+                                        style={{display: 'block'}}>{viewMode === 'column' ? moment(selectedDate).format('DD/MM') : weekDates[index]}</strong>
                                 </div>
 
                                 {dayInWeek.length > 0 ? dayInWeek.map((appointment: any) => {
@@ -147,7 +159,9 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
                                         <AppointmentItem
                                             key={appointment._id}
                                             appointment={appointment}
-                                            viewMode={viewMode}/>
+                                            viewMode={viewMode}
+                                            handleDialogOpen={handleDialogOpen}
+                                        />
                                     )
                                 }) : <EmptyCard viewMode={viewMode}>לא נמצאו תורים ליום זה</EmptyCard>}
                             </DayColumn>
@@ -163,6 +177,15 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
                     <img src={arrowIcon} alt="אייקון כיוון גלילה" style={{transform: 'rotate(180deg)'}}/>
                 )}
             </FabStyle>}
+
+            <RemovingConfirmation
+                appointments={appointments}
+                setAppointments={setAppointments}
+                appointmentToRemove={appointmentToRemove}
+                setAppointmentToRemove={setAppointmentToRemove}
+                removingDialogOpen={removingDialogOpen}
+                setRemovingDialogOpen={setRemovingDialogOpen}
+            />
         </AppointmentsLogContainer>
     );
 };

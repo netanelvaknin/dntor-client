@@ -515,9 +515,9 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                         </Grid>
                     </div>
                 </div>
-                <div>
-                    <Busy />
-                </div>
+                {!isSmallScreen && <div>
+                     <Busy />
+                </div>}
             </form>
 
             <Grid container justify="center" style={{maxWidth: isSmallScreen ? '100%' : '50%', marginTop: '2rem'}}>
@@ -585,7 +585,6 @@ export const BlockAppointments = ({serviceProviderData}: BlockAppointmentsProps)
                 })}
 
                 {businessBlockedAppointments.map((businessBlockedAppointment: any, index: number) => {
-                    console.log(businessBlockedAppointment);
                     return (
                         <BlockedAppointmentsCard key={index}>
                             <Grid
