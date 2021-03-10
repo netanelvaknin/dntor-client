@@ -9,7 +9,7 @@ import {
 import { useHistory, useLocation } from "react-router-dom";
 import { useCookies, withCookies } from "react-cookie";
 import businessRegisterContext from "../../context/business-register/businessRegisterContext";
-import {useScreenSize, useSmallScreen} from "../../hooks/index";
+import {useScreenSize} from "../../hooks/index";
 import DotsIcon from "../../assets/icons/mobile_dots.svg";
 import NotificationsIcon from "../../assets/icons/notifications.svg";
 import ShareIcon from "../../assets/icons/share.svg";
@@ -25,7 +25,6 @@ export const Navbar = () => {
   const history = useHistory();
   const location = useLocation();
   const [cookies, remove] = useCookies();
-  const isSmallScreen = useSmallScreen();
   const useProfileRef = useRef(null);
   const isSmallerThan1175px = useScreenSize(0, 1175);
 

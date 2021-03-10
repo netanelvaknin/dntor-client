@@ -15,7 +15,6 @@ const AppointmentItem = ({
                              viewMode,
                              handleDialogOpen
                          }: AppointmentItemProps) => {
-
     return (
         <>
             <Fade in timeout={1500}>
@@ -66,22 +65,24 @@ const AppointmentItem = ({
                                              alt="עריכה"/></ActionButton>
                                     <span>עריכה</span>
                                 </Grid>
-                                <Grid
-                                    item
-                                    container
-                                    direction="column"
-                                    md={6}
-                                    xs={6}
-                                    justify="center"
-                                    alignItems="center">
-                                    <ActionButton
-                                        style={{background: '#F97575'}}
-                                        onClick={() => handleDialogOpen(appointment._id)}
-                                    >
-                                        <img src={removeIcon} alt="מחיקה"/>
-                                    </ActionButton>
-                                    <span>מחיקה</span>
-                                </Grid>
+                                {moment().isBefore(moment(appointment.to)) && (
+                                    <Grid
+                                        item
+                                        container
+                                        direction="column"
+                                        md={6}
+                                        xs={6}
+                                        justify="center"
+                                        alignItems="center">
+                                        <ActionButton
+                                            style={{background: '#F97575'}}
+                                            onClick={() => handleDialogOpen(appointment._id)}
+                                        >
+                                            <img src={removeIcon} alt="מחיקה"/>
+                                        </ActionButton>
+                                        <span>מחיקה</span>
+                                    </Grid>
+                                )}
                             </Grid>
                         </div>
                     </AppointmentCard>

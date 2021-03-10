@@ -87,11 +87,6 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
         setAppointmentToRemove(id);
     }
 
-    const handleRemoveAppointment = (appointmentId: string) => {
-        setRemovingDialogOpen(true);
-        console.log(appointmentId);
-    };
-
     useEffect(() => {
         const fromDate = moment(selectedDate).startOf('week');
         const toDate = moment(selectedDate).endOf('week');
