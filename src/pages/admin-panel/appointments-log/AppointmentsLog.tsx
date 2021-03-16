@@ -98,6 +98,7 @@ export const AppointmentsLog = (props: AppointmentsLogProps) => {
         }
 
         setWeekDates(getWeekDates(fromDate, toDate));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedProviderId, selectedDate, viewMode]);
 
     return (

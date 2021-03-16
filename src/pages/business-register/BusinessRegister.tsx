@@ -186,7 +186,6 @@ export const BusinessRegister = () => {
                     setCurrentStep={setCurrentStep}
                     showMobileView={showMobileView}
                     setShowMobileView={setShowMobileView}
-                    currentStep={currentStep}
                 />
             ),
         },

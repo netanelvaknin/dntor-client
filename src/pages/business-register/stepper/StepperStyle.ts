@@ -7,6 +7,7 @@ export const StepperContainerStyle = styled.div`
     top: 0;
     left: -16.6rem;
     height: 100%;
+    max-height: 55rem;
     width: 19rem;
     display: flex;
     flex-direction: column;

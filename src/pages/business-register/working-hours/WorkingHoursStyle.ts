@@ -2,16 +2,11 @@ import styled from 'styled-components/macro';
 import {TextField, Button} from '../../../ui/index';
 import {Grid, Typography} from '@material-ui/core';
 import {mobile, tablet} from '../../../utils/screen-sizes';
-import {Card, Checkbox} from "../../../ui/index";
+import {Checkbox} from "../../../ui/index";
 
-interface RightGridProps {
-    $workingHoursLength: number;
-}
-
-export const RightGrid = styled(Grid)<RightGridProps>`
+export const RightGrid = styled(Grid)`
   margin: 0 auto;
   padding: 0rem 2rem 0rem;
-  max-width: ${props => props.$workingHoursLength > 0 ? '32rem' : 'auto'};
 
   @media ${mobile} {
     padding: 0;
@@ -61,23 +56,6 @@ export const AddButton = styled(Button)`
   }
 `;
 
-export const WorkingHourCard = styled(Card)`
-  width: 22rem;
-  min-height: 8.5rem;
-  position: relative;
-  margin-bottom: 2rem;
-  padding: 1rem;
-
-  @media ${mobile} {
-    width: 80%;
-    max-width: 32rem;
-  }
-`;
-
-export const MobileAddButton = styled(Button)`
-  padding: 1.5rem;
-  width: 28rem;
-`;
 
 export const DayCheckbox = styled(Checkbox)`
   margin: 10px !important;
