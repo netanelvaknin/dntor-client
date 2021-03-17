@@ -85,6 +85,7 @@ export const WorkingHours = ({
     const onSubmit = async () => {
         const errors = validate(hours);
         const finalResult: any = [];
+
         if (errors.length <= 0) {
             Object.keys(hours).forEach((key) => {
                 finalResult.push({
@@ -119,7 +120,7 @@ export const WorkingHours = ({
         if (initialWorkTimesData) {
             let data = {};
             let newCheckedDays: any = {};
-            initialWorkTimesData.res.days.forEach((day: any) => {
+            initialWorkTimesData?.res?.days?.forEach((day: any) => {
                 const key = day.days;
                 data = {
                     ...data,
