@@ -2,6 +2,7 @@ import React, {forwardRef, useContext, useEffect, useState} from "react";
 import {Dialog, Grid, IconButton, Slide, Typography} from "@material-ui/core";
 import ServiceProvidersInfoDialog from "./service-providers-info-dialog/ServiceProvidersInfoDialog";
 import AdditionalHoursModal from "./additional-hours-modal/AdditionalHoursModal";
+import {translateDaysToEnglish, translateDaysToHebrew} from '../../../utils/functions';
 import {Button, Checkbox, TextField} from "../../../ui/index";
 import {useForm} from "react-hook-form";
 import {TransitionProps} from "@material-ui/core/transitions";
@@ -65,49 +66,256 @@ export const ServiceProviders = ({
     });
     const requestBuilder = useRequestBuilder();
 
+    const [errors, setErrors] = useState<any>([]);
     const [mountedOnce, setMountedOnce] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [additionalHoursOpen, setAdditionalHoursOpen] = useState(false);
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-    const [showBreakOne, setShowBreakOne] = useState(false);
-    const [showBreakTwo, setShowBreakTwo] = useState(false);
-    const [showBreakThree, setShowBreakThree] = useState(false);
-    const [showAddBreakButton, setShowAddBreakButton] = useState(true);
-
-    // Days states
-    const [sunday, setSunday] = useState({selected: false, disabled: false});
-    const [monday, setMonday] = useState({selected: false, disabled: false});
-    const [tuesday, setTuesday] = useState({selected: false, disabled: false});
-    const [wednesday, setWednesday] = useState({
-        selected: false,
-        disabled: false,
+    const [checkedDay, setCheckedDay] = useState<any>({
+        sunday: false,
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false,
+        friday: false,
+        saturday: false,
     });
-    const [thursday, setThursday] = useState({
-        selected: false,
-        disabled: false,
-    });
-    const [friday, setFriday] = useState({selected: false, disabled: false});
-    const [saturday, setSaturday] = useState({
-        selected: false,
-        disabled: false,
-    });
-
-    // Hours states
-    const [startWorking, setStartWorking] = useState("08:00");
-    const [endWorking, setEndWorking] = useState("18:00");
-
-    // Breaks states
-    const [startBreakOne, setStartBreakOne] = useState("08:00");
-    const [endBreakOne, setEndBreakOne] = useState("18:00");
-    const [startBreakTwo, setStartBreakTwo] = useState("08:00");
-    const [endBreakTwo, setEndBreakTwo] = useState("18:00");
-    const [startBreakThree, setStartBreakThree] = useState("08:00");
-    const [endBreakThree, setEndBreakThree] = useState("18:00");
+    const [disabledDays, setDisabledDays] = useState({})
+    const [hours, setHours] = useState<any>({});
 
     const providerName = watch("provider_name");
     const confirmationClasses = useConfirmationDialogStyles();
 
     const isSmallScreen = useSmallScreen();
+
+    const handleChangeDay = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, checked} = event.target
+
+        setHours((prev: any) => {
+            if (checked) {
+                return {...prev, [name]: {from: "08:00", to: "17:00", breaks: []}}
+            }
+            const {[name]: namesValue, ...rest} = prev
+            return rest
+        })
+
+        setCheckedDay((prev: any) => ({...prev, [name]: checked}))
+    }
+
+    const handleServiceChange = (index: number) => {
+        const servicesCopy = [...services];
+        servicesCopy[index].selected = !servicesCopy[index].selected;
+
+        setServices(servicesCopy);
+    };
+
+    const handleAddProvider = () => {
+        let providerData: any = {};
+
+        const currentSelectedServices = services.filter((service: any) => {
+            if (service.selected) {
+                return {name: service.serviceName, ...service};
+            }
+
+            return null;
+        });
+
+        const initialWorkingHoursCopy = [...initialWorkingHours];
+        const currentProviderDataCopy: any = [...currentProviderData];
+
+        initialWorkingHoursCopy.map((w: any) => {
+            return (w.days = translateDaysToHebrew(w.days));
+        });
+
+        currentProviderDataCopy.map((c: any) => {
+            return (c.days = translateDaysToHebrew(c.days));
+        });
+
+        providerData.providerName = providerName;
+        providerData.services = currentSelectedServices;
+
+        if (sameHours) {
+            providerData.workTimes = [{days: initialWorkingHoursCopy}];
+        } else {
+            providerData.workTimes = [{days: currentProviderData}];
+        }
+
+        if (providerName !== "") {
+            rootState?.setError("");
+
+            if (currentSelectedServices.length > 0) {
+                rootState?.setError("");
+                if (providerData.workTimes[0].days.length > 0) {
+                    if (serviceProviders.length < 5) {
+                        setServiceProviders([...serviceProviders, providerData]);
+
+                        // Reset and move to providers view
+                        reset({provider_name: ""});
+                        resetSelectedServices();
+                        setCurrentProviderData([]);
+                        setSameHours(true);
+                        setShowMobileView(true);
+                        setCheckedDay({
+                            sunday: false,
+                            monday: false,
+                            tuesday: false,
+                            wednesday: false,
+                            thursday: false,
+                            friday: false,
+                            saturday: false,
+                        });
+
+                        setDisabledDays({});
+                        setHours({});
+                    } else {
+                        rootState?.setError('לא ניתן להוסיף יותר מ-5 נותני שירות לעסק אחד')
+                    }
+                } else {
+                    rootState?.setError(`נא להוסיף שעות פעילות עבור ${providerName}`);
+                }
+            } else {
+                rootState?.setError(`נא לסמן לפחות שירות אחד ש${providerName} נותנ/ת`);
+            }
+        } else {
+            rootState?.setError("נא לבדוק ששם נותן השירות תקין");
+        }
+    };
+
+    const resetSelectedServices = () => {
+        const servicesCopy = [...services];
+        servicesCopy.map((service: any) => {
+            return (service.selected = false);
+        });
+    };
+
+    const removeServiceProvider = async (index: number, spId: string) => {
+        const serviceProvidersCopy = [...serviceProviders];
+        serviceProvidersCopy.splice(index, 1);
+        setServiceProviders(serviceProvidersCopy);
+
+        if (spId) {
+            rootState?.setLoader(<Delete/>);
+            await requestBuilder({
+                method: 'post',
+                endpoint: '/serviceProvider/remove',
+                payload: {spId}
+            });
+        }
+    }
+
+    const validate = (hours: any) => {
+        const errors: any[] = [];
+        const atleastOneCheckedDay = Object.entries(checkedDay).some(([key, value]: any) => {
+            return value;
+        })
+
+        if (atleastOneCheckedDay) {
+            Object.entries(hours).forEach(([, value]: any) => {
+                const startWorkingTime = moment(value.from, "hh:mm");
+                const endWorkingTime = moment(value.to, "hh:mm");
+                if (startWorkingTime.isBefore(endWorkingTime)) {
+                    value.breaks.forEach((b: any) => {
+                        const startBreakTime = moment(b.from, "hh:mm");
+                        const endBreakTime = moment(b.to, "hh:mm");
+
+                        if (!startBreakTime.isBefore(endBreakTime)) {
+                            errors.push('זמן ההתחלה של אחת ההפסקות הוא אחרי זמן הסיום שנבחר.');
+                        }
+
+                        if (!startBreakTime.isBetween(startWorkingTime, endWorkingTime) || !endBreakTime.isBetween(startWorkingTime, endWorkingTime)) {
+                            errors.push('זמן ההתחלה או הסיום של אחת ההפסקות הוא לא בין שעות העבודה שנבחרו.')
+                        }
+                    });
+                } else {
+                    errors.push('זמן ההתחלה של אחד מימי העבודה הוא אחרי זמן הסיום שהוזן.');
+                }
+
+            });
+        } else {
+            errors.push('נא לסמן לפחות יום עבודה אחד');
+        }
+        return errors;
+    }
+
+    const onSave = async () => {
+        const errors = validate(hours);
+        const selectedDays: any = [];
+
+        if (errors.length <= 0) {
+            setErrors([]);
+
+            Object.keys(hours).forEach((key) => {
+                selectedDays.push({
+                    days: [key],
+                    workingHours: {
+                        from: hours[key].from,
+                        to: hours[key].to
+                    },
+                    breaks: [
+                        ...hours[key].breaks
+                    ]
+                })
+            });
+
+
+            // Making sure that when user opens the modal for 2nd time
+            // The hours will not be duplicated
+            const finalResult: any = [];
+            selectedDays.forEach((selected: any) => {
+                if (currentProviderData.length === 0) {
+                    finalResult.push(selected);
+                } else {
+                    currentProviderData.forEach((data: any) => {
+                        if (data.days[0] !== selected.days[0]) {
+                            finalResult.push(selected);
+                        }
+                    })
+                }
+            });
+
+            setCurrentProviderData(finalResult);
+            handleCloseHoursModal();
+        } else {
+            setErrors(errors);
+        }
+    };
+
+    const handleCloseHoursModal = () => {
+        setErrors([]);
+        let newDisabledDays: any = {};
+        Object.entries(checkedDay).forEach(
+            ([key, value]) => {
+                if (value) {
+                    newDisabledDays[key] = value;
+                }
+            }
+        );
+
+        setDisabledDays(newDisabledDays);
+        setAdditionalHoursOpen(false);
+    }
+
+    const handleConfirmationDialogActions = (action: number) => {
+        if (action === 1) {
+            setCurrentProviderData([]);
+            setConfirmationDialogOpen(false);
+            setCurrentProviderData([]);
+            setDisabledDays({});
+            setHours({});
+            setCheckedDay({
+                sunday: false,
+                monday: false,
+                tuesday: false,
+                wednesday: false,
+                thursday: false,
+                friday: false,
+                saturday: false,
+            });
+        } else if (action === 2) {
+            setConfirmationDialogOpen(false);
+            setSameHours(false);
+        }
+    };
 
     const onSubmit = async () => {
         rootState?.setLoader(<Loader/>);
@@ -206,401 +414,6 @@ export const ServiceProviders = ({
         setServices(initialServices);
     }, [initialServicesData]);
 
-    const handleServiceChange = (index: number) => {
-        const servicesCopy = [...services];
-        servicesCopy[index].selected = !servicesCopy[index].selected;
-
-        setServices(servicesCopy);
-    };
-
-    const handleAddBreak = () => {
-        if (!showBreakOne && !showBreakTwo && !showBreakThree) {
-            setShowBreakOne(true);
-        } else if (!showBreakTwo && !showBreakThree) {
-            setShowBreakTwo(true);
-        } else if (!showBreakThree) {
-            setShowBreakThree(true);
-            setShowAddBreakButton(false);
-        }
-    };
-
-    const handleRemoveBreak = (breakNumber: number) => {
-        switch (breakNumber) {
-            case 1:
-                setShowBreakOne(false);
-                break;
-            case 2:
-                setShowBreakTwo(false);
-                break;
-            case 3:
-                setShowBreakThree(false);
-        }
-    };
-
-    const handleSaveDaysAndHours = () => {
-        // Setup breaks array
-        const breaks: any = [];
-
-        const workStartTime = moment(startWorking, "hh:mm");
-        const workEndTime = moment(endWorking, "hh:mm");
-        const startIsBeforeEnd = workStartTime.isBefore(workEndTime);
-        let workTimesError = "";
-
-        if (!startIsBeforeEnd) {
-            workTimesError = "זמן התחלה גדול מזמן סיום";
-        }
-
-        const startBreakOneTime = moment(startBreakOne, "hh:mm");
-        const endBreakOneTime = moment(endBreakOne, "hh:mm");
-        const startBreakTwoTime = moment(startBreakTwo, "hh:mm");
-        const endBreakTwoTime = moment(endBreakTwo, "hh:mm");
-        const startBreakThreeTime = moment(startBreakThree, "hh:mm");
-        const endBreakThreeTime = moment(endBreakThree, "hh:mm");
-        const isStartBreakOneValid =
-            startBreakOneTime.isBetween(workStartTime, workEndTime) &&
-            startBreakOneTime.isAfter(workStartTime) &&
-            startBreakOneTime.isBefore(endBreakOneTime);
-        const isEndBreakOneValid =
-            endBreakOneTime.isBetween(workStartTime, workEndTime) &&
-            endBreakOneTime.isBefore(workEndTime);
-        const isStartBreakTwoValid =
-            startBreakTwoTime.isBetween(workStartTime, workEndTime) &&
-            startBreakTwoTime.isAfter(workStartTime) &&
-            startBreakTwoTime.isBefore(endBreakTwoTime);
-        const isEndBreakTwoValid =
-            endBreakTwoTime.isBetween(workStartTime, workEndTime) &&
-            endBreakTwoTime.isBefore(workEndTime);
-        const isStartBreakThreeValid =
-            startBreakThreeTime.isBetween(workStartTime, workEndTime) &&
-            startBreakThreeTime.isAfter(workStartTime) &&
-            startBreakThreeTime.isBefore(endBreakThreeTime);
-        const isEndBreakThreeValid =
-            endBreakThreeTime.isBetween(workStartTime, workEndTime) &&
-            endBreakThreeTime.isBefore(workEndTime);
-
-        let breaksError = "";
-
-        if (showBreakOne) {
-            if (isStartBreakOneValid && isEndBreakOneValid) {
-                breaks.push({from: startBreakOne, to: endBreakOne});
-            } else {
-                breaksError =
-                    "נא לבדוק ששעות ההפסקה שהוגדרו הגיוניות ובין שעות העבודה של העסק";
-            }
-        }
-
-        if (showBreakTwo) {
-            if (isStartBreakTwoValid && isEndBreakTwoValid) {
-                breaks.push({from: startBreakTwo, to: endBreakTwo});
-            } else {
-                breaksError =
-                    "נא לבדוק ששעות ההפסקה שהוגדרו הגיוניות ובין שעות העבודה של העסק";
-            }
-        }
-
-        if (showBreakThree) {
-            if (isStartBreakThreeValid && isEndBreakThreeValid) {
-                breaks.push({from: startBreakThree, to: endBreakThree});
-            } else {
-                breaksError =
-                    "נא לבדוק ששעות ההפסקה שהוגדרו הגיוניות ובין שעות העבודה של העסק";
-            }
-        }
-
-        if (!breaksError && !workTimesError) {
-            // Extract the selected days
-            const currentProviderDataCopy = JSON.stringify(currentProviderData);
-
-            // Include only the days that selected and unique for each card
-            const selectedDaysNames: any = [];
-            sunday.selected && !sunday.disabled && !currentProviderDataCopy.includes("sunday") && selectedDaysNames.push("sunday");
-            monday.selected && !currentProviderDataCopy.includes("monday") && selectedDaysNames.push("monday");
-            tuesday.selected && !currentProviderDataCopy.includes("tuesday") && selectedDaysNames.push("tuesday");
-            wednesday.selected && !currentProviderDataCopy.includes("wednesday") && selectedDaysNames.push("wednesday");
-            thursday.selected && !currentProviderDataCopy.includes("thursday") && selectedDaysNames.push("thursday");
-            friday.selected && !currentProviderDataCopy.includes("friday") && selectedDaysNames.push("friday");
-            saturday.selected && !currentProviderDataCopy.includes("saturday") && selectedDaysNames.push("saturday");
-
-            // collect all initial working days from the current business
-            const days = initialWorkingHours.map((workingHours: any) => {
-                return workingHours.days;
-            });
-
-            const businessDays = days.flat();
-
-            // Check if one of the selected days inside the checkbox is exist in initial working hours from step 2
-            if (
-                (sunday.selected && !businessDays.includes('sunday')) ||
-                (monday.selected && !businessDays.includes('monday')) ||
-                (tuesday.selected && !businessDays.includes('tuesday')) ||
-                (wednesday.selected && !businessDays.includes('wednesday')) ||
-                (thursday.selected && !businessDays.includes('thursday')) ||
-                (friday.selected && !businessDays.includes('friday')) ||
-                (saturday.selected && !businessDays.includes('saturday'))
-            ) {
-                rootState?.setError('בחרת בימים שבהם העסק סגור. אם אחד מנותני השירות עובד בשעות אחרות יש לחזור לשלב "שעות פעילות" ולשנות שם את ימי הפעילות.')
-            } else {
-                rootState?.setError('');
-
-                const isValidWorkTimes = initialWorkingHours.every((workingHours: any) => {
-                    const hours = workingHours.workingHours;
-
-                    return workingHours.days.every((day: string) => {
-                        const dayIncluded = selectedDaysNames.includes(day);
-
-                        if (dayIncluded) {
-                            const initialWorkStart = moment(hours.from, "hh:mm");
-                            const initialWorkEnd = moment(hours.to, "hh:mm");
-                            const startTimeValid = workStartTime.isBetween(initialWorkStart, initialWorkEnd) || workStartTime.isSame(initialWorkStart);
-                            const endTimeValid = workEndTime.isBetween(initialWorkStart, initialWorkEnd) || workEndTime.isSame(initialWorkEnd);
-                            return startTimeValid && endTimeValid;
-                        }
-
-                        return true;
-                    });
-                });
-
-                if (isValidWorkTimes) {
-                    // Disabled the selected days
-                    sunday.selected && setSunday({...sunday, disabled: true});
-                    monday.selected && setMonday({...monday, disabled: true});
-                    tuesday.selected && setTuesday({...tuesday, disabled: true});
-                    wednesday.selected && setWednesday({...wednesday, disabled: true});
-                    thursday.selected && setThursday({...thursday, disabled: true});
-                    friday.selected && setFriday({...friday, disabled: true});
-                    saturday.selected && setSaturday({...saturday, disabled: true});
-
-                    if (selectedDaysNames.length > 0) {
-                        setCurrentProviderData([
-                            ...currentProviderData, {
-                                days: selectedDaysNames,
-                                workingHours: {
-                                    from: startWorking,
-                                    to: endWorking,
-                                },
-                                breaks,
-                            }]);
-
-                        // Reset and close
-                        setShowBreakOne(false);
-                        setShowBreakTwo(false);
-                        setShowBreakThree(false);
-                        setAdditionalHoursOpen(false);
-                        rootState?.setError("");
-                    }
-                } else {
-                    rootState?.setError('רק רגע ! בחרת ימים ושעות שלא תואמות לשעות העסק. נא לוודא שהשעות שבחרת מתאימות עבור כל אחד מהימים.')
-                }
-
-
-            }
-        } else if (breaksError) {
-            rootState?.setError(breaksError);
-        } else if (workTimesError) {
-            rootState?.setError(workTimesError);
-        }
-    };
-
-    const handleConfirmationDialogActions = (action: number) => {
-        if (action === 1) {
-            setCurrentProviderData([]);
-            setConfirmationDialogOpen(false);
-            resetDays();
-        } else if (action === 2) {
-            setConfirmationDialogOpen(false);
-            setSameHours(false);
-        }
-    };
-
-    const resetDays = () => {
-        setSunday({selected: false, disabled: false});
-        setMonday({selected: false, disabled: false});
-        setTuesday({selected: false, disabled: false});
-        setWednesday({selected: false, disabled: false});
-        setThursday({selected: false, disabled: false});
-        setFriday({selected: false, disabled: false});
-        setSaturday({selected: false, disabled: false});
-    };
-
-    const removeWorkTimesCard = (index: number) => {
-        const currentServiceProviderCopy = [...currentProviderData];
-        const daysToEnable = currentServiceProviderCopy[index].days;
-        daysToEnable.includes("sunday") &&
-        setSunday({selected: false, disabled: false});
-        daysToEnable.includes("monday") &&
-        setMonday({selected: false, disabled: false});
-        daysToEnable.includes("tuesday") &&
-        setTuesday({selected: false, disabled: false});
-        daysToEnable.includes("wednesday") &&
-        setWednesday({selected: false, disabled: false});
-        daysToEnable.includes("thursday") &&
-        setThursday({selected: false, disabled: false});
-        daysToEnable.includes("friday") &&
-        setFriday({selected: false, disabled: false});
-        daysToEnable.includes("saturday") &&
-        setSaturday({selected: false, disabled: false});
-        currentServiceProviderCopy.splice(index, 1);
-        setCurrentProviderData(currentServiceProviderCopy);
-    };
-
-    const handleAddProvider = () => {
-        let providerData: any = {};
-
-
-        const currentSelectedServices = services.filter((service: any) => {
-            if (service.selected) {
-                return {name: service.serviceName, ...service};
-            }
-
-            return null;
-        });
-
-
-        const initialWorkingHoursCopy = [...initialWorkingHours];
-        const currentProviderDataCopy: any = [...currentProviderData];
-
-        initialWorkingHoursCopy.map((w: any) => {
-            return (w.days = translateDaysToHebrew(w.days));
-        });
-
-        currentProviderDataCopy.map((c: any) => {
-            return (c.days = translateDaysToHebrew(c.days));
-        });
-
-        providerData.providerName = providerName;
-        providerData.services = currentSelectedServices;
-
-        if (sameHours) {
-            providerData.workTimes = [{days: initialWorkingHoursCopy}];
-        } else {
-            providerData.workTimes = [{days: currentProviderData}];
-        }
-
-
-        if (providerName !== "") {
-            rootState?.setError("");
-
-            if (currentSelectedServices.length > 0) {
-                rootState?.setError("");
-                if (providerData.workTimes[0].days.length > 0) {
-                    if (serviceProviders.length < 5) {
-                        setServiceProviders([...serviceProviders, providerData]);
-
-                        // Reset and move to providers view
-                        resetDays();
-                        reset({provider_name: ""});
-                        resetSelectedServices();
-                        setCurrentProviderData([]);
-                        setSameHours(true);
-                        setShowMobileView(true);
-                    } else {
-                        rootState?.setError('לא ניתן להוסיף יותר מ-5 נותני שירות לעסק אחד')
-                    }
-                } else {
-                    rootState?.setError(`נא להוסיף שעות פעילות עבור ${providerName}`);
-                }
-            } else {
-                rootState?.setError(`נא לסמן לפחות שירות אחד ש${providerName} נותנ/ת`);
-            }
-        } else {
-            rootState?.setError("נא לבדוק ששם נותן השירות תקין");
-        }
-    };
-
-
-    const resetSelectedServices = () => {
-        const servicesCopy = [...services];
-        servicesCopy.map((service: any) => {
-            return (service.selected = false);
-        });
-    };
-
-    useEffect(() => {
-        if (!showBreakOne || !showBreakTwo || !showBreakThree) {
-            setShowAddBreakButton(true);
-        }
-    }, [showBreakOne, showBreakTwo, showBreakThree]);
-
-    const translateDaysToHebrew = (daysArr: string[]) => {
-        if (daysArr) {
-            if (
-                daysArr.includes("א") ||
-                daysArr.includes("ב") ||
-                daysArr.includes("ג") ||
-                daysArr.includes("ד") ||
-                daysArr.includes("ה") ||
-                daysArr.includes("ו") ||
-                daysArr.includes("ש")
-            ) {
-                return daysArr;
-            }
-
-            const daysNames: any = {
-                sunday: "א",
-                monday: "ב",
-                tuesday: "ג",
-                wednesday: "ד",
-                thursday: "ה",
-                friday: "ו",
-                saturday: "ש",
-            };
-
-            return daysArr.map((day: string) => {
-                return daysNames[day];
-            });
-        }
-
-    };
-
-    const translateDaysToEnglish = (daysArr: string[]) => {
-        if (
-            daysArr.includes("sunday") ||
-            daysArr.includes("monday") ||
-            daysArr.includes("tuesday") ||
-            daysArr.includes("wednesday") ||
-            daysArr.includes("thursday") ||
-            daysArr.includes("friday") ||
-            daysArr.includes("saturday")
-        ) {
-            return daysArr;
-        }
-
-        return daysArr.map((day: string) => {
-            if (day === 'א') {
-                return 'sunday';
-            } else if (day === 'ב') {
-                return 'monday';
-            } else if (day === 'ג') {
-                return 'tuesday';
-            } else if (day === 'ד') {
-                return 'wednesday';
-            } else if (day === 'ה') {
-                return 'thursday';
-            } else if (day === 'ו') {
-                return 'friday';
-            } else if (day === 'ש') {
-                return 'saturday';
-            } else {
-                return null;
-            }
-        });
-    };
-
-    const removeServiceProvider = async (index: number, spId: string) => {
-        const serviceProvidersCopy = [...serviceProviders];
-        serviceProvidersCopy.splice(index, 1);
-        setServiceProviders(serviceProvidersCopy);
-
-        if (spId) {
-            rootState?.setLoader(<Delete/>);
-            await requestBuilder({
-                method: 'post',
-                endpoint: '/serviceProvider/remove',
-                payload: {spId}
-            });
-        }
-    }
-
     useEffect(() => {
         if (sameHours && currentProviderData.length > 0) {
             setConfirmationDialogOpen(true);
@@ -613,49 +426,6 @@ export const ServiceProviders = ({
     useEffect(() => {
         setInitialWorkingHours(businessWorkingHours?.res?.days);
     }, [businessWorkingHours?.res?.days]);
-
-    const additionalHoursModalProps = {
-        open: additionalHoursOpen,
-        setOpen: setAdditionalHoursOpen,
-        providerName: providerName,
-        showBreakOne: showBreakOne,
-        showBreakTwo: showBreakTwo,
-        showBreakThree: showBreakThree,
-        handleAddBreak: handleAddBreak,
-        showAddBreakButton: showAddBreakButton,
-        handleRemoveBreak: handleRemoveBreak,
-        sunday: sunday,
-        monday: monday,
-        tuesday: tuesday,
-        wednesday: wednesday,
-        thursday: thursday,
-        friday: friday,
-        saturday: saturday,
-        startWorking: startWorking,
-        endWorking: endWorking,
-        setStartWorking: setStartWorking,
-        setEndWorking: setEndWorking,
-        setSunday: setSunday,
-        setMonday: setMonday,
-        setTuesday: setTuesday,
-        setWednesday: setWednesday,
-        setThursday: setThursday,
-        setFriday: setFriday,
-        setSaturday: setSaturday,
-        startBreakOne: startBreakOne,
-        endBreakOne: endBreakOne,
-        startBreakTwo: startBreakTwo,
-        endBreakTwo: endBreakTwo,
-        startBreakThree: startBreakThree,
-        endBreakThree: endBreakThree,
-        setStartBreakOne: setStartBreakOne,
-        setEndBreakOne: setEndBreakOne,
-        setStartBreakTwo: setStartBreakTwo,
-        setEndBreakTwo: setEndBreakTwo,
-        setStartBreakThree: setStartBreakThree,
-        setEndBreakThree: setEndBreakThree,
-        handleSaveDaysAndHours: handleSaveDaysAndHours,
-    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
@@ -769,7 +539,10 @@ export const ServiceProviders = ({
                                 </ButtonStyle>
                             </Grid>
                             <Grid item>
-                                <ButtonStyle variant="contained" type="submit" disabled={serviceProviders.length < 1}>
+                                <ButtonStyle
+                                    variant="contained"
+                                    type="submit"
+                                    disabled={serviceProviders.length < 1}>
                                     סיימתי, בוא נמשיך לשלב הבא
                                 </ButtonStyle>
                             </Grid>
@@ -883,32 +656,31 @@ export const ServiceProviders = ({
                                                     <p>
                                                         {w.workingHours.from} - {w.workingHours.to}
                                                     </p>
-
-                                                    {w.breaks.length !== 0 && (
-                                                        <>
-                                                            <strong>הפסקות:</strong>
-
-                                                            {w.breaks[0] && (
-                                                                <p>
-                                                                    {w.breaks[0].from} - {w.breaks[0].to}
-                                                                </p>
-                                                            )}
-
-                                                            {w.breaks[1] && (
-                                                                <p>
-                                                                    {w.breaks[1].from} - {w.breaks[1].to}
-                                                                </p>
-                                                            )}
-
-                                                            {w.breaks[2] && (
-                                                                <p>
-                                                                    {w.breaks[2].from} - {w.breaks[2].to}
-                                                                </p>
-                                                            )}
-                                                        </>
-                                                    )}
                                                 </ServiceProviderCard>
                                             );
+                                        })}
+                                    </ServiceProvidersContainer>
+                                )}
+
+                                {currentProviderData.length > 0 && (
+                                    <ServiceProvidersContainer>
+                                        {currentProviderData.map((workTime: any, index: number) => {
+                                            const translatedDays = translateDaysToHebrew(workTime.days);
+                                            return (
+                                                <ServiceProviderCard key={index}>
+                                                    <strong>ימי פעילות:</strong>
+                                                    <p>
+                                                        {translatedDays?.map((day: string) => {
+                                                            return day + " ";
+                                                        })}
+                                                    </p>
+
+                                                    <strong>שעת התחלה וסיום:</strong>
+                                                    <p>
+                                                        {workTime.workingHours.from} - {workTime.workingHours.to}
+                                                    </p>
+                                                </ServiceProviderCard>
+                                            )
                                         })}
                                     </ServiceProvidersContainer>
                                 )}
@@ -925,7 +697,7 @@ export const ServiceProviders = ({
                                             style={{marginRight: "-1.2rem"}}
                                             onClick={() => {
                                                 rootState?.setError("");
-                                                setAdditionalHoursOpen(true)
+                                                setAdditionalHoursOpen(true);
                                             }}
                                         >
                                             <img src={AddIcon} alt="הוספת זמנים לנותן שירות"/>{" "}
@@ -942,60 +714,20 @@ export const ServiceProviders = ({
                                     </Grid>
                                 )}
                             </Grid>
-
-                            {/* Service provider working hours & breaks times */}
-                            <ServiceProvidersContainer item container>
-                                {currentProviderData?.map((serviceProvider: any, index: number) => {
-                                    return (
-                                        <ServiceProviderCard key={index}>
-                                            <strong>ימי פעילות:</strong>
-                                            <p>
-                                                {serviceProvider.days.includes("sunday") && "א "}
-                                                {serviceProvider.days.includes("monday") && "ב "}
-                                                {serviceProvider.days.includes("tuesday") && "ג "}
-                                                {serviceProvider.days.includes("wednesday") && "ד "}
-                                                {serviceProvider.days.includes("thursday") && "ה "}
-                                                {serviceProvider.days.includes("friday") && "ו "}
-                                                {serviceProvider.days.includes("saturday") && "ש "}
-                                            </p>
-
-                                            <strong>שעת התחלה וסיום:</strong>
-                                            <p>
-                                                {serviceProvider.workingHours.from} -{" "}
-                                                {serviceProvider.workingHours.to}
-                                            </p>
-
-                                            {serviceProvider.breaks[0] && <strong>הפסקות:</strong>}
-                                            <p>
-                                                {serviceProvider.breaks[0] &&
-                                                `${serviceProvider.breaks[0].from} - ${serviceProvider.breaks[0].to}`}
-                                            </p>
-                                            <p>
-                                                {serviceProvider.breaks[1] &&
-                                                `${serviceProvider.breaks[1].from} - ${serviceProvider.breaks[1].to}`}
-                                            </p>
-
-                                            <p>
-                                                {serviceProvider.breaks[2] &&
-                                                `${serviceProvider.breaks[2].from} - ${serviceProvider.breaks[2].to}`}
-                                            </p>
-
-                                            <IconButton
-                                                onClick={() => removeWorkTimesCard(index)}
-                                                style={{
-                                                    position: "absolute",
-                                                    left: "1rem",
-                                                    top: "50%",
-                                                    transform: "translateY(-50%)",
-                                                }}
-                                            >
-                                                <img src={TrashIcon} alt="מחיקה"/>
-                                            </IconButton>
-                                        </ServiceProviderCard>
-                                    );
-                                })}
-                            </ServiceProvidersContainer>
                         </Grid>
+
+                        <AdditionalHoursModal
+                            open={additionalHoursOpen}
+                            setOpen={setAdditionalHoursOpen}
+                            checkedDay={checkedDay}
+                            handleChangeDay={handleChangeDay}
+                            disabledDays={disabledDays}
+                            hours={hours}
+                            setHours={setHours}
+                            errors={errors}
+                            onSave={onSave}
+                            handleClose={handleCloseHoursModal}
+                        />
 
                         <Grid container style={{margin: "2rem 0 2rem"}}>
                             <Grid item md={12} xs={12}>
@@ -1030,10 +762,13 @@ export const ServiceProviders = ({
                             container
                             justify="center"
                             alignItems="center"
-                            style={{marginTop: "2rem", paddingBottom: "4rem"}}
+                            style={{
+                                marginTop: "2rem",
+                                paddingBottom: '4rem'
+                            }}
                         >
                             <ContinueButton
-                                variant="contained"
+                                variant="outlined"
                                 onClick={handleAddProvider}>
                                 הוספה
                             </ContinueButton>
@@ -1042,12 +777,10 @@ export const ServiceProviders = ({
                 )}
             </div>
 
-            <ServiceProvidersInfoDialog
-                open={dialogOpen}
-                setDialogOpen={setDialogOpen}
-            />
-
-            <AdditionalHoursModal {...additionalHoursModalProps} />
+            {/*<ServiceProvidersInfoDialog*/}
+            {/*    open={dialogOpen}*/}
+            {/*    setDialogOpen={setDialogOpen}*/}
+            {/*/>*/}
 
             <Dialog
                 TransitionComponent={Transition}

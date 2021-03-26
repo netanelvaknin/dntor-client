@@ -52,7 +52,7 @@ export const WorkingHours = ({
         const errors: any[] = [];
         const atleastOneCheckedDay = Object.entries(checkedDay).some(([key, value]: any) => {
             return value;
-        })
+        });
 
         if (atleastOneCheckedDay) {
             Object.entries(hours).forEach(([, value]: any) => {
@@ -117,6 +117,7 @@ export const WorkingHours = ({
     };
 
     useEffect(() => {
+        // Insert previous data from server to the form
         if (initialWorkTimesData) {
             let data = {};
             let newCheckedDays: any = {};

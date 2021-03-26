@@ -3,12 +3,20 @@ import {Grid} from "@material-ui/core";
 import {DayCheckbox} from "../WorkingHoursStyle";
 
 interface DaysProps {
+    title?: string;
     checkedDay: any;
     handleChange: any;
     register?: any;
+    disabledDays?: any;
 }
 
-const Days = ({register, checkedDay, handleChange}: DaysProps) => {
+const Days = ({
+                  title = 'נא לסמן את הימים בהם העסק עובד',
+                  register,
+                  checkedDay,
+                  handleChange,
+                  disabledDays
+}: DaysProps) => {
     return (
         <Grid
             md={6}
@@ -28,7 +36,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                 direction="column"
                 style={{marginBottom: "3rem"}}
             >
-                <Grid item>נא לסמן את הימים בהם העסק עובד</Grid>
+                <Grid item>{title}</Grid>
                 <Grid item style={{maxWidth: "28rem"}}>
                     <DayCheckbox
                         value={checkedDay.sunday}
@@ -36,6 +44,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         labelPlacement="top"
                         name="sunday"
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.sunday}
                     />
                     <DayCheckbox
                         value={checkedDay.monday}
@@ -44,6 +53,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         name="monday"
                         register={register}
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.monday}
                     />
                     <DayCheckbox
                         value={checkedDay.tuesday}
@@ -52,6 +62,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         name="tuesday"
                         register={register}
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.tuesday}
                     />
                     <DayCheckbox
                         value={checkedDay.wednesday}
@@ -60,6 +71,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         name="wednesday"
                         register={register}
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.wednesday}
                     />
                     <DayCheckbox
                         value={checkedDay.thursday}
@@ -68,6 +80,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         name="thursday"
                         register={register}
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.thursday}
                     />
                     <DayCheckbox
                         value={checkedDay.friday}
@@ -76,6 +89,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         name="friday"
                         register={register}
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.friday}
                     />
                     <DayCheckbox
                         value={checkedDay.saturday}
@@ -84,6 +98,7 @@ const Days = ({register, checkedDay, handleChange}: DaysProps) => {
                         name="saturday"
                         register={register}
                         onChange={handleChange}
+                        disabled={disabledDays && disabledDays.saturday}
                     />
                 </Grid>
             </Grid>

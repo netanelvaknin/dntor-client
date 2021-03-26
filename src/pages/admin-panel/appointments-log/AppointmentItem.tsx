@@ -24,22 +24,22 @@ const AppointmentItem = ({
                         expandable
                         cardTitle={
                             <div style={{display: "flex", flexDirection: "column"}}>
-                                <HourText>{moment(appointment.from).format('HH:mm')}-{moment(appointment.to).format('HH:mm')}</HourText>
-                                <span>{appointment.customerName}</span>
+                                <HourText>{moment(appointment?.from).format('HH:mm')}-{moment(appointment?.to).format('HH:mm')}</HourText>
+                                <span>{appointment?.customerName}</span>
                             </div>
                         }>
                         <div style={{display: "flex", flexDirection: "column", width: '100%'}}>
                             <PhoneNumber
-                                href={`tel: ${appointment.customerPhone}`}>{appointment.customerPhone}</PhoneNumber>
+                                href={`tel: ${appointment?.customerPhone}`}>{appointment?.customerPhone}</PhoneNumber>
 
                             <div>
                                 <span style={{fontWeight: "bold"}}>שירות: </span>
-                                <span>{appointment.serviceId.serviceName}</span>
+                                <span>{appointment?.serviceId?.serviceName}</span>
                             </div>
 
                             <div>
                                 <span style={{fontWeight: "bold"}}>נותנ\ת שירות: </span>
-                                <span>{appointment.spId.fullName}</span>
+                                <span>{appointment?.spId?.fullName}</span>
                             </div>
 
                             {appointment.notes && <div>
