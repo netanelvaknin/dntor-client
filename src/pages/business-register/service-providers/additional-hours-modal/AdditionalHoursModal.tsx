@@ -1,6 +1,5 @@
 import React from "react";
-import {Dialog, Grid, IconButton, makeStyles,} from "@material-ui/core";
-import closeIcon from "../../../../assets/icons/x_icon.svg";
+import {Dialog, Grid, makeStyles,} from "@material-ui/core";
 import {AdditionalHoursModalProps} from "./AdditionalHoursModalInterface";
 import {Transition} from "../ServiceProviders";
 import Days from "../../working-hours/days/Days";
@@ -24,12 +23,10 @@ export const AdditionalHoursModal = ({
                                          setOpen,
                                          checkedDay,
                                          handleChangeDay,
-                                         disabledDays,
                                          hours,
                                          setHours,
                                          errors,
                                          onSave,
-                                         handleClose
                                      }: AdditionalHoursModalProps) => {
     const classes = useDialogStyles();
     const {register} = useForm();
@@ -41,19 +38,12 @@ export const AdditionalHoursModal = ({
             fullScreen
             TransitionComponent={Transition}
         >
-            <IconButton
-                onClick={handleClose}
-                style={{position: "absolute", left: "1rem", top: "1rem"}}
-            >
-                <img src={closeIcon} alt="סגור חלון"/>
-            </IconButton>
             <div>
                 <Days
                     title="מהם ימי הפעילות של נותן השירות ?"
                     register={register}
                     checkedDay={checkedDay}
                     handleChange={handleChangeDay}
-                    disabledDays={disabledDays}
                 />
 
                 <Hours

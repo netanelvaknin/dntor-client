@@ -44,7 +44,7 @@ export const BusinessServices = ({
   const requestBuilder = useRequestBuilder();
   const rootState = useContext(rootContext);
 
-  const [duration, setDuration] = useState<any>();
+  const [duration, setDuration] = useState<any>({hours: '00', minutes: '00'});
   const [services, setServices] = useState<any>([]);
   const [canAdd, setCanAdd] = useState(false);
   const serviceName = watch("service_name");
@@ -59,19 +59,7 @@ export const BusinessServices = ({
       if (serviceName && (duration.hours > 0 || duration.minutes > 0)) {
         rootState?.setError("");
         const { hours, minutes } = duration;
-        let finalDuration = "";
-
-        if (hours.toString().length < 2) {
-          finalDuration = `0${hours}:`;
-        } else {
-          finalDuration = `${hours}:`;
-        }
-
-        if (minutes.toString().length < 2) {
-          finalDuration = `${finalDuration}0${minutes}`;
-        } else {
-          finalDuration = `${finalDuration}${minutes}`;
-        }
+        const finalDuration = `${hours}:${minutes}`;
 
         setServices([
           ...services,
@@ -90,6 +78,8 @@ export const BusinessServices = ({
           service_name: "",
           service_price: "",
         });
+
+        setDuration({hours: '00', minutes: '00'})
       } else {
         rootState?.setError("נא לבדוק שמילאת את שם ומשך השירות");
       }
@@ -116,7 +106,7 @@ export const BusinessServices = ({
     } else {
       setCanAdd(false);
     }
-  }, [serviceName]);
+  }, [serviceName, duration]);
 
   const onSubmit = async () => {
     const servicesCopy = services.filter((service: any) => {
@@ -195,7 +185,7 @@ export const BusinessServices = ({
 
             <TextField
               control={control}
-              label="מחיר השירות (בשקלים)"
+              label="מחיר השירות (ספרות בלבד)"
               inputRef={servicePriceRef}
               type="number"
               helperText={
@@ -218,8 +208,13 @@ export const BusinessServices = ({
               alignItems="center"
               style={{ marginTop: "3rem" }}
             >
-              <DurationText>קביעת משך התור</DurationText>
-              <DurationSelector onChange={(value: any) => setDuration(value)} />
+              <DurationText>משך התור :</DurationText>
+              <DurationSelector
+                  value={duration}
+                  onChange={(hours, minutes) => {
+                    setDuration({ hours, minutes });
+                  }}
+              />
             </Grid>
           </RightGrid>
         )}
@@ -351,7 +346,7 @@ export const BusinessServices = ({
           </Grid>
         )}
 
-        <Grid container style={{ margin: "2rem 0 0rem" }}>
+        <Grid container style={{ margin: "2rem 0 2rem" }}>
           <Grid item md={12} xs={12}>
             {rootState?.error && (
               <Alert

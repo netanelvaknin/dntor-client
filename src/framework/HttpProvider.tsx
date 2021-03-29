@@ -53,7 +53,7 @@ export const HttpProvider = ({children}: HttpProviderProps) => {
 
     return (
         // @ts-ignore
-        <Provider url="https://dev.dntor.com" options={options}>
+        <Provider url="http://devapi.fastor.co.il" options={options}>
             {children}
         </Provider>
     );

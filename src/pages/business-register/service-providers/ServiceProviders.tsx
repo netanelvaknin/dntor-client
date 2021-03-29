@@ -1,6 +1,6 @@
 import React, {forwardRef, useContext, useEffect, useState} from "react";
 import {Dialog, Grid, IconButton, Slide, Typography} from "@material-ui/core";
-import ServiceProvidersInfoDialog from "./service-providers-info-dialog/ServiceProvidersInfoDialog";
+// import ServiceProvidersInfoDialog from "./service-providers-info-dialog/ServiceProvidersInfoDialog";
 import AdditionalHoursModal from "./additional-hours-modal/AdditionalHoursModal";
 import {translateDaysToEnglish, translateDaysToHebrew} from '../../../utils/functions';
 import {Button, Checkbox, TextField} from "../../../ui/index";
@@ -80,7 +80,6 @@ export const ServiceProviders = ({
         friday: false,
         saturday: false,
     });
-    const [disabledDays, setDisabledDays] = useState({})
     const [hours, setHours] = useState<any>({});
 
     const providerName = watch("provider_name");
@@ -165,7 +164,6 @@ export const ServiceProviders = ({
                             saturday: false,
                         });
 
-                        setDisabledDays({});
                         setHours({});
                     } else {
                         rootState?.setError('לא ניתן להוסיף יותר מ-5 נותני שירות לעסק אחד')
@@ -205,8 +203,14 @@ export const ServiceProviders = ({
 
     const validate = (hours: any) => {
         const errors: any[] = [];
+
+        const businessWorkingDays = translateDaysToEnglish(initialWorkingHours?.map((wTime: any) => wTime.days[0]));
         const atleastOneCheckedDay = Object.entries(checkedDay).some(([key, value]: any) => {
             return value;
+        });
+
+        const includesNonWorkingDay = Object.entries(hours).some(([key, value]: any) => {
+            return !businessWorkingDays.includes(key);
         })
 
         if (atleastOneCheckedDay) {
@@ -234,46 +238,38 @@ export const ServiceProviders = ({
         } else {
             errors.push('נא לסמן לפחות יום עבודה אחד');
         }
+
+        if (includesNonWorkingDay) {
+            errors.push('אחד מימי העבודה שנבחרו לא קיימים בימי העבודה שהוגדרו לעסק.');
+        }
         return errors;
     }
 
+    const selectedDays: any = [];
+
     const onSave = async () => {
         const errors = validate(hours);
-        const selectedDays: any = [];
 
         if (errors.length <= 0) {
             setErrors([]);
 
-            Object.keys(hours).forEach((key) => {
-                selectedDays.push({
-                    days: [key],
-                    workingHours: {
-                        from: hours[key].from,
-                        to: hours[key].to
-                    },
-                    breaks: [
-                        ...hours[key].breaks
-                    ]
-                })
-            });
+            Object.entries(checkedDay).forEach(([key, value]) => {
+                if (value) {
+                    selectedDays.push({
+                        days: [key],
+                        workingHours: {
+                            from: hours[key].from,
+                            to: hours[key].to
+                        },
+                        breaks: [
+                            ...hours[key].breaks
+                        ]
+                    });
 
-
-            // Making sure that when user opens the modal for 2nd time
-            // The hours will not be duplicated
-            const finalResult: any = [];
-            selectedDays.forEach((selected: any) => {
-                if (currentProviderData.length === 0) {
-                    finalResult.push(selected);
-                } else {
-                    currentProviderData.forEach((data: any) => {
-                        if (data.days[0] !== selected.days[0]) {
-                            finalResult.push(selected);
-                        }
-                    })
+                    setCurrentProviderData(selectedDays);
                 }
             });
 
-            setCurrentProviderData(finalResult);
             handleCloseHoursModal();
         } else {
             setErrors(errors);
@@ -282,16 +278,6 @@ export const ServiceProviders = ({
 
     const handleCloseHoursModal = () => {
         setErrors([]);
-        let newDisabledDays: any = {};
-        Object.entries(checkedDay).forEach(
-            ([key, value]) => {
-                if (value) {
-                    newDisabledDays[key] = value;
-                }
-            }
-        );
-
-        setDisabledDays(newDisabledDays);
         setAdditionalHoursOpen(false);
     }
 
@@ -300,7 +286,6 @@ export const ServiceProviders = ({
             setCurrentProviderData([]);
             setConfirmationDialogOpen(false);
             setCurrentProviderData([]);
-            setDisabledDays({});
             setHours({});
             setCheckedDay({
                 sunday: false,
@@ -721,12 +706,10 @@ export const ServiceProviders = ({
                             setOpen={setAdditionalHoursOpen}
                             checkedDay={checkedDay}
                             handleChangeDay={handleChangeDay}
-                            disabledDays={disabledDays}
                             hours={hours}
                             setHours={setHours}
                             errors={errors}
                             onSave={onSave}
-                            handleClose={handleCloseHoursModal}
                         />
 
                         <Grid container style={{margin: "2rem 0 2rem"}}>

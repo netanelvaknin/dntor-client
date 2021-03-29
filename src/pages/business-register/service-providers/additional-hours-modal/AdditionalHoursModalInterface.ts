@@ -7,6 +7,4 @@ export interface AdditionalHoursModalProps {
     setHours: any;
     errors: any;
     onSave: any;
-    disabledDays: any;
-    handleClose: any;
   }

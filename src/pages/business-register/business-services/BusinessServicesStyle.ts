@@ -38,10 +38,11 @@ export const LeftGrid = styled(Grid)`
     }
 `;
 
-export const DurationText = styled.span`
+export const DurationText = styled.p`
     font-size: 1.8rem;
-    margin-left: 6rem;
     margin-bottom: 1rem;
+    margin-left: 2rem;
+    display: block;
 `;
 
 export const ServiceCard = styled(Card)`

@@ -1,52 +1,100 @@
-import { useState, useEffect } from "react";
-import DurationPicker from "react-duration-picker";
-import { DurationSelectorContainer } from "./DurationSelectorStyle";
+import {hours, minutes} from './duration-data';
+import {IconButton} from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import {TimeItem} from './DurationSelectorStyle';
 
-// Needs followup in this link for fix "unable to preventDefault... " error:
-// https://github.com/flurmbo/react-duration-picker/issues/41
-
-interface DurationSelectorProps {
-  onChange: any;
+interface ValueProps {
+    hours: string,
+    minutes: string
 }
 
-export const DurationSelector = ({ onChange }: DurationSelectorProps) => {
-  const [state, setState] = useState<any>();
+interface DurationSelectorProps {
+    value: ValueProps;
+    className?: string;
+    onChange: (h: string, m: string) => void;
+}
 
-  const onDuartionChange = (duration: any) => {
-    setState(duration);
+export const DurationSelector = ({
+                                     value,
+                                     className,
+                                     onChange
+                                 }: DurationSelectorProps) => {
+    return (
+        <div className={className} style={{display: 'flex', alignItems: 'center'}}>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                    <IconButton
+                        type="button"
+                        onClick={() => {
+                            const index = minutes.findIndex(
+                                (minute) => value.minutes === minute
+                            );
 
-    if (onChange) {
-      onChange(state);
-    }
-  };
+                            if (onChange && minutes[index + 1] !== minutes[minutes.length]) {
+                                onChange(value.hours, minutes[index + 1]);
+                            }
+                        }}
+                    >
+                        <AddIcon/>
+                    </IconButton>
+                    <IconButton
+                        type="button"
+                        onClick={() => {
+                            const index = minutes.findIndex(
+                                (minute) => value.minutes === minute
+                            );
 
-  useEffect(() => {
-    // Change language from english to hebrew (No support)
+                            if (onChange && minutes[index - 1] !== minutes[0 - 1]) {
+                                onChange(value.hours, minutes[index - 1]);
+                            }
+                        }}
+                    >
+                        <RemoveIcon/>
+                    </IconButton>
+                </div>
+                <TimeItem>
+                    <p style={{fontSize: '1.3rem'}}>דקות</p>
+                    <p style={{fontSize: '2rem'}}>{value.minutes}</p>
+                </TimeItem>
+            </div>
 
-    setTimeout(() => {
-      const hoursColumn = document.querySelectorAll(".rdp-text-overlay div")[0];
-      const minutesColumn = document.querySelectorAll(
-        ".rdp-text-overlay div"
-      )[1];
+            <strong>:</strong>
 
-      // Stupid library changing the value names after some ms
-      // So I override it after 100ms
-      if (hoursColumn && minutesColumn) {
-        hoursColumn.innerHTML = "שעות";
-        minutesColumn.innerHTML = "דקות";
-      }
-    }, 500);
-  });
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <TimeItem>
+                    <p style={{fontSize: '1.3rem'}}>שעות</p>
+                    <p style={{fontSize: '2rem'}}>{value.hours}</p>
+                </TimeItem>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                    <IconButton
+                        type="button"
+                        onClick={() => {
+                            const index = hours.findIndex((hour) => value.hours === hour);
 
-  return (
-    <DurationSelectorContainer>
-      <DurationPicker
-        onChange={onDuartionChange}
-        initialDuration={{ hours: 0, minutes: 0, seconds: 0 }}
-        maxHours={23}
-      />
-    </DurationSelectorContainer>
-  );
+                            if (onChange && hours[index + 1] !== hours[hours.length]) {
+                                onChange(hours[index + 1], value.minutes);
+                            }
+                        }}
+                    >
+                        <AddIcon/>
+                    </IconButton>
+                    <IconButton
+                        type="button"
+                        onClick={() => {
+                            const index = hours.findIndex((hour) => value.hours === hour);
+
+                            if (onChange && hours[index - 1] !== hours[0 - 1]) {
+                                onChange(hours[index - 1], value.minutes);
+                            }
+                        }}
+                    >
+                        <RemoveIcon/>
+                    </IconButton>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default DurationSelector;
